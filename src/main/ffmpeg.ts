@@ -67,7 +67,8 @@ export interface FfmpegResult {
  *   `totalDurationSec` is provided.
  * - Throttles `onProgress` callbacks to ~200 ms.
  * - On `signal.abort`: kills the subprocess and rejects.
- * - On non-zero exit: rejects with the last 500 characters of stderr.
+ * - On non-zero exit: rejects with a cleaned, human-readable error
+ *   extracted from stderr (see `formatFfmpegError`).
  */
 export async function runFfmpeg(
   args: string[],
@@ -147,10 +148,63 @@ export async function runFfmpeg(
       if (code === 0) {
         resolve({ stderr })
       } else {
-        reject(new Error(`ffmpeg exited ${code}: ${stderr.slice(-500)}`))
+        reject(new Error(`ffmpeg exited ${code}: ${formatFfmpegError(stderr)}`))
       }
     })
   })
+}
+
+/**
+ * Extract a concise, human-readable error message from raw ffmpeg stderr.
+ *
+ * ffmpeg writes progress updates (carriage returns), overwrite markers
+ * (backspaces) and ANSI color codes to stderr, so the raw tail is garbled
+ * and full of noise when shown to users (e.g. "tream #0:0:Audio:fac").
+ * This function:
+ *   1. Strips ANSI escape sequences.
+ *   2. Resolves backspace characters (`\b` deletes the preceding char).
+ *   3. Splits progress-update lines on `\r`.
+ *   4. Prefers the first line that actually looks like an error, falling
+ *      back to the last meaningful line when nothing error-like is found.
+ */
+export function formatFfmpegError(stderr: string): string {
+  // 1. Strip ANSI escape sequences (colors, cursor moves)
+  let clean = stderr.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '')
+
+  // 2. Resolve backspaces: \b deletes the preceding character
+  const resolved: string[] = []
+  for (const ch of clean) {
+    if (ch === '\b') {
+      resolved.pop()
+    } else {
+      resolved.push(ch)
+    }
+  }
+  clean = resolved.join('')
+
+  // 3. Split into logical lines (ffmpeg uses \r to overwrite progress)
+  const lines = clean
+    .split(/\r\n|\r|\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+
+  // 4. Drop noise/progress lines and the generic "Conversion failed!" trailer
+  const informative = lines.filter(
+    (l) =>
+      !/^(size=|time=|bitrate=|speed=|frame=|fps=|stream mapping|press \[q\]|configuration:|built with|ffmpeg version|  --)/i.test(l) &&
+      !/^conversion failed!?$/i.test(l)
+  )
+
+  // 5. Prefer the first line that looks like a real error (root cause
+  //    usually appears before the cascade of follow-up failures)
+  const errorLines = informative.filter((l) =>
+    /error|invalid|cannot|unable|could not|failed|no such|not found|unknown|corrupt|does not contain|no streams|no packets|nothing was written|permission|denied/i.test(
+      l
+    )
+  )
+  const picked = errorLines.length > 0 ? errorLines[0] : informative[informative.length - 1]
+  const message = picked || 'unknown ffmpeg error'
+  return message.length > 300 ? message.slice(0, 300) + '…' : message
 }
 
 // ---------------------------------------------------------------------------

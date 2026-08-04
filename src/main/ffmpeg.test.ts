@@ -11,7 +11,7 @@ vi.mock('child_process', () => ({
 }))
 
 import { spawn } from 'child_process'
-import { runFfmpeg, probeDuration, run, extractLyrics } from './ffmpeg'
+import { runFfmpeg, probeDuration, run, extractLyrics, formatFfmpegError } from './ffmpeg'
 
 // Helper to create a mock child process
 function createMockProcess(): EventEmitter & { stdout: EventEmitter; stderr: EventEmitter; kill: ReturnType<typeof vi.fn> } {
@@ -528,6 +528,56 @@ describe('run (high-level conversion)', () => {
     const metaIdx = args.indexOf('-metadata')
     expect(metaIdx).toBeGreaterThanOrEqual(0)
     expect(args[metaIdx + 1]).toContain('lyrics=line1')
+  })
+})
+
+describe('formatFfmpegError', () => {
+  it('should strip ANSI escape sequences', () => {
+    const input = '\u001b[31mError: something failed\u001b[0m'
+    expect(formatFfmpegError(input)).toBe('Error: something failed')
+  })
+
+  it('should resolve backspace characters (in-place progress overwrites)', () => {
+    // ffmpeg overwrites digits in place with \b; the erased chars are gone
+    const input = 'Error opening input: 12\b\bwrong.mp3'
+    expect(formatFfmpegError(input)).toBe('Error opening input: wrong.mp3')
+  })
+
+  it('should split progress-update lines on carriage returns', () => {
+    const input = 'frame=   10 size=0kB\rframe=   20 size=1kB\rInvalid data found when processing input'
+    const result = formatFfmpegError(input)
+    expect(result).toBe('Invalid data found when processing input')
+  })
+
+  it('should prefer the root-cause error line over the final trailer', () => {
+    const input = [
+      'Cannot determine format of input stream 0:0 after EOF',
+      'Error marking filters as finished',
+      'Error while filtering: Invalid data found when processing input',
+      'size= 0kB time=N/A bitrate=N/A speed=N/A',
+      'Conversion failed!'
+    ].join('\n')
+    const result = formatFfmpegError(input)
+    expect(result).toBe('Cannot determine format of input stream 0:0 after EOF')
+  })
+
+  it('should drop noise lines and fall back to the last meaningful line', () => {
+    const input = [
+      'Press [q] to stop, [?] for help',
+      'Stream #0:0: Audio: flac, 44100 Hz, stereo',
+      'Output #0, mp3, to output.mp3',
+      'size= 0kB time=N/A bitrate=N/A speed=N/A'
+    ].join('\n')
+    const result = formatFfmpegError(input)
+    expect(result).toBe('Output #0, mp3, to output.mp3')
+  })
+
+  it('should return a fallback message for empty stderr', () => {
+    expect(formatFfmpegError('')).toBe('unknown ffmpeg error')
+  })
+
+  it('should return a fallback message for whitespace-only stderr', () => {
+    expect(formatFfmpegError('   \n  ')).toBe('unknown ffmpeg error')
   })
 })
 

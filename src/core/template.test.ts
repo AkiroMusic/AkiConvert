@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { renderFilenameTemplate, sanitizeFileName, DEFAULT_TEMPLATE } from './template'
+import { renderFilenameTemplate, sanitizeFileName, DEFAULT_TEMPLATE, deriveMetadataFromFilename } from './template'
 
 describe('sanitizeFileName', () => {
   it('should replace illegal Windows chars with underscores', () => {
@@ -79,5 +79,31 @@ describe('renderFilenameTemplate', () => {
 
   it('should use DEFAULT_TEMPLATE', () => {
     expect(DEFAULT_TEMPLATE).toBe('{artist} - {title}')
+  })
+})
+
+describe('deriveMetadataFromFilename', () => {
+  it('should split "Artist - Title" convention', () => {
+    expect(deriveMetadataFromFilename('周杰伦 - 晴天')).toEqual({ artist: '周杰伦', title: '晴天' })
+  })
+
+  it('should split and trim surrounding whitespace', () => {
+    expect(deriveMetadataFromFilename('  Artist  -  Title  ')).toEqual({ artist: 'Artist', title: 'Title' })
+  })
+
+  it('should return null when no separator present', () => {
+    expect(deriveMetadataFromFilename('just_a_title')).toBeNull()
+  })
+
+  it('should return null for an empty artist part', () => {
+    expect(deriveMetadataFromFilename(' - Title')).toBeNull()
+  })
+
+  it('should return null for an empty title part', () => {
+    expect(deriveMetadataFromFilename('Artist - ')).toBeNull()
+  })
+
+  it('should return null for an empty string', () => {
+    expect(deriveMetadataFromFilename('')).toBeNull()
   })
 })

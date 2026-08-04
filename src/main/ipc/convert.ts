@@ -14,7 +14,7 @@ import { tmpdir } from "os"
 import * as ncm from "../../core/ncmDecrypt"
 import * as decoders from "../../core/decoders"
 import { writeID3Tags } from "../../core/id3Writer"
-import { renderFilenameTemplate } from "../../core/template"
+import { renderFilenameTemplate, deriveMetadataFromFilename } from "../../core/template"
 import { run, runFfmpeg, FfmpegOptions, extractLyrics } from "../ffmpeg"
 import { HistoryStore } from "../history"
 import { settingsStore } from "./settings"
@@ -103,6 +103,9 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
       const controller = new AbortController()
       const { filePath } = payload
       let tempDir: string | null = null
+      // Hoisted so the catch block can enrich error messages with decrypt context
+      let isEncrypted = false
+      let decryptionVerified = true
 
       pendingConversions.set(filePath, controller)
 
@@ -142,7 +145,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         sendProgress(0.05)
 
         const ext = extname(filePath).toLowerCase()
-        const isEncrypted = ENCRYPTED_EXTS.has(ext)
+        isEncrypted = ENCRYPTED_EXTS.has(ext)
         const isPlainAudio = PLAIN_AUDIO_EXTS.has(ext)
 
         if (!isEncrypted && !isPlainAudio) {
@@ -190,8 +193,22 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
           songName = basename(filePath, ext)
         }
 
+        // --- Fallback: encrypted cache formats (KGM/KWM/QMC/NCM with empty
+        // metadata) often carry no embedded tags → derive artist/title from
+        // the source filename so outputs aren't "Unknown - Unknown".
+        if (!songName || songName === "Unknown") {
+          const stem = basename(filePath, ext)
+          const derived = deriveMetadataFromFilename(stem)
+          if (derived) {
+            artist = derived.artist
+            songName = derived.title
+          } else {
+            songName = stem
+          }
+        }
+
         // Verify decrypted audio header integrity
-        const decryptionVerified = verifyAudioHeader(audio, sourceFormat)
+        decryptionVerified = verifyAudioHeader(audio, sourceFormat)
         // Compute integrity hash of decrypted audio data
         const audioHash = createHash('md5').update(Buffer.from(audio)).digest('hex')
 
@@ -391,7 +408,15 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
           verified: decryptionVerified && outputVerified
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Unknown error"
+        let message = error instanceof Error ? error.message : "Unknown error"
+
+        // For encrypted formats that produced an invalid audio header, the
+        // failure is almost always a corrupt/truncated source file or a
+        // wrong decryption key — append a human-readable hint to the raw
+        // error so users aren't left staring at cryptic ffmpeg output.
+        if (isEncrypted && !decryptionVerified) {
+          message += " The source file appears to be corrupt or may require a decryption key."
+        }
 
         // Record failure to history
         historyStore.append({

@@ -18,6 +18,27 @@ export interface TemplateVars {
   album: string
 }
 
+/**
+ * Derive fallback artist/title from a source filename that follows the
+ * common "Artist - Title" naming convention.
+ *
+ * Encrypted cache formats (KGM, KWM, QMC, and NCM files with an empty or
+ * corrupt metadata block) often carry no embedded tags, which would
+ * otherwise produce "Unknown - Unknown" output names. Returns `null` when
+ * the filename contains no " - " separator (or only a partial one), so the
+ * caller can fall back to the raw filename itself.
+ */
+export function deriveMetadataFromFilename(
+  fileName: string
+): { artist: string; title: string } | null {
+  const sep = fileName.indexOf(' - ')
+  if (sep <= 0) return null
+  const artist = fileName.slice(0, sep).trim()
+  const title = fileName.slice(sep + 3).trim()
+  if (!artist || !title) return null
+  return { artist, title }
+}
+
 /** Default fallback template when none is configured. */
 export const DEFAULT_TEMPLATE = '{artist} - {title}'
 

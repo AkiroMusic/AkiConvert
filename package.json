@@ -107,6 +107,7 @@
       ],
       "icon": "build/icon.png",
       "category": "public.app-category.utilities",
+      "x64ArchFiles": "Contents/Resources/ffmpeg/darwin/**",
       "fileAssociations": [
         {
           "ext": ".ncm",

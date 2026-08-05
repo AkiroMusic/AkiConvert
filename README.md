@@ -49,6 +49,8 @@ Grab the latest installer from the [Releases](https://github.com/AkiroMusic/form
 | Remove selected files | `Delete` |
 | Select all / Deselect all | `Ctrl+A` (toggles) |
 | Toggle fullscreen | `F11` |
+| Play / Pause audio preview | `Space` |
+| Close context menu | `Escape` |
 
 ---
 
@@ -124,10 +126,6 @@ src/
 ├── core/               # Shared core logic
 │   ├── decoders/       # Per-format decryption implementations
 │   ├── ncmDecrypt.ts   # NetEase Cloud Music (.ncm) decryption
-│   ├── kgmDecrypt.ts   # Kugou (.kgm) decryption
-│   ├── kwmDecrypt.ts   # Kuwo (.kwm) decryption
-│   ├── qmcDecrypt.ts   # QQ Music (.qmc) decryption
-│   ├── decoderRouter.ts# Format detection & decoder dispatch
 │   ├── id3Writer.ts    # ID3v2 tag writer
 │   ├── template.ts     # File name template engine
 │   ├── types.ts        # Shared type definitions

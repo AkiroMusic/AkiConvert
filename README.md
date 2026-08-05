@@ -129,7 +129,7 @@ src/
 │   ├── id3Writer.ts    # ID3v2 tag writer
 │   ├── template.ts     # File name template engine
 │   ├── types.ts        # Shared type definitions
-│   └── convertPipeline.ts # Conversion pipeline orchestration
+│   └── supportedFormats.ts # Format support matrix
 └── preload/            # Electron preload scripts
 ```
 

@@ -10,7 +10,20 @@ permissions:
   contents: write
 
 jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+
   build-win:
+    needs: [quality-gate]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +44,7 @@ jobs:
           if-no-files-found: error
 
   build-mac:
+    needs: [quality-gate]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,8 +64,29 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  build-linux:
+    needs: [quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm install --no-audit --no-fund
+      - run: npx electron-vite build
+      - run: npx electron-builder --linux --publish=never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: release/
+          retention-days: 1
+          if-no-files-found: error
+
   release:
-    needs: [build-win, build-mac]
+    needs: [build-win, build-mac, build-linux]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:

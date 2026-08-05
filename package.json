@@ -1,6 +1,6 @@
 {
   "name": "format-converter",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "description": "Format Converter - Multi-format audio conversion tool",
   "main": "./out/main/index.js",
   "author": "Akiro",
@@ -12,6 +12,7 @@
     "preview": "electron-vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "build:win": "electron-vite build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
@@ -74,21 +75,6 @@
           "description": "QQ音乐 QMC2 文件"
         },
         {
-          "ext": ".mflac",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MFLAC 文件"
-        },
-        {
-          "ext": ".mflac0",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MFLAC0 文件"
-        },
-        {
-          "ext": ".mgg",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MGG 文件"
-        },
-        {
           "ext": ".kgm",
           "name": "Kugou Music Crypted",
           "description": "酷狗音乐 KGM 文件"
@@ -97,11 +83,6 @@
           "ext": ".kgma",
           "name": "Kugou Music Crypted",
           "description": "酷狗音乐 KGMA 文件"
-        },
-        {
-          "ext": ".kgg",
-          "name": "Kugou Music Crypted v5",
-          "description": "酷狗音乐 KGG 文件"
         },
         {
           "ext": ".vpr",
@@ -163,21 +144,6 @@
           "description": "QQ音乐 QMC2 文件"
         },
         {
-          "ext": ".mflac",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MFLAC 文件"
-        },
-        {
-          "ext": ".mflac0",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MFLAC0 文件"
-        },
-        {
-          "ext": ".mgg",
-          "name": "QQ Music Crypted v2",
-          "description": "QQ音乐 MGG 文件"
-        },
-        {
           "ext": ".kgm",
           "name": "Kugou Music Crypted",
           "description": "酷狗音乐 KGM 文件"
@@ -186,11 +152,6 @@
           "ext": ".kgma",
           "name": "Kugou Music Crypted",
           "description": "酷狗音乐 KGMA 文件"
-        },
-        {
-          "ext": ".kgg",
-          "name": "Kugou Music Crypted v5",
-          "description": "酷狗音乐 KGG 文件"
         },
         {
           "ext": ".vpr",

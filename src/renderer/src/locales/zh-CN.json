@@ -68,6 +68,7 @@
   "settings.keyManagement": "密钥管理",
   "settings.kggKeys": "KGG 密钥",
   "settings.kggKeysCount": "已加载 {count} 个密钥",
+  "settings.kggComingSoon": "即将支持（第二阶段）：KGG / MFLAC / MGG 解密暂未生效",
   "settings.qmcEkey": "QMCv2 Ekey",
   "settings.qmcEkeyHint": "输入 QMCv2 解密用的 ekey（可选）",
   "settings.qualitySection": "质量设置",

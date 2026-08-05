@@ -68,6 +68,7 @@
   "settings.keyManagement": "Key Management",
   "settings.kggKeys": "KGG Keys",
   "settings.kggKeysCount": "{count} keys loaded",
+  "settings.kggComingSoon": "Coming soon (Phase 2): KGG / MFLAC / MGG decryption is not active yet",
   "settings.qmcEkey": "QMCv2 Ekey",
   "settings.qmcEkeyHint": "Enter ekey for QMCv2 decryption (optional)",
   "settings.qualitySection": "Quality Settings",

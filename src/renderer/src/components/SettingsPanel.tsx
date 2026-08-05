@@ -1112,6 +1112,9 @@ function SettingsPanel(): JSX.Element {
           <label style={{ display: 'block', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             {t('settings.kggKeys')}
           </label>
+          <div style={{ fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: 'var(--space-2)' }}>
+            {t('settings.kggComingSoon')}
+          </div>
           <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: 'var(--space-3)' }}>
             {t('settings.kggKeysCount', { count: kggKeyCount })}
           </div>

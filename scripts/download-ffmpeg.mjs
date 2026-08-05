@@ -3,13 +3,21 @@
  * Format Converter
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
- * Download bundled FFmpeg/FFprobe binaries from ffbinaries.com.
- * FFmpeg 版本固定为 6.0（缺失时回退 5.1.1），保证构建可复现；
+ * Download bundled FFmpeg/FFprobe binaries from the ffmpeg-static GitHub
+ * releases (eugeneware/ffmpeg-static, tag b6.1.1 → FFmpeg 6.1.1).
+ *
+ * Why not ffbinaries.com?
+ *  - ffbinaries 已停止提供 6.0 / 5.1.1，且从未提供 osx-arm64，
+ *    无法支撑 macOS Universal（x64 + arm64 双架构）构建。
+ *  - ffmpeg-static releases 提供 win32-x64 / darwin-x64 / darwin-arm64 /
+ *    linux-x64 四平台 ffmpeg + ffprobe，资产为 gzip 压缩的裸二进制。
+ *
  * 下载完成后校验二进制魔数（magic bytes）与大小，防止供应链被篡改。
  *
  * Usage:
- *   node scripts/download-ffmpeg.mjs          # current platform only
- *   node scripts/download-ffmpeg.mjs --all     # all platforms (win32, darwin/x64, darwin/arm64, linux)
+ *   node scripts/download-ffmpeg.mjs            # current platform only
+ *   node scripts/download-ffmpeg.mjs --all       # all 4 platforms
+ *   FFMPEG_DOWNLOAD_BASE=<url> node scripts/download-ffmpeg.mjs   # override mirror
  *
  * Binaries are placed in resources/ffmpeg/{platform}/ (darwin 下再分 x64/arm64).
  */
@@ -17,32 +25,34 @@
 import { existsSync, mkdirSync, chmodSync, writeFileSync, statSync, unlinkSync, openSync, readSync, closeSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { gunzipSync } from 'zlib'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
-const FFBINARIES_API = 'https://ffbinaries.com/api/v1/version'
-// 固定 FFmpeg 版本：主版本 6.0，若 6.0 资源缺失则回退 5.1.1
-// （评审项：未固定版本会导致构建不可复现、打包产物静默变化）
-const FF_VERSION = '6.0'
-const FF_VERSION_FALLBACK = '5.1.1'
+// 固定 FFmpeg 版本（ffmpeg-static b6.1.1 → FFmpeg 6.1.1），保证构建可复现
+const RELEASE_TAG = 'b6.1.1'
+const RELEASE_BASE = `https://github.com/eugeneware/ffmpeg-static/releases/download/${RELEASE_TAG}`
+// 允许用镜像覆盖（企业网络 / 国内网络场景），默认直连 GitHub
+const DOWNLOAD_BASE = process.env.FFMPEG_DOWNLOAD_BASE || RELEASE_BASE
 
 // ---------------------------------------------------------------------------
-// Platform mappings
+// Platform mappings（与 src/main/ffmpeg-path.ts 的目录布局保持一致）
 // ---------------------------------------------------------------------------
 
 const PLATFORM_MAP = {
-  'windows-64': { dir: 'win32', ext: '.exe' },
+  'win32-x64':    { dir: 'win32', ext: '.exe' },
   // macOS 按架构拆分：x64 与 arm64 分别存放（Universal 构建需要双架构二进制）
-  'osx-64':     { dir: 'darwin/x64', ext: '' },
-  'osx-arm64':  { dir: 'darwin/arm64', ext: '' },
-  'linux-64':   { dir: 'linux', ext: '' },
+  'darwin-x64':   { dir: 'darwin/x64', ext: '' },
+  'darwin-arm64': { dir: 'darwin/arm64', ext: '' },
+  'linux-x64':    { dir: 'linux', ext: '' },
 }
 
 function currentPlatformCode() {
   const { platform, arch } = process
-  if (platform === 'win32') return 'windows-64'
-  if (platform === 'darwin') return arch === 'arm64' ? 'osx-arm64' : 'osx-64'
-  return 'linux-64'
+  if (platform === 'win32') return 'win32-x64'
+  if (platform === 'darwin') return arch === 'arm64' ? 'darwin-arm64' : 'darwin-x64'
+  if (arch === 'arm64') return 'linux-arm64'
+  return 'linux-x64'
 }
 
 function platformsToDownload(all) {
@@ -51,45 +61,17 @@ function platformsToDownload(all) {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Download & verify helpers
 // ---------------------------------------------------------------------------
 
-async function fetchZipBuffer(url) {
+async function fetchBinaryGz(name, plat) {
+  const url = `${DOWNLOAD_BASE}/${name}-${plat}.gz`
   console.log(`[ffmpeg-download]   fetching ${url}...`)
   const resp = await fetch(url)
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-  return Buffer.from(await resp.arrayBuffer())
-}
-
-async function extractFromZip(zipBuf, name, outPath) {
-  const JSZip = (await import('jszip')).default
-  const zip = await JSZip.loadAsync(zipBuf)
-  const entry = zip.file(name) || zip.file(name.replace('.exe', ''))
-  if (!entry) return false
-  const data = Buffer.from(await entry.async('uint8array'))
-  writeFileSync(outPath, data)
-  try { chmodSync(outPath, 0o755) } catch { /* best-effort */ }
-  return true
-}
-
-// 从 ffbinaries 拉取指定版本的版本信息；请求失败（如该版本不存在）时返回 null
-async function fetchVersionInfo(version) {
-  const url = `${FFBINARIES_API}/${version}`
-  console.log(`[ffmpeg-download] Fetching version info from ${url}...`)
-  const resp = await fetch(url)
-  if (!resp.ok) return null
-  return resp.json()
-}
-
-let fallbackVersionInfoCache = null
-
-// 惰性拉取回退版本（5.1.1）的版本信息，仅当固定版本缺少某平台资源时触发
-async function getFallbackVersionInfo() {
-  if (!fallbackVersionInfoCache) {
-    console.warn(`[ffmpeg-download] ⚠ FFmpeg ${FF_VERSION} 缺少当前平台资源，回退使用 ${FF_VERSION_FALLBACK}`)
-    fallbackVersionInfoCache = await fetchVersionInfo(FF_VERSION_FALLBACK)
-  }
-  return fallbackVersionInfoCache
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${url}`)
+  const gz = Buffer.from(await resp.arrayBuffer())
+  // gzip 解压为裸二进制；解压失败（损坏）直接抛错
+  return gunzipSync(gz)
 }
 
 // 各平台可执行文件魔数（magic bytes）：
@@ -109,12 +91,12 @@ const MAGIC_BYTES = {
 }
 
 // 校验下载的二进制文件：魔数匹配当前平台 + 大小 > 1MB。
-// 任一不通过即删除文件并抛出错误（下载的 FFmpeg 未通过魔数校验），
-// 绝不把未经验证的二进制交给应用使用。
+// 任一不通过即删除文件并抛出错误，绝不把未经验证的二进制交给应用使用。
 function verifyBinaryFile(filePath, platform) {
   // platform 可能是 'darwin/x64' 这类子目录，取第一段作为平台名
   const family = platform.split('/')[0]
   const magics = MAGIC_BYTES[family]
+  if (!magics) throw new Error(`no magic bytes configured for platform family: ${family}`)
 
   const stat = statSync(filePath)
   if (stat.size < 1024 * 1024) {
@@ -141,7 +123,21 @@ function verifyBinaryFile(filePath, platform) {
 // Download one platform
 // ---------------------------------------------------------------------------
 
-async function downloadPlatform(plat, versionInfo) {
+async function saveBinary(name, plat, outPath, platformDir) {
+  if (existsSync(outPath)) {
+    console.log(`[ffmpeg-download] ✓ ${platformDir}/${name} already exists, skipping`)
+    return true
+  }
+  const data = await fetchBinaryGz(name, plat)
+  writeFileSync(outPath, data)
+  try { chmodSync(outPath, 0o755) } catch { /* best-effort */ }
+  // 下载校验：魔数 + 大小，防止拿到损坏或被篡改的二进制
+  verifyBinaryFile(outPath, platformDir)
+  console.log(`[ffmpeg-download] ✓ ${platformDir}/${name} saved (${(data.length / 1024 / 1024).toFixed(1)} MB)`)
+  return true
+}
+
+async function downloadPlatform(plat) {
   const platCfg = PLATFORM_MAP[plat]
   if (!platCfg) {
     console.warn(`[ffmpeg-download] ⚠ Unknown platform code: ${plat}, skipping`)
@@ -150,70 +146,20 @@ async function downloadPlatform(plat, versionInfo) {
 
   const { dir: targetDir, ext: suf } = platCfg
   const outDir = join(ROOT, 'resources', 'ffmpeg', targetDir)
-  let binInfo = versionInfo?.bin?.[plat]
-  // 固定版本 6.0 没有该平台的产物时，回退使用 5.1.1 的产物
-  if (!binInfo?.ffmpeg && versionInfo?.version !== FF_VERSION_FALLBACK) {
-    const fallbackInfo = await getFallbackVersionInfo()
-    const fallbackBin = fallbackInfo?.bin?.[plat]
-    if (fallbackBin?.ffmpeg) {
-      binInfo = fallbackBin
-    }
-  }
-  if (!binInfo?.ffmpeg) {
-    console.warn(`[ffmpeg-download] ⚠ No download URL for ${plat}, skipping`)
-    return false
-  }
-
   if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true })
 
-  const ffmpegName = `ffmpeg${suf}`
-  const ffmpegOut = join(outDir, ffmpegName)
-  let ffmpegZipBuf = null
+  const ffmpegOut = join(outDir, `ffmpeg${suf}`)
+  const ffprobeOut = join(outDir, `ffprobe${suf}`)
 
-  if (existsSync(ffmpegOut)) {
-    console.log(`[ffmpeg-download] ✓ ${targetDir}/${ffmpegName} already exists, skipping`)
-  } else {
-    ffmpegZipBuf = await fetchZipBuffer(binInfo.ffmpeg)
-    const ok = await extractFromZip(ffmpegZipBuf, ffmpegName, ffmpegOut)
-    if (!ok) throw new Error(`Could not find ${ffmpegName} in archive`)
-    // 下载校验：魔数 + 大小，防止拿到损坏或被篡改的二进制
-    verifyBinaryFile(ffmpegOut, targetDir)
-    console.log(`[ffmpeg-download] ✓ ${targetDir}/${ffmpegName} saved`)
-  }
+  await saveBinary('ffmpeg', plat, ffmpegOut, targetDir)
+  await saveBinary('ffprobe', plat, ffprobeOut, targetDir)
 
-  const ffprobeName = `ffprobe${suf}`
-  const ffprobeOut = join(outDir, ffprobeName)
-
-  if (existsSync(ffprobeOut)) {
-    console.log(`[ffmpeg-download] ✓ ${targetDir}/${ffprobeName} already exists, skipping`)
-  } else {
-    let found = false
-    if (ffmpegZipBuf) {
-      found = await extractFromZip(ffmpegZipBuf, ffprobeName, ffprobeOut)
-    } else {
-      const buf = await fetchZipBuffer(binInfo.ffmpeg)
-      found = await extractFromZip(buf, ffprobeName, ffprobeOut)
-    }
-    if (!found && binInfo.ffprobe) {
-      console.log(`[ffmpeg-download]   ffprobe not in ffmpeg archive, downloading separately...`)
-      const buf = await fetchZipBuffer(binInfo.ffprobe)
-      found = await extractFromZip(buf, ffprobeName, ffprobeOut)
-    }
-    if (found) {
-      // ffprobe 同样做魔数 + 大小校验
-      verifyBinaryFile(ffprobeOut, targetDir)
-      console.log(`[ffmpeg-download] ✓ ${targetDir}/${ffprobeName} saved`)
-    } else {
-      console.warn(`[ffmpeg-download] ⚠ Could not find ${targetDir}/${ffprobeName}`)
-    }
-  }
-
-  // Verify
+  // Verify both landed
   const ffmpegOk = existsSync(ffmpegOut)
   const ffprobeOk = existsSync(ffprobeOut)
   if (!ffmpegOk || !ffprobeOk) {
-    if (!ffmpegOk) console.error(`[ffmpeg-download] ❌ ${targetDir}/${ffmpegName} missing`)
-    if (!ffprobeOk) console.error(`[ffmpeg-download] ❌ ${targetDir}/${ffprobeName} missing`)
+    if (!ffmpegOk) console.error(`[ffmpeg-download] ❌ ${targetDir}/ffmpeg${suf} missing`)
+    if (!ffprobeOk) console.error(`[ffmpeg-download] ❌ ${targetDir}/ffprobe${suf} missing`)
     return false
   }
   return true
@@ -227,32 +173,19 @@ async function main() {
   const all = process.argv.includes('--all')
   const targets = platformsToDownload(all)
 
-  console.log(`[ffmpeg-download] Targets: ${targets.join(', ')}`)
-
-  // 固定 FFmpeg 版本（6.0），保证构建可复现；6.0 不可用时整体回退到 5.1.1
-  let versionInfo = await fetchVersionInfo(FF_VERSION)
-  if (!versionInfo) {
-    console.warn(`[ffmpeg-download] ⚠ FFmpeg ${FF_VERSION} 不可用，回退到 ${FF_VERSION_FALLBACK}`)
-    versionInfo = await fetchVersionInfo(FF_VERSION_FALLBACK)
-  }
-  if (!versionInfo) {
-    throw new Error(`Neither FFmpeg ${FF_VERSION} nor ${FF_VERSION_FALLBACK} is available`)
-  }
-  const version = versionInfo.version || FF_VERSION
-  console.log(`[ffmpeg-download] Pinned FFmpeg version: ${version}\n`)
+  console.log(`[ffmpeg-download] Targets: ${targets.join(', ')} (release ${RELEASE_TAG}, FFmpeg 6.1.1)`)
+  console.log(`[ffmpeg-download] Source: ${DOWNLOAD_BASE}\n`)
 
   let allOk = true
   for (const plat of targets) {
-    const ok = await downloadPlatform(plat, versionInfo)
+    const ok = await downloadPlatform(plat)
     if (!ok) allOk = false
   }
 
   if (allOk) {
-    console.log(`\n[ffmpeg-download] ✅ All platforms ready (version ${version})`)
+    console.log(`\n[ffmpeg-download] ✅ All platforms ready (${RELEASE_TAG})`)
   } else {
     console.error(`\n[ffmpeg-download] ❌ Some downloads failed`)
-    // Don't exit with error — missing platform URLs (e.g. osx-arm64 on ffbinaries)
-    // are just warnings. The build step will handle FFmpeg absence gracefully.
   }
 }
 

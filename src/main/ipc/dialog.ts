@@ -4,6 +4,7 @@
  */
 
 import { ipcMain, dialog } from 'electron'
+import { ENCRYPTED_EXTS, PLAIN_AUDIO_EXTS } from '../../core/supportedFormats'
 
 export function registerDialogHandlers(): void {
   // Legacy handler — kept for backward compatibility
@@ -22,10 +23,7 @@ export function registerDialogHandlers(): void {
       filters: [
         {
           name: 'All Supported Audio Files',
-          extensions: [
-            'ncm', 'kwm', 'kgm', 'kgma', 'vpr',
-            'qmc0', 'qmc3', 'qmcflac', 'qmcogg', 'qmc1', 'qmc2', 'tkm'
-          ]
+          extensions: ENCRYPTED_EXTS.map((e) => e.slice(1))
         },
         { name: 'All Files', extensions: ['*'] }
       ]
@@ -47,7 +45,7 @@ export function registerDialogHandlers(): void {
       filters: [
         {
           name: 'Audio Files',
-          extensions: ['mp3', 'flac', 'wav', 'm4a', 'aac', 'ogg', 'opus', 'aiff', 'alac', 'wma', 'ape']
+          extensions: PLAIN_AUDIO_EXTS.map((e) => e.slice(1))
         },
         { name: 'All Files', extensions: ['*'] }
       ]

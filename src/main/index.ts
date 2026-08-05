@@ -17,6 +17,7 @@ import { registerShellHandlers } from './ipc/shell'
 import { registerNotificationHandlers } from './ipc/notification'
 import { registerThemeHandlers } from './ipc/theme'
 import { ensureFfmpeg, type FfmpegStatus } from './ffmpeg-check'
+import { getAllSupportedExts } from '../core/supportedFormats'
 import { existsSync } from 'fs'
 
 let mainWindow: BrowserWindow | null = null
@@ -42,12 +43,7 @@ async function refreshFfmpegStatus(): Promise<FfmpegStatus> {
 function extractFilePathsFromArgv(argv: string[]): string[] {
   // First arg is the app path, skip it
   // Subsequent args may be file paths from the shell
-  const supportedExts = new Set([
-    '.ncm', '.kwm', '.kgm', '.kgma', '.vpr',
-    '.qmc0', '.qmc3', '.qmcflac', '.qmcogg', '.qmc1', '.qmc2', '.tkm',
-    '.mflac', '.mflac0', '.mgg',
-    '.kgg'
-  ])
+  const supportedExts = new Set(getAllSupportedExts())
   return argv.slice(1).filter((arg) => {
     const ext = arg.toLowerCase().slice(arg.lastIndexOf('.'))
     return supportedExts.has(ext) && existsSync(arg)

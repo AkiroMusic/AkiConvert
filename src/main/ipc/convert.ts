@@ -18,6 +18,7 @@ import { renderFilenameTemplate, deriveMetadataFromFilename } from "../../core/t
 import { run, runFfmpeg, FfmpegOptions, extractLyrics } from "../ffmpeg"
 import { HistoryStore } from "../history"
 import { settingsStore } from "./settings"
+import { isEncryptedExt, isPlainAudioExt } from '../../core/supportedFormats'
 
 // ---------------------------------------------------------------------------
 // Module-level state
@@ -25,21 +26,6 @@ import { settingsStore } from "./settings"
 
 const pendingConversions = new Map<string, AbortController>()
 const historyStore = new HistoryStore(app.getPath("userData"))
-
-// ---------------------------------------------------------------------------
-// Format classification
-// ---------------------------------------------------------------------------
-
-const ENCRYPTED_EXTS = new Set([
-  ".ncm", ".kwm", ".kgm", ".kgma", ".vpr",
-  ".qmc0", ".qmc3", ".qmcflac", ".qmcogg",
-  ".qmc1", ".qmc2", ".tkm"
-])
-
-const PLAIN_AUDIO_EXTS = new Set([
-  ".mp3", ".flac", ".wav", ".m4a", ".aac",
-  ".ogg", ".opus", ".aiff", ".alac", ".wma", ".ape"
-])
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -145,8 +131,8 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         sendProgress(0.05)
 
         const ext = extname(filePath).toLowerCase()
-        isEncrypted = ENCRYPTED_EXTS.has(ext)
-        const isPlainAudio = PLAIN_AUDIO_EXTS.has(ext)
+        isEncrypted = isEncryptedExt(ext)
+        const isPlainAudio = isPlainAudioExt(ext)
 
         if (!isEncrypted && !isPlainAudio) {
           return { success: false, errorMessage: `Unsupported file format: ${ext}` }
@@ -177,7 +163,12 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
             album = result.album
             coverImage = result.image
           } else {
-            const result = decoders.decryptBuffer(ext, data)
+            const result = decoders.decryptBuffer(ext, data, {
+              ekey: settingsStore.store.qmcEkey,
+              // KGG 接入点：kggKeys 模块目前仅导出 loadKeysMap() 等函数，
+              // 尚未提供符合 KeyProvider 接口（{ find(id), count() }）的封装，
+              // 待 kggKeys 提供 provider 工厂后再在此挂载 keyProvider
+            })
             audio = result.audio
             sourceFormat = result.format
             if (result.songName) songName = result.songName
@@ -284,7 +275,9 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
           // Write cover image to temp file if available
           let coverPath: string | null = null
-          try { coverPath = await writeCoverTemp(coverImage, tempDir!) } catch { /* non-fatal */ }
+          if (coverImage) {
+            try { coverPath = await writeCoverTemp(coverImage, tempDir) } catch { /* non-fatal */ }
+          }
 
           const ffmpegOpts: FfmpegOptions = {
             format: effectiveFormat as FfmpegOptions["format"],
@@ -338,7 +331,9 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
             await writeFile(tempInputPath, Buffer.from(audio))
 
             let coverPath: string | null = null
-            try { coverPath = await writeCoverTemp(coverImage, tempDir!) } catch { /* non-fatal */ }
+            if (coverImage) {
+            try { coverPath = await writeCoverTemp(coverImage, tempDir) } catch { /* non-fatal */ }
+          }
 
             const args: string[] = ['-y', '-i', tempInputPath]
 

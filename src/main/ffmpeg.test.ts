@@ -66,15 +66,28 @@ describe('runFfmpeg', () => {
     await expect(promise).rejects.toThrow('ffmpeg exited 1')
   })
 
-  it('should reject on spawn error', async () => {
+  it('should reject with a friendly message when ffmpeg binary is missing (ENOENT)', async () => {
     const mockProc = createMockProcess()
     vi.mocked(spawn).mockReturnValue(mockProc as any)
 
     const promise = runFfmpeg(['-i', 'input.mp3', 'output.wav'])
 
-    mockProc.emit('error', new Error('ENOENT'))
+    // Real spawn ENOENT errors carry code === 'ENOENT'
+    mockProc.emit('error', Object.assign(new Error('spawn ffmpeg ENOENT'), { code: 'ENOENT' }))
 
-    await expect(promise).rejects.toThrow('ENOENT')
+    await expect(promise).rejects.toThrow('FFmpeg binary not found')
+  })
+
+  it('should reject with the original error on non-ENOENT spawn error', async () => {
+    const mockProc = createMockProcess()
+    vi.mocked(spawn).mockReturnValue(mockProc as any)
+
+    const promise = runFfmpeg(['-i', 'input.mp3', 'output.wav'])
+
+    const err = Object.assign(new Error('spawn ffmpeg EACCES'), { code: 'EACCES' })
+    mockProc.emit('error', err)
+
+    await expect(promise).rejects.toBe(err)
   })
 
   describe('extractLyrics', () => {

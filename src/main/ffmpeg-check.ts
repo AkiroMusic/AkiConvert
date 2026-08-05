@@ -36,10 +36,11 @@ function isPackaged(): boolean {
 // Platform helpers
 // ---------------------------------------------------------------------------
 
+// darwin 需要区分 x64 / arm64，与 ffmpeg-path.ts 的目录布局保持一致
 function platformDir(): string {
   const p = process.platform
   if (p === 'win32') return 'win32'
-  if (p === 'darwin') return 'darwin'
+  if (p === 'darwin') return process.arch === 'arm64' ? 'darwin/arm64' : 'darwin/x64'
   return 'linux'
 }
 

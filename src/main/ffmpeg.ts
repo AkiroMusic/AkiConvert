@@ -131,6 +131,13 @@ export async function runFfmpeg(
 
     // --- lifetime events ---
     proc.on('error', (err: Error) => {
+      // ENOENT means the binary could not be spawned (not installed / not
+      // found) — surface a friendly message instead of the raw error so the
+      // user knows to install FFmpeg or point Settings at its path.
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        reject(new Error('FFmpeg binary not found. Please install FFmpeg or select its path in Settings.'))
+        return
+      }
       reject(err)
     })
 

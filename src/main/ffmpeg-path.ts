@@ -5,6 +5,7 @@
  * Cross-platform bundled FFmpeg binary path resolver.
  * Binaries are stored in resources/ffmpeg/{platform}/ and copied
  * into the app resources during build (electron-builder extraResources).
+ * macOS 在 {platform} 下再按架构拆分：darwin/x64 与 darwin/arm64。
  *
  * Packaged:  {process.resourcesPath}/ffmpeg/{platform}/
  * Dev/test:  {projectRoot}/resources/ffmpeg/{platform}/
@@ -38,9 +39,10 @@ function isPackaged(): boolean {
 // Platform helpers
 // ---------------------------------------------------------------------------
 
-function platformDir(platform: NodeJS.Platform): string {
+// darwin 需要区分 x64 / arm64（Universal 构建同时打包两种架构的二进制）
+function platformDir(platform: NodeJS.Platform, arch: string): string {
   if (platform === 'win32') return 'win32'
-  if (platform === 'darwin') return 'darwin'
+  if (platform === 'darwin') return arch === 'arm64' ? 'darwin/arm64' : 'darwin/x64'
   return 'linux'
 }
 
@@ -53,7 +55,8 @@ function binExt(platform: NodeJS.Platform): string {
 // ---------------------------------------------------------------------------
 
 function bundledDir(): string {
-  const pDir = platformDir(process.platform)
+  // macOS 按运行架构选择 darwin/x64 或 darwin/arm64
+  const pDir = platformDir(process.platform, process.arch)
 
   if (isPackaged()) {
     // Packaged: binaries live inside the app's resources

@@ -242,12 +242,14 @@ function App(): JSX.Element {
 
   return (
     <div className="flex flex-col w-full h-screen" style={{ backgroundColor: 'var(--bg-base)', position: 'relative' }}>
+      <div className="ambient-bg" />
+      <div className="noise-overlay" />
       <StarBackground />
       <TitleBar />
       <div className="flex flex-1 overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
         <Sidebar currentView={currentView} onNavigate={setCurrentView} />
-        <main className="flex-1 flex flex-col overflow-hidden" style={{ maxWidth: '960px', margin: '0 auto', width: '100%' }}>
-          <div className="flex-1 overflow-y-auto" style={{ padding: 'var(--space-6)' }}>
+        <main className="flex-1 flex flex-col overflow-hidden" style={{ maxWidth: '1180px', margin: '0 auto', width: '100%' }}>
+          <div className="flex-1 overflow-y-auto" style={{ padding: 'var(--space-8) var(--space-6)' }}>
             {renderContent()}
           </div>
         </main>
@@ -290,13 +292,12 @@ function App(): JSX.Element {
 
       {/* Footer bar */}
       <div
+        className="glass-surface"
         style={{
-          height: '26px',
+          height: '28px',
           padding: '0 var(--space-4)',
           fontSize: '11px',
           color: 'var(--text-tertiary)',
-          backgroundColor: 'var(--surface-1)',
-          borderTop: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

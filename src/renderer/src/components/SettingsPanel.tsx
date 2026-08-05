@@ -14,7 +14,7 @@ function InfoTooltip({ text }: { text: string }): JSX.Element {
   const iconRef = useRef<HTMLSpanElement>(null)
 
   const commonTipStyle: React.CSSProperties = {
-    padding: '8px 12px',
+    padding: 'var(--space-2) var(--space-3)',
     borderRadius: 'var(--radius-sm)',
     backgroundColor: 'var(--surface-2)',
     border: '1px solid var(--border)',
@@ -24,17 +24,17 @@ function InfoTooltip({ text }: { text: string }): JSX.Element {
     whiteSpace: 'normal',
     width: '260px',
     zIndex: 10000,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    boxShadow: 'var(--shadow-2)',
     pointerEvents: 'none',
     textAlign: 'left',
     fontWeight: 400,
-    fontFamily: 'inherit'
+    fontFamily: 'var(--font-sans)'
   }
 
   return (
     <span
       ref={iconRef}
-      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', marginLeft: '6px', cursor: 'pointer', verticalAlign: 'middle' }}
+      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', marginLeft: 'var(--space-2)', cursor: 'pointer', verticalAlign: 'middle' }}
       onMouseEnter={() => {
         if (iconRef.current) {
           const r = iconRef.current.getBoundingClientRect()
@@ -259,14 +259,16 @@ function SettingsPanel(): JSX.Element {
   }, [setSettings, setFfmpegAvailable, showFfmpegMsg, t])
 
   return (
-    <div style={{ padding: 'var(--space-4) 0' }}>
+    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       <h2
         style={{
-          fontFamily: "'Fraunces', serif",
+          fontFamily: 'var(--font-display)',
           fontSize: '20px',
           color: 'var(--text-primary)',
           marginBottom: 'var(--space-6)',
-          fontWeight: 600
+          fontWeight: 600,
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em'
         }}
       >
         {t('settings.title')}
@@ -278,14 +280,14 @@ function SettingsPanel(): JSX.Element {
           <button
             onClick={handleExportSettings}
             style={{
-              padding: '8px 16px',
+              padding: 'var(--space-2) var(--space-4)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--surface-2)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
               fontSize: '13px',
-              fontFamily: 'inherit'
+              fontFamily: 'var(--font-sans)'
             }}
           >
             {t('settings.exportSettings')}
@@ -293,14 +295,14 @@ function SettingsPanel(): JSX.Element {
           <button
             onClick={handleImportSettings}
             style={{
-              padding: '8px 16px',
+              padding: 'var(--space-2) var(--space-4)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--surface-2)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
               fontSize: '13px',
-              fontFamily: 'inherit'
+              fontFamily: 'var(--font-sans)'
             }}
           >
             {t('settings.importSettings')}
@@ -334,14 +336,14 @@ function SettingsPanel(): JSX.Element {
                 key={opt.value}
                 onClick={() => handleThemeChange(opt.value)}
                 style={{
-                  padding: '4px 10px',
+                  padding: 'var(--space-1) 10px',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                   color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '12px',
-                  fontFamily: 'inherit'
+                  fontFamily: 'var(--font-sans)'
                 }}
               >
                 {opt.label}
@@ -379,17 +381,17 @@ function SettingsPanel(): JSX.Element {
         </label>
         <div
           style={{
-            padding: '10px 14px',
+            padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
-            backgroundColor: ffmpegAvailable ? 'rgba(79, 174, 138, 0.05)' : 'rgba(255, 193, 7, 0.08)',
-            border: `1px solid ${ffmpegAvailable ? 'rgba(79, 174, 138, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
+            backgroundColor: ffmpegAvailable ? 'color-mix(in srgb, var(--success) 5%, transparent)' : 'color-mix(in srgb, var(--warning) 8%, transparent)',
+            border: `1px solid ${ffmpegAvailable ? 'color-mix(in srgb, var(--success) 30%, transparent)' : 'color-mix(in srgb, var(--warning) 30%, transparent)'}`,
             color: 'var(--text-secondary)',
             fontSize: '13px',
             lineHeight: 1.5
           }}
         >
           {/* Status row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
             <span
               style={{
                 display: 'inline-block',
@@ -410,7 +412,7 @@ function SettingsPanel(): JSX.Element {
             )}
           </div>
           {/* Path display */}
-          <div style={{ marginBottom: '8px', fontSize: '12px', color: 'var(--text-tertiary)', wordBreak: 'break-all' }}>
+          <div style={{ marginBottom: 'var(--space-2)', fontSize: '12px', color: 'var(--text-tertiary)', wordBreak: 'break-all' }}>
             {ffmpegAvailable
               ? (settings.customFfmpegPath
                   ? t('ffmpeg.customPath', { path: settings.customFfmpegPath })
@@ -422,7 +424,7 @@ function SettingsPanel(): JSX.Element {
           {/* Feedback message */}
           {ffmpegMessage && (
             <div style={{
-              marginBottom: '8px',
+              marginBottom: 'var(--space-2)',
               fontSize: '12px',
               color: ffmpegMessage.type === 'ok' ? 'var(--success)' : ffmpegMessage.type === 'error' ? 'var(--error)' : 'var(--text-tertiary)'
             }}>
@@ -435,14 +437,14 @@ function SettingsPanel(): JSX.Element {
               onClick={handleSelectFfmpeg}
               title={t('ffmpeg.selectBinaryTitle')}
               style={{
-                padding: '5px 12px',
+                padding: 'var(--space-1) var(--space-3)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--surface-2)',
                 color: 'var(--text-primary)',
                 cursor: 'pointer',
                 fontSize: '12px',
-                fontFamily: 'inherit'
+                fontFamily: 'var(--font-sans)'
               }}
             >
               {t('ffmpeg.selectBinary')}
@@ -466,15 +468,15 @@ function SettingsPanel(): JSX.Element {
                 disabled={disabled}
                 onClick={() => handleSelectPreset(p.id)}
                 style={{
-                  padding: '4px 10px',
+                  padding: 'var(--space-1) 10px',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                   color: disabled ? 'var(--text-tertiary)' : isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: disabled ? 'not-allowed' : 'pointer',
                   opacity: disabled ? 0.4 : 1,
                   fontSize: '12px',
-                  fontFamily: 'inherit'
+                  fontFamily: 'var(--font-sans)'
                 }}
               >
                 {p.name}
@@ -492,13 +494,13 @@ function SettingsPanel(): JSX.Element {
               placeholder={t('preset.saveAsName')}
               style={{
                 flex: 1,
-                padding: '6px 10px',
+                padding: 'var(--space-2) 10px',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--surface-1)',
                 border: '1px solid var(--border)',
                 color: 'var(--text-primary)',
                 fontSize: '12px',
-                fontFamily: 'inherit',
+                fontFamily: 'var(--font-sans)',
                 outline: 'none'
               }}
             />
@@ -506,14 +508,14 @@ function SettingsPanel(): JSX.Element {
               onClick={handleSavePreset}
               disabled={!presetNameInput.trim()}
               style={{
-                padding: '6px 14px',
+                padding: 'var(--space-2) var(--space-3)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--surface-2)',
                 color: presetNameInput.trim() ? 'var(--text-primary)' : 'var(--text-tertiary)',
                 cursor: presetNameInput.trim() ? 'pointer' : 'not-allowed',
                 fontSize: '12px',
-                fontFamily: 'inherit'
+                fontFamily: 'var(--font-sans)'
               }}
             >
               {t('preset.saveAs')}
@@ -531,7 +533,7 @@ function SettingsPanel(): JSX.Element {
           <div
             style={{
               flex: 1,
-              padding: '8px 12px',
+              padding: 'var(--space-2) var(--space-3)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--surface-1)',
               border: '1px solid var(--border)',
@@ -547,14 +549,14 @@ function SettingsPanel(): JSX.Element {
           <button
             onClick={handleBrowseOutputDir}
             style={{
-              padding: '8px 16px',
+              padding: 'var(--space-2) var(--space-4)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--surface-2)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
               fontSize: '13px',
-              fontFamily: 'inherit'
+              fontFamily: 'var(--font-sans)'
             }}
           >
             {t('actions.browse')}
@@ -573,13 +575,13 @@ function SettingsPanel(): JSX.Element {
           onChange={(e) => handleTemplateChange(e.target.value)}
           style={{
             width: '100%',
-            padding: '8px 12px',
+            padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
             backgroundColor: 'var(--surface-1)',
             border: '1px solid var(--border)',
             color: 'var(--text-primary)',
             fontSize: '13px',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: 'var(--font-mono)',
             outline: 'none',
             marginBottom: 'var(--space-2)'
           }}
@@ -590,14 +592,14 @@ function SettingsPanel(): JSX.Element {
               key={preset.value}
               onClick={() => handleTemplateChange(preset.value)}
               style={{
-                padding: '4px 10px',
+                padding: 'var(--space-1) 10px',
                 border: `1px solid ${settings.filenameTemplate === preset.value ? 'var(--accent)' : 'var(--border)'}`,
                 borderRadius: 'var(--radius-sm)',
-                backgroundColor: settings.filenameTemplate === preset.value ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                backgroundColor: settings.filenameTemplate === preset.value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                 color: settings.filenameTemplate === preset.value ? 'var(--accent)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontSize: '12px',
-                fontFamily: "'IBM Plex Mono', monospace"
+                fontFamily: 'var(--font-mono)'
               }}
             >
               {preset.label}
@@ -638,15 +640,15 @@ function SettingsPanel(): JSX.Element {
                   window.formatConverter.setSettings({ outputFormat: opt.value })
                 }}
                 style={{
-                  padding: '4px 10px',
+                  padding: 'var(--space-1) 10px',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                   color: disabled ? 'var(--text-tertiary)' : isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: disabled ? 'not-allowed' : 'pointer',
                   opacity: disabled ? 0.4 : 1,
                   fontSize: '12px',
-                  fontFamily: 'inherit'
+                  fontFamily: 'var(--font-sans)'
                 }}
               >
                 {opt.label}
@@ -715,7 +717,7 @@ function SettingsPanel(): JSX.Element {
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <h3
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: '16px',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
@@ -743,14 +745,14 @@ function SettingsPanel(): JSX.Element {
                       window.formatConverter.setSettings({ bitrate: rate })
                     }}
                     style={{
-                      padding: '4px 10px',
+                      padding: 'var(--space-1) 10px',
                       border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                       borderRadius: 'var(--radius-sm)',
-                      backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                      backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                       color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                       cursor: 'pointer',
                       fontSize: '12px',
-                      fontFamily: "'IBM Plex Mono', monospace"
+                      fontFamily: 'var(--font-mono)'
                     }}
                   >
                     {rate}
@@ -859,14 +861,14 @@ function SettingsPanel(): JSX.Element {
                     window.formatConverter.setSettings({ sampleRate: rate })
                   }}
                   style={{
-                    padding: '4px 10px',
+                    padding: 'var(--space-1) 10px',
                     border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                     borderRadius: 'var(--radius-sm)',
-                    backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                    backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                     color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                     cursor: 'pointer',
                     fontSize: '12px',
-                    fontFamily: "'IBM Plex Mono', monospace"
+                    fontFamily: 'var(--font-mono)'
                   }}
                 >
                   {rate}
@@ -894,14 +896,14 @@ function SettingsPanel(): JSX.Element {
                       window.formatConverter.setSettings({ bitDepth: depth })
                     }}
                     style={{
-                      padding: '4px 10px',
+                      padding: 'var(--space-1) 10px',
                       border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                       borderRadius: 'var(--radius-sm)',
-                      backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                      backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                       color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                       cursor: 'pointer',
                       fontSize: '12px',
-                      fontFamily: "'IBM Plex Mono', monospace"
+                      fontFamily: 'var(--font-mono)'
                     }}
                   >
                     {depth}
@@ -933,7 +935,7 @@ function SettingsPanel(): JSX.Element {
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <h3
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: '16px',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
@@ -1048,14 +1050,14 @@ function SettingsPanel(): JSX.Element {
                   window.formatConverter.setSettings({ duplicateAction: opt.value })
                 }}
                 style={{
-                  padding: '4px 10px',
+                  padding: 'var(--space-1) 10px',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                   color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '12px',
-                  fontFamily: 'inherit'
+                  fontFamily: 'var(--font-sans)'
                 }}
               >
                 {opt.label}
@@ -1069,7 +1071,7 @@ function SettingsPanel(): JSX.Element {
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <h3
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: '16px',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
@@ -1095,13 +1097,13 @@ function SettingsPanel(): JSX.Element {
             placeholder={t('settings.qmcEkeyHint')}
             style={{
               width: '100%',
-              padding: '8px 12px',
+              padding: 'var(--space-2) var(--space-3)',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--surface-1)',
               border: '1px solid var(--border)',
               color: 'var(--text-primary)',
               fontSize: '13px',
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               outline: 'none'
             }}
           />
@@ -1123,14 +1125,14 @@ function SettingsPanel(): JSX.Element {
               onClick={handleImportKgg}
               disabled={kggScanning}
               style={{
-                padding: '8px 16px',
+                padding: 'var(--space-2) var(--space-4)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--surface-2)',
                 color: kggScanning ? 'var(--text-tertiary)' : 'var(--text-primary)',
                 cursor: kggScanning ? 'not-allowed' : 'pointer',
                 fontSize: '13px',
-                fontFamily: 'inherit'
+                fontFamily: 'var(--font-sans)'
               }}
             >
               {kggScanning ? t('settings.scanning') : t('settings.importKggKeys')}
@@ -1139,14 +1141,14 @@ function SettingsPanel(): JSX.Element {
               onClick={handleScanKgg}
               disabled={kggScanning}
               style={{
-                padding: '8px 16px',
+                padding: 'var(--space-2) var(--space-4)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--surface-2)',
                 color: kggScanning ? 'var(--text-tertiary)' : 'var(--text-primary)',
                 cursor: kggScanning ? 'not-allowed' : 'pointer',
                 fontSize: '13px',
-                fontFamily: 'inherit'
+                fontFamily: 'var(--font-sans)'
               }}
             >
               {kggScanning ? t('settings.scanning') : t('settings.scanKggKeys')}

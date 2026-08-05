@@ -314,9 +314,10 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   if (files.length === 0) {
     return (
       <div
-        className="flex flex-col items-center justify-center"
+        className="double-bezel spring-in flex flex-col items-center justify-center"
         style={{
           padding: 'var(--space-8)',
+          marginBottom: 'var(--space-6)',
           color: 'var(--text-tertiary)',
           fontSize: '14px'
         }}
@@ -337,16 +338,16 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   })
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="double-bezel spring-in flex flex-col flex-1" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* FFmpeg unavailable warning */}
       {!ffmpegAvailable && needsFfmpeg && (
         <div
           style={{
-            margin: '0 16px 8px',
-            padding: '8px 12px',
+            margin: '0 var(--space-2) var(--space-2)',
+            padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'rgba(255, 193, 7, 0.08)',
-            border: '1px solid rgba(255, 193, 7, 0.3)',
+            backgroundColor: 'color-mix(in srgb, var(--warning) 8%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)',
             color: 'var(--text-secondary)',
             fontSize: '12px',
             lineHeight: 1.4
@@ -360,8 +361,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       <div
         className="flex items-center"
         style={{
-          padding: '0 16px 8px',
-          gap: '8px',
+          padding: '0 var(--space-2) var(--space-2)',
+          gap: 'var(--space-2)',
           minHeight: '32px'
         }}
       >
@@ -385,15 +386,25 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             height: '28px',
             padding: '0 12px',
             border: 'none',
-            borderRadius: '14px',
+            borderRadius: 'var(--radius-sm)',
             cursor: selectedIds.length === 0 ? 'not-allowed' : 'pointer',
-            fontFamily: 'inherit',
+            fontFamily: 'var(--font-sans)',
             fontSize: '12px',
             fontWeight: 500,
             backgroundColor: 'var(--surface-2)',
             color: selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
             opacity: selectedIds.length === 0 ? 0.5 : 1,
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (selectedIds.length > 0) {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 8%, var(--surface-2))'
+              e.currentTarget.style.color = 'var(--text-primary)'
+            }
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'var(--surface-2)'
+            e.currentTarget.style.color = selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)'
           }}
         >
           {t('actions.removeSelected', { count: selectedIds.length })}
@@ -405,14 +416,20 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               height: '28px',
               padding: '0 12px',
               border: 'none',
-              borderRadius: '14px',
+              borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
-              fontFamily: 'inherit',
+              fontFamily: 'var(--font-sans)',
               fontSize: '12px',
               fontWeight: 500,
               backgroundColor: 'var(--surface-2)',
               color: 'var(--error)',
-              transition: 'all 150ms ease'
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--error) 12%, var(--surface-2))'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-2)'
             }}
           >
             {t('actions.retryAll')}
@@ -441,7 +458,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             style={{
               borderTop: dragOverIndex === index && draggedFileId !== file.id ? '2px solid var(--accent)' : '2px solid transparent',
               marginTop: dragOverIndex === index && draggedFileId !== file.id ? '-2px' : '0',
-              transition: 'border-color 100ms ease, opacity 150ms ease'
+              transition: 'border-color var(--duration-hover) var(--ease-default), opacity var(--duration-hover) var(--ease-default)'
             }}
           >
             <FileItem file={file} index={index} />
@@ -466,17 +483,23 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               height: '40px',
               padding: '0 24px',
               border: 'none',
-              borderRadius: '20px',
+              borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
-              fontFamily: 'inherit',
+              fontFamily: 'var(--font-sans)',
               fontSize: '14px',
               fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               backgroundColor: 'var(--surface-2)',
               color: 'var(--text-primary)',
-              transition: 'all 150ms ease'
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 8%, var(--surface-2))'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-2)'
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -492,17 +515,23 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               height: '40px',
               padding: '0 24px',
               border: 'none',
-              borderRadius: '20px',
+              borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
-              fontFamily: 'inherit',
+              fontFamily: 'var(--font-sans)',
               fontSize: '14px',
               fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               backgroundColor: 'var(--accent)',
-              color: '#12141A',
-              transition: 'all 150ms ease'
+              color: 'var(--bg-base)',
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent)'
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -518,18 +547,24 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               height: '40px',
               padding: '0 24px',
               border: 'none',
-              borderRadius: '20px',
+              borderRadius: 'var(--radius-sm)',
               cursor: !hasPending ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit',
+              fontFamily: 'var(--font-sans)',
               fontSize: '14px',
               fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               backgroundColor: 'var(--accent)',
-              color: '#12141A',
+              color: 'var(--bg-base)',
               opacity: !hasPending ? 0.6 : 1,
-              transition: 'all 150ms ease'
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default), opacity var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              if (hasPending) e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent)'
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -547,17 +582,27 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             height: '40px',
             padding: '0 24px',
             border: '1px solid var(--border)',
-            borderRadius: '20px',
+            borderRadius: 'var(--radius-sm)',
             cursor: 'pointer',
-            fontFamily: 'inherit',
+            fontFamily: 'var(--font-sans)',
             fontSize: '14px',
             fontWeight: 500,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: 'var(--space-2)',
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
-            transition: 'all 150ms ease'
+            transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--text-tertiary)'
+            e.currentTarget.style.color = 'var(--text-primary)'
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--border)'
+            e.currentTarget.style.color = 'var(--text-secondary)'
+            e.currentTarget.style.backgroundColor = 'transparent'
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -573,17 +618,27 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             height: '40px',
             padding: '0 24px',
             border: '1px solid var(--border)',
-            borderRadius: '20px',
+            borderRadius: 'var(--radius-sm)',
             cursor: 'pointer',
-            fontFamily: 'inherit',
+            fontFamily: 'var(--font-sans)',
             fontSize: '14px',
             fontWeight: 500,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: 'var(--space-2)',
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
-            transition: 'all 150ms ease'
+            transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--text-tertiary)'
+            e.currentTarget.style.color = 'var(--text-primary)'
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--border)'
+            e.currentTarget.style.color = 'var(--text-secondary)'
+            e.currentTarget.style.backgroundColor = 'transparent'
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -599,17 +654,23 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               height: '40px',
               padding: '0 24px',
               border: '1px solid var(--accent)',
-              borderRadius: '20px',
+              borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
-              fontFamily: 'inherit',
+              fontFamily: 'var(--font-sans)',
               fontSize: '14px',
               fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               backgroundColor: 'transparent',
               color: 'var(--accent)',
-              transition: 'all 150ms ease'
+              transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--accent) 10%, transparent)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -634,7 +695,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             }}
           >
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
                 {stats.total}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -642,7 +703,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-mono)' }}>
                 {stats.success}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -650,7 +711,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-mono)' }}>
                 {stats.fail}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -676,8 +737,9 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
                 textAlign: 'center',
                 fontSize: '11px',
                 color: 'var(--text-tertiary)',
-                paddingTop: '8px',
-                letterSpacing: '0.3px'
+                paddingTop: 'var(--space-2)',
+                letterSpacing: '0.3px',
+                fontFamily: 'var(--font-mono)'
               }}
             >
               {etaLabel}

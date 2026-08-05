@@ -74,8 +74,8 @@ function ContextMenu({ x, y, items, onClose }: ContextMenuProps): JSX.Element {
         backgroundColor: 'var(--surface-1)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-md)',
-        padding: '4px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)',
+        padding: 'var(--space-1)',
+        boxShadow: 'var(--shadow-3)',
         overflow: 'hidden'
       }}
     >
@@ -87,7 +87,7 @@ function ContextMenu({ x, y, items, onClose }: ContextMenuProps): JSX.Element {
               style={{
                 height: '1px',
                 backgroundColor: 'var(--border)',
-                margin: '4px 4px'
+                margin: 'var(--space-1)'
               }}
             />
           )
@@ -104,26 +104,29 @@ function ContextMenu({ x, y, items, onClose }: ContextMenuProps): JSX.Element {
               }
             }}
             style={{
-              padding: '7px 10px',
+              padding: 'var(--space-2) 10px',
               borderRadius: 'var(--radius-sm)',
               cursor: item.disabled ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               fontSize: '13px',
               fontWeight: 400,
+              fontFamily: 'var(--font-sans)',
               color: item.danger
                 ? 'var(--error)'
                 : item.disabled
                   ? 'var(--text-tertiary)'
                   : 'var(--text-primary)',
-              transition: 'background-color 150ms ease',
+              transition: 'background-color var(--duration-hover) var(--ease-default)',
               opacity: item.disabled ? 0.4 : 1,
               userSelect: 'none'
             }}
             onMouseEnter={(e) => {
               if (!item.disabled) {
-                e.currentTarget.style.backgroundColor = 'var(--surface-2)'
+                e.currentTarget.style.backgroundColor = item.danger
+                  ? 'color-mix(in srgb, var(--error) 10%, transparent)'
+                  : 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
               }
             }}
             onMouseLeave={(e) => {

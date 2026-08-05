@@ -24,16 +24,26 @@ function LanguageSwitcher(): JSX.Element {
     <button
       onClick={toggleLanguage}
       style={{
-        padding: '4px 10px',
+        padding: 'var(--space-1) 10px',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-sm)',
         backgroundColor: 'transparent',
         color: 'var(--text-secondary)',
         cursor: 'pointer',
         fontSize: '12px',
-        fontFamily: "'IBM Plex Mono', monospace",
-        transition: 'all 150ms ease',
-        marginRight: '8px'
+        fontFamily: 'var(--font-mono)',
+        transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)',
+        marginRight: 'var(--space-2)'
+      }}
+      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+        e.currentTarget.style.borderColor = 'var(--accent)'
+        e.currentTarget.style.color = 'var(--accent)'
+        e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--accent) 8%, transparent)'
+      }}
+      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+        e.currentTarget.style.borderColor = 'var(--border)'
+        e.currentTarget.style.color = 'var(--text-secondary)'
+        e.currentTarget.style.backgroundColor = 'transparent'
       }}
       title={t('language.switch')}
     >

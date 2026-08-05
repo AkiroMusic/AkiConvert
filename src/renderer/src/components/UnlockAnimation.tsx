@@ -52,10 +52,10 @@ function UnlockAnimation({ status, progress }: UnlockAnimationProps): JSX.Elemen
   // Waveform icon SVG
   const waveformIcon = (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="10" width="3" height="6" rx="0.5" style={{ transition: 'height 0.15s ease' }} />
-      <rect x="8" y="6" width="3" height="14" rx="0.5" style={{ transition: 'height 0.15s ease' }} />
-      <rect x="13" y="8" width="3" height="10" rx="0.5" style={{ transition: 'height 0.15s ease' }} />
-      <rect x="18" y="4" width="3" height="18" rx="0.5" style={{ transition: 'height 0.15s ease' }} />
+      <rect x="3" y="10" width="3" height="6" rx="0.5" style={{ transition: 'height var(--duration-hover) var(--ease-default)' }} />
+      <rect x="8" y="6" width="3" height="14" rx="0.5" style={{ transition: 'height var(--duration-hover) var(--ease-default)' }} />
+      <rect x="13" y="8" width="3" height="10" rx="0.5" style={{ transition: 'height var(--duration-hover) var(--ease-default)' }} />
+      <rect x="18" y="4" width="3" height="18" rx="0.5" style={{ transition: 'height var(--duration-hover) var(--ease-default)' }} />
     </svg>
   )
 
@@ -110,8 +110,8 @@ function UnlockAnimation({ status, progress }: UnlockAnimationProps): JSX.Elemen
                 width: '3px',
                 height: `${Math.max(4, barHeight)}px`,
                 backgroundColor: 'currentColor',
-                borderRadius: '2px',
-                transition: 'height 0.15s ease'
+                borderRadius: 'var(--radius-sm)',
+                transition: 'height var(--duration-hover) var(--ease-default)'
               }}
             />
           )

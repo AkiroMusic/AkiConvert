@@ -53,21 +53,18 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)'
+        backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, transparent)'
       }}
       onClick={onClose}
     >
       <div
+        className="double-bezel spring-in"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '480px',
           maxWidth: '90vw',
           maxHeight: '80vh',
           padding: 'var(--space-6)',
-          borderRadius: 'var(--radius-lg)',
-          backgroundColor: 'var(--surface-1)',
-          border: '1px solid var(--border)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -77,15 +74,18 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: 'var(--space-4)',
           marginBottom: 'var(--space-4)'
         }}>
           <h2
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: 'var(--font-display)',
               fontSize: '18px',
               fontWeight: 600,
               color: 'var(--text-primary)',
-              margin: 0
+              margin: 0,
+              lineHeight: 1.25,
+              letterSpacing: '-0.01em'
             }}
           >
             {t('lyrics.dialogTitle')}
@@ -106,7 +106,7 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
             border: '1px solid var(--border)',
             minHeight: '120px',
             maxHeight: '50vh',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: 'var(--font-mono)',
             fontSize: '13px',
             lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
@@ -114,11 +114,11 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
           }}
         >
           {loading ? (
-            <div style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '24px' }}>
+            <div style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: 'var(--space-6)' }}>
               {t('status.converting')}...
             </div>
           ) : error ? (
-            <div style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '24px' }}>
+            <div style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: 'var(--space-6)' }}>
               {error}
             </div>
           ) : (
@@ -131,15 +131,22 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
           <button
             onClick={onClose}
             style={{
-              padding: '8px 24px',
+              padding: 'var(--space-2) var(--space-6)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--accent)',
-              color: '#12141A',
+              color: 'var(--bg-base)',
               fontSize: '14px',
               fontWeight: 500,
               cursor: 'pointer',
-              fontFamily: 'inherit'
+              fontFamily: 'var(--font-sans)',
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent)'
             }}
           >
             {t('summary.close')}

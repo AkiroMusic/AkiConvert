@@ -83,9 +83,9 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
 
   const getStatusBg = (): string => {
     switch (file.status) {
-      case 'converting': return 'rgba(201, 162, 75, 0.05)'
-      case 'success': return 'rgba(79, 174, 138, 0.05)'
-      case 'error': return 'rgba(217, 105, 95, 0.05)'
+      case 'converting': return 'color-mix(in srgb, var(--accent) 5%, transparent)'
+      case 'success': return 'color-mix(in srgb, var(--success) 5%, transparent)'
+      case 'error': return 'color-mix(in srgb, var(--error) 5%, transparent)'
       default: return 'transparent'
     }
   }
@@ -164,19 +164,17 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
   return (
     <>
     <div
-      className="flex items-center"
+      className="double-bezel spring-in flex items-center"
       draggable
       data-file-id={file.id}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onContextMenu={handleContextMenu}
       style={{
-        padding: '12px 16px',
+        padding: 'var(--space-3) var(--space-4)',
         backgroundColor: getStatusBg(),
-        borderRadius: 'var(--radius-md)',
-        marginBottom: '8px',
+        marginBottom: 'var(--space-2)',
         border: `1px solid ${getStatusColor()}`,
-        transition: 'all 150ms ease',
         outline: isSelected ? `2px solid var(--accent)` : undefined,
         outlineOffset: '-2px'
       }}
@@ -184,7 +182,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
       {/* Drag handle */}
       <div
         style={{
-          marginRight: '8px',
+          marginRight: 'var(--space-2)',
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
@@ -206,7 +204,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
 
       {/* Checkbox for selection */}
       <div
-        style={{ marginRight: '8px', flexShrink: 0 }}
+        style={{ marginRight: 'var(--space-2)', flexShrink: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -223,7 +221,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
       </div>
 
       {/* Cover image or icon */}
-      <div style={{ marginRight: '12px', flexShrink: 0 }}>
+      <div style={{ marginRight: 'var(--space-3)', flexShrink: 0 }}>
         {file.coverImageBase64 && file.status === 'success' ? (
           <img
             src={`data:image/jpeg;base64,${file.coverImageBase64}`}
@@ -281,15 +279,23 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
         >
           {file.status === 'pending' && (
             <>
-              {`${t('status.pending')}${file.fileSize > 0 ? ' · ' + formatFileSize(file.fileSize) : ''}`}
+              <span>{t('status.pending')}{file.fileSize > 0 ? ' · ' : ''}</span>
+              {file.fileSize > 0 && (
+                <span style={{ fontFamily: 'var(--font-mono)' }}>{formatFileSize(file.fileSize)}</span>
+              )}
               {file.estimatedOutputSize != null && file.estimatedOutputSize > 0 && (
-                <span style={{ marginLeft: '8px', color: 'var(--text-tertiary)' }}>
+                <span style={{ marginLeft: 'var(--space-2)', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
                   {t('sizeEstimate.label', { size: formatFileSize(file.estimatedOutputSize) })}
                 </span>
               )}
             </>
           )}
-          {file.status === 'converting' && `${t('status.converting')} ${Math.round(file.progress * 100)}%`}
+          {file.status === 'converting' && (
+            <span>
+              {t('status.converting')}{' '}
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{Math.round(file.progress * 100)}%</span>
+            </span>
+          )}
           {file.status === 'success' && (
             <>
               <span>{(file.format || '').toUpperCase()} · {file.songName || ''}</span>
@@ -298,6 +304,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
                   style={{
                     fontSize: '11px',
                     color: 'var(--text-tertiary)',
+                    fontFamily: 'var(--font-mono)',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -315,14 +322,14 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
 
         {/* Progress / Unlock animation for converting state */}
         {file.status === 'converting' && (
-          <div className="flex items-center" style={{ marginTop: '6px', gap: '8px' }}>
+          <div className="flex items-center" style={{ marginTop: 'var(--space-2)', gap: 'var(--space-2)' }}>
             <UnlockAnimation status="converting" progress={file.progress} />
             <div
               style={{
                 flex: 1,
                 height: '3px',
                 backgroundColor: 'var(--border)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden'
               }}
             >
@@ -331,8 +338,8 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
                   height: '100%',
                   width: `${Math.round(file.progress * 100)}%`,
                   backgroundColor: 'var(--accent)',
-                  borderRadius: '2px',
-                  transition: 'width 0.2s ease'
+                  borderRadius: 'var(--radius-sm)',
+                  transition: 'width var(--duration-hover) var(--ease-default)'
                 }}
               />
             </div>
@@ -351,7 +358,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
       </div>
 
       {/* Action buttons */}
-      <div className="flex" style={{ gap: '4px', marginLeft: '8px', flexShrink: 0 }}>
+      <div className="flex" style={{ gap: 'var(--space-1)', marginLeft: 'var(--space-2)', flexShrink: 0 }}>
         {file.status === 'success' && (
           <button
             onClick={handlePreview}
@@ -359,14 +366,20 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
               width: '36px',
               height: '36px',
               border: 'none',
-              borderRadius: '50%',
+              borderRadius: 'var(--radius-full)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: 'transparent',
               color: isPlaying ? 'var(--accent)' : 'var(--text-secondary)',
-              transition: 'all 150ms ease'
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
             }}
             title={isPlaying ? t('player.pause') : t('player.play')}
           >
@@ -392,14 +405,14 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
               width: '36px',
               height: '36px',
               border: 'none',
-              borderRadius: '50%',
+              borderRadius: 'var(--radius-full)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: 'transparent',
               color: 'var(--error)',
-              transition: 'all 150ms ease',
+              transition: 'background-color var(--duration-hover) var(--ease-default), opacity var(--duration-hover) var(--ease-default)',
               opacity: 0.7
             }}
             title={t('actions.cancel')}
@@ -419,14 +432,22 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
             width: '36px',
             height: '36px',
             border: 'none',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: 'transparent',
             color: 'var(--text-tertiary)',
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--error) 10%, transparent)'
+            e.currentTarget.style.color = 'var(--error)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = 'var(--text-tertiary)'
           }}
           title={t('actions.clear')}
         >

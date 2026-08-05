@@ -183,7 +183,7 @@ function DropZone(): JSX.Element {
   }, [setOutputDir])
 
   return (
-    <div style={{ marginBottom: 'var(--space-4)' }}>
+    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* Output directory selector */}
       <div
         className="flex items-center"
@@ -215,7 +215,17 @@ function DropZone(): JSX.Element {
             background: 'var(--surface-2)',
             color: 'var(--text-primary)',
             cursor: 'pointer',
-            fontSize: '12px'
+            fontSize: '12px',
+            fontFamily: 'var(--font-sans)',
+            transition: 'background-color var(--duration-hover) var(--ease-default), border-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--text-tertiary)'
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 8%, var(--surface-2))'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = 'var(--border)'
+            e.currentTarget.style.backgroundColor = 'var(--surface-2)'
           }}
         >
           {t('actions.browse')}
@@ -245,11 +255,22 @@ function DropZone(): JSX.Element {
                   padding: '4px 10px',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'rgba(201, 162, 75, 0.1)' : 'transparent',
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
                   color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '12px',
-                  fontFamily: 'inherit'
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'background-color var(--duration-hover) var(--ease-default), border-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.borderColor = 'var(--accent)'
+                  e.currentTarget.style.color = 'var(--accent)'
+                  e.currentTarget.style.backgroundColor = isActive ? 'color-mix(in srgb, var(--accent) 18%, transparent)' : 'color-mix(in srgb, var(--accent) 6%, transparent)'
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.borderColor = isActive ? 'var(--accent)' : 'var(--border)'
+                  e.currentTarget.style.color = isActive ? 'var(--accent)' : 'var(--text-secondary)'
+                  e.currentTarget.style.backgroundColor = isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent'
                 }}
               >
                 {opt.label}
@@ -272,7 +293,7 @@ function DropZone(): JSX.Element {
           padding: '40px 24px',
           textAlign: 'center',
           cursor: isConverting ? 'default' : 'pointer',
-          transition: 'all 150ms ease',
+          transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default)',
           backgroundColor: isDragOver ? 'var(--surface-2)' : 'transparent',
           opacity: isConverting ? 0.5 : 1
         }}
@@ -344,10 +365,10 @@ function FormatBadge({ ext, label, desc, dimmed }: { ext: string; label: string;
     >
       <code
         style={{
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: 'var(--font-mono)',
           fontSize: '11px',
           padding: '1px 5px',
-          borderRadius: '3px',
+          borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--surface-2)',
           color: dimmed ? 'var(--text-tertiary)' : 'var(--accent)'
         }}

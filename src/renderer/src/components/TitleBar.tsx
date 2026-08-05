@@ -9,6 +9,14 @@ import { useAppStore } from '../store/useAppStore'
 import LanguageSwitcher from './LanguageSwitcher'
 import AppIcon from './AppIcon'
 
+const THEME_ORDER: string[] = ['dark', 'light', 'sepia', 'forest', 'ocean', 'lavender']
+
+function nextThemeName(current: string): string {
+  const base = current === 'system' ? 'dark' : current
+  const idx = THEME_ORDER.indexOf(base)
+  return THEME_ORDER[(idx + 1) % THEME_ORDER.length]
+}
+
 function TitleBar(): JSX.Element {
   const { t } = useTranslation()
   const settings = useAppStore((s) => s.settings)
@@ -49,7 +57,7 @@ function TitleBar(): JSX.Element {
   }, [])
 
   const handleToggleTheme = useCallback((): void => {
-    const newTheme = settings.theme === 'dark' ? 'light' : 'dark'
+    const newTheme = nextThemeName(settings.theme)
     setSettings({ theme: newTheme })
     document.documentElement.dataset.theme = newTheme
     window.formatConverter?.setSettings({ theme: newTheme })
@@ -65,12 +73,11 @@ function TitleBar(): JSX.Element {
 
   return (
     <div
+      className="glass-surface"
       style={{
         display: 'flex',
         alignItems: 'center',
-        height: '36px',
-        backgroundColor: 'var(--surface-1)',
-        borderBottom: '1px solid var(--border)',
+        height: '40px',
         WebkitAppRegion: 'drag',
         WebkitUserSelect: 'none',
         flexShrink: 0,
@@ -115,7 +122,7 @@ function TitleBar(): JSX.Element {
           onClick={handleToggleTheme}
           style={{
             width: '36px',
-            height: '36px',
+            height: '40px',
             border: 'none',
             background: 'transparent',
             color: 'var(--text-secondary)',
@@ -124,12 +131,12 @@ function TitleBar(): JSX.Element {
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '12px',
-            transition: 'color 150ms ease'
+            transition: 'color var(--duration-hover) var(--ease-default)'
           }}
-          title={t(settings.theme === 'dark' ? 'theme.light' : 'theme.dark')}
+          title={t('theme.' + nextThemeName(settings.theme))}
         >
           {settings.theme === 'dark' ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="5" />
               <line x1="12" y1="1" x2="12" y2="3" />
               <line x1="12" y1="21" x2="12" y2="23" />
@@ -141,7 +148,7 @@ function TitleBar(): JSX.Element {
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
             </svg>
           ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           )}
@@ -154,7 +161,7 @@ function TitleBar(): JSX.Element {
               onClick={handleMinimize}
               style={{
                 width: '46px',
-                height: '36px',
+                height: '40px',
                 border: 'none',
                 background: 'transparent',
                 color: 'var(--text-secondary)',
@@ -172,7 +179,7 @@ function TitleBar(): JSX.Element {
               onClick={() => window.formatConverter?.toggleMaximize()}
               style={{
                 width: '46px',
-                height: '36px',
+                height: '40px',
                 border: 'none',
                 background: 'transparent',
                 color: 'var(--text-secondary)',
@@ -199,7 +206,7 @@ function TitleBar(): JSX.Element {
               onClick={handleClose}
               style={{
                 width: '46px',
-                height: '36px',
+                height: '40px',
                 border: 'none',
                 background: 'transparent',
                 color: 'var(--text-secondary)',
@@ -208,7 +215,7 @@ function TitleBar(): JSX.Element {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '14px',
-                transition: 'background-color 100ms ease'
+                transition: 'background-color var(--duration-hover) var(--ease-default)'
               }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e81123'; e.currentTarget.style.color = '#fff' }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)' }}

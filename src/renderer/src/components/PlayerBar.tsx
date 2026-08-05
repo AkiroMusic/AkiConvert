@@ -162,16 +162,15 @@ function PlayerBar(): JSX.Element {
 
   return (
     <div
+      className="glass-surface"
       style={{
-        backgroundColor: 'var(--surface-1)',
-        borderTop: '1px solid var(--border)',
-        padding: '12px 24px',
+        padding: 'var(--space-3) var(--space-6)',
         flexShrink: 0
       }}
     >
       <div
         className="flex items-center"
-        style={{ width: '100%', maxWidth: '960px', margin: '0 auto', gap: '9px' }}
+        style={{ width: '100%', maxWidth: '960px', margin: '0 auto', gap: 'var(--space-2)' }}
       >
         {/* Cover */}
         <img
@@ -208,9 +207,9 @@ function PlayerBar(): JSX.Element {
           {/* Progress bar row with inline time display */}
           <div
             className="flex items-center"
-            style={{ gap: '8px', marginTop: '6px' }}
+            style={{ gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}
           >
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '35px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '35px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
               {formatTime(currentTime)}
             </span>
             <div
@@ -219,7 +218,7 @@ function PlayerBar(): JSX.Element {
                 flex: 1,
                 height: '4px',
                 backgroundColor: 'var(--border)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 cursor: 'pointer',
                 position: 'relative'
               }}
@@ -229,12 +228,12 @@ function PlayerBar(): JSX.Element {
                   width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
                   height: '100%',
                   backgroundColor: 'var(--accent)',
-                  borderRadius: '2px',
-                  transition: 'width 0.1s linear'
+                  borderRadius: 'var(--radius-sm)',
+                  transition: 'width var(--duration-hover) var(--ease-default)'
                 }}
               />
             </div>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '35px', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '35px', fontFamily: 'var(--font-mono)' }}>
               {formatTime(duration)}
             </span>
           </div>
@@ -247,7 +246,7 @@ function PlayerBar(): JSX.Element {
             width: '32px',
             height: '32px',
             border: 'none',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -255,7 +254,15 @@ function PlayerBar(): JSX.Element {
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
             flexShrink: 0,
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+            e.currentTarget.style.color = 'var(--text-primary)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = 'var(--text-secondary)'
           }}
           title={t('player.previous')}
         >
@@ -272,15 +279,21 @@ function PlayerBar(): JSX.Element {
             width: '40px',
             height: '40px',
             border: 'none',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: 'var(--accent)',
-            color: '#12141A',
+            color: 'var(--bg-base)',
             flexShrink: 0,
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'var(--accent)'
           }}
           title={isPlaying ? t('player.pause') : t('player.play')}
         >
@@ -303,7 +316,7 @@ function PlayerBar(): JSX.Element {
             width: '32px',
             height: '32px',
             border: 'none',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -311,7 +324,15 @@ function PlayerBar(): JSX.Element {
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
             flexShrink: 0,
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+            e.currentTarget.style.color = 'var(--text-primary)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = 'var(--text-secondary)'
           }}
           title={t('player.next')}
         >
@@ -324,7 +345,7 @@ function PlayerBar(): JSX.Element {
         {/* Volume control */}
         <div
           className="flex items-center"
-          style={{ gap: '6px', flexShrink: 0 }}
+          style={{ gap: 'var(--space-2)', flexShrink: 0 }}
         >
           <button
             onClick={toggleMute}
@@ -332,7 +353,7 @@ function PlayerBar(): JSX.Element {
               width: '28px',
               height: '28px',
               border: 'none',
-              borderRadius: '50%',
+              borderRadius: 'var(--radius-full)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -340,7 +361,15 @@ function PlayerBar(): JSX.Element {
               backgroundColor: 'transparent',
               color: 'var(--text-secondary)',
               flexShrink: 0,
-              transition: 'all 150ms ease'
+              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
+              e.currentTarget.style.color = 'var(--text-primary)'
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.color = 'var(--text-secondary)'
             }}
             title={t('player.volume')}
           >
@@ -377,7 +406,7 @@ function PlayerBar(): JSX.Element {
             }}
             title={t('player.volume')}
           />
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '32px', textAlign: 'right' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '32px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
             {formatVolume(volume)}
           </span>
         </div>
@@ -389,7 +418,7 @@ function PlayerBar(): JSX.Element {
             width: '32px',
             height: '32px',
             border: 'none',
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -397,8 +426,17 @@ function PlayerBar(): JSX.Element {
             backgroundColor: 'transparent',
             color: 'var(--text-tertiary)',
             flexShrink: 0,
-            transition: 'all 150ms ease'
+            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
           }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--error) 10%, transparent)'
+            e.currentTarget.style.color = 'var(--error)'
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = 'var(--text-tertiary)'
+          }}
+          title={t('player.close')}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

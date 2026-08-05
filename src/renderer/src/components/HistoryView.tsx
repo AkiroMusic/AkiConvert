@@ -51,13 +51,16 @@ function HistoryView(): JSX.Element {
   if (loading) {
     return (
       <div
+        className="double-bezel spring-in"
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           height: '200px',
           color: 'var(--text-secondary)',
-          fontSize: '14px'
+          fontSize: '14px',
+          padding: 'var(--space-6)',
+          marginBottom: 'var(--space-6)'
         }}
       >
         {t('status.loading')}
@@ -68,13 +71,16 @@ function HistoryView(): JSX.Element {
   if (records.length === 0) {
     return (
       <div
+        className="double-bezel spring-in"
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           height: '200px',
           color: 'var(--text-secondary)',
-          fontSize: '14px'
+          fontSize: '14px',
+          padding: 'var(--space-6)',
+          marginBottom: 'var(--space-6)'
         }}
       >
         {t('history.empty')}
@@ -83,23 +89,26 @@ function HistoryView(): JSX.Element {
   }
 
   return (
-    <div>
+    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* Header */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'space-between',
+          gap: 'var(--space-4)',
           marginBottom: 'var(--space-6)'
         }}
       >
         <h2
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: '20px',
             color: 'var(--text-primary)',
             fontWeight: 600,
-            margin: 0
+            margin: 0,
+            lineHeight: 1.25,
+            letterSpacing: '-0.01em'
           }}
         >
           {t('history.title')}
@@ -107,23 +116,25 @@ function HistoryView(): JSX.Element {
         <button
           onClick={handleClear}
           style={{
-            padding: '6px 14px',
+            padding: 'var(--space-2) var(--space-3)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--radius-sm)',
             backgroundColor: 'var(--surface-2)',
             color: 'var(--text-secondary)',
             cursor: 'pointer',
             fontSize: '13px',
-            fontFamily: 'inherit',
-            transition: 'all 150ms ease'
+            fontFamily: 'var(--font-sans)',
+            transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--error)'
             e.currentTarget.style.color = 'var(--error)'
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--error) 8%, var(--surface-2))'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border)'
             e.currentTarget.style.color = 'var(--text-secondary)'
+            e.currentTarget.style.backgroundColor = 'var(--surface-2)'
           }}
         >
           {t('history.clear')}
@@ -135,12 +146,9 @@ function HistoryView(): JSX.Element {
         {records.map((record, index) => (
           <div
             key={`${record.ts}-${index}`}
+            className="double-bezel spring-in"
             style={{
-              padding: 'var(--space-3) var(--space-4)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--surface-1)',
-              transition: 'all 150ms ease'
+              padding: 'var(--space-3) var(--space-4)'
             }}
           >
             {/* Main row */}
@@ -177,13 +185,13 @@ function HistoryView(): JSX.Element {
               {/* Format badge */}
               <div
                 style={{
-                  padding: '2px 8px',
+                  padding: '2px var(--space-2)',
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: 'rgba(108, 140, 255, 0.1)',
+                  backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)',
                   color: 'var(--accent)',
                   fontSize: '11px',
                   fontWeight: 500,
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   flexShrink: 0,
                   textTransform: 'uppercase'
                 }}
@@ -197,7 +205,7 @@ function HistoryView(): JSX.Element {
                   style={{
                     fontSize: '12px',
                     color: 'var(--text-tertiary)',
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: 'var(--font-mono)',
                     flexShrink: 0,
                     minWidth: '40px',
                     textAlign: 'right'
@@ -256,7 +264,7 @@ function HistoryView(): JSX.Element {
                   marginTop: 'var(--space-2)',
                   fontSize: '11px',
                   color: 'var(--text-tertiary)',
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',

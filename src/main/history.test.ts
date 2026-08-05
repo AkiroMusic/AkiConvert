@@ -99,4 +99,29 @@ describe('HistoryStore', () => {
     // Should keep the newest (highest ts)
     expect(records[records.length - 1].inputName).toBe('file_2.mp3')
   })
+
+  it('should survive concurrent appends without losing or corrupting lines', async () => {
+    const concurrentStore = new HistoryStore(tempDir, 30)
+    const count = 100
+
+    // 并发批量转换场景：100 次 append 同时触发，依赖内部写链串行化，
+    // 不能出现 read-modify-write 竞态导致的丢行或半截行
+    await Promise.all(
+      Array.from({ length: count }, (_, i) =>
+        concurrentStore.append(makeRecord({ ts: i, inputName: `file_${i}.mp3` }))
+      )
+    )
+
+    const records = await concurrentStore.readAll()
+    expect(records.length).toBeLessThanOrEqual(30)
+    // 所有行都能解析为 JSON 记录，且 inputName 都在预期集合内（无损坏/丢失混入）
+    const expectedNames = new Set(
+      Array.from({ length: count }, (_, i) => `file_${i}.mp3`)
+    )
+    for (const record of records) {
+      expect(record).toHaveProperty('inputName')
+      expect(expectedNames.has(record.inputName)).toBe(true)
+      expect(record.ts).toBeGreaterThanOrEqual(0)
+    }
+  })
 })

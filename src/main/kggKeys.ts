@@ -227,7 +227,7 @@ function buildScanPaths(
       paths.push(join(appData, 'KuGou8', 'KGMusicV3.db'))
     }
 
-    // Aggressive fallback: check all local drives via WMI
+    // Aggressive fallback: check all local drives via CIM
     paths.push(...scanWindowsDrives())
   } else if (platform === 'darwin') {
     const home = env.HOME || ''
@@ -252,15 +252,19 @@ function buildScanPaths(
 }
 
 /**
- * Uses WMI to enumerate local drives and builds KuGou DB paths for each.
+ * Uses PowerShell CIM to enumerate local fixed drives and builds
+ * KuGou DB paths for each. (CIM replaces the removed wmic tool.)
  */
 function scanWindowsDrives(): string[] {
   const paths: string[] = []
   try {
-    const output = execSync('wmic logicaldisk get name', {
-      encoding: 'utf-8',
-      windowsHide: true,
-    })
+    const output = execSync(
+      'powershell -NoProfile -NonInteractive -Command "Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 } | Select-Object -ExpandProperty DeviceID"',
+      {
+        encoding: 'utf-8',
+        windowsHide: true,
+      },
+    )
     const drives = output
       .split(/\r?\n/)
       .map((l) => l.trim())
@@ -276,7 +280,7 @@ function scanWindowsDrives(): string[] {
       )
     }
   } catch {
-    // WMI may not be available on all systems — ignore
+    // PowerShell may not be available on all systems — ignore
   }
   return paths
 }

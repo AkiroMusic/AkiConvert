@@ -26,6 +26,9 @@ export interface HistoryRecord {
 export class HistoryStore {
   private readonly filePath: string
   private readonly maxEntries: number
+  // 串行写链：保证 append + trimIfNeeded 整体顺序执行，避免并发批量转换时
+  // read-modify-write 竞态导致丢行（readAll 时读到半截/被覆盖的数据）
+  private writeChain: Promise<void> = Promise.resolve()
 
   constructor(userDataDir: string, maxEntries: number = 500) {
     this.filePath = join(userDataDir, 'history.jsonl')
@@ -38,8 +41,17 @@ export class HistoryStore {
   async append(record: HistoryRecord): Promise<void> {
     try {
       const line = JSON.stringify(record) + '\n'
-      await appendFile(this.filePath, line, 'utf-8')
-      await this.trimIfNeeded()
+      // 将本次写入挂到链尾，返回整条链；链内 catch 吞掉错误，
+      // 避免某次写失败让 writeChain 变成 rejected 导致后续写入被永久跳过
+      this.writeChain = this.writeChain
+        .then(async () => {
+          await appendFile(this.filePath, line, 'utf-8')
+          await this.trimIfNeeded()
+        })
+        .catch((err) => {
+          console.error('HistoryStore.append failed:', err)
+        })
+      return this.writeChain
     } catch (err) {
       console.error('HistoryStore.append failed:', err)
     }

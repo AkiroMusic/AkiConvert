@@ -6,6 +6,7 @@
 import { BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import { isSafeExternalUrl } from './ipc/url-safety'
 
 export function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -29,7 +30,10 @@ export function createWindow(): BrowserWindow {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    // 新窗口一律 deny，仅对白名单协议的外部链接调用系统浏览器打开
+    if (isSafeExternalUrl(details.url)) {
+      shell.openExternal(details.url)
+    }
     return { action: 'deny' }
   })
 

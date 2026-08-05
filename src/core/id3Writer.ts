@@ -40,10 +40,18 @@ function stringToBytes(str: string, encoding: number): Uint8Array {
   if (encoding === 0x01) {
     const utf16: number[] = []
     utf16.push(0xfe, 0xff)
-    for (let i = 0; i < str.length; i++) {
-      const code = str.charCodeAt(i)
-      utf16.push((code >> 8) & 0xff)
-      utf16.push(code & 0xff)
+    // 按 code point 迭代，避免 astral 字符（emoji 等 > 0xFFFF）被拆成孤代理对
+    for (const ch of str) {
+      const cp = ch.codePointAt(0)!
+      if (cp > 0xffff) {
+        // 拆成 UTF-16 代理对，大端输出
+        const high = 0xd800 + ((cp - 0x10000) >> 10)
+        const low = 0xdc00 + ((cp - 0x10000) & 0x3ff)
+        utf16.push((high >> 8) & 0xff, high & 0xff)
+        utf16.push((low >> 8) & 0xff, low & 0xff)
+      } else {
+        utf16.push((cp >> 8) & 0xff, cp & 0xff)
+      }
     }
     return new Uint8Array(utf16)
   }
@@ -193,6 +201,27 @@ function writeID3Tags(tags: ID3Tags, audioData: Uint8Array): Uint8Array {
   result.set(audioData, 10 + framesData.length)
 
   return result
+}
+
+/**
+ * 剥离已有的 ID3v2 头部。
+ *
+ * 当 data 以 'ID3' magic（0x49 0x44 0x33）开头且长度足够时，读取第 6-9 字节的
+ * syncsafe size，若 10 + size 未超出 data 长度则返回剥头后的正文；
+ * 否则返回原 data。无 ID3 magic 时原样返回。
+ * 用于修复「同格式直拷贝给 MP3 叠第二层 ID3 头」的问题（评审 P1#8）。
+ */
+export function stripExistingId3Header(data: Uint8Array): Uint8Array {
+  if (data.length < 10) return data
+  if (data[0] !== 0x49 || data[1] !== 0x44 || data[2] !== 0x33) return data
+
+  const size =
+    ((data[6] & 0x7f) << 21) |
+    ((data[7] & 0x7f) << 14) |
+    ((data[8] & 0x7f) << 7) |
+    (data[9] & 0x7f)
+  if (10 + size > data.length) return data
+  return data.slice(10 + size)
 }
 
 export { writeID3Tags }

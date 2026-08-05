@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { writeID3Tags } from './id3Writer'
+import { writeID3Tags, stripExistingId3Header } from './id3Writer'
 
 describe('writeID3Tags', () => {
   const dummyAudio = new Uint8Array([0xff, 0xfb, 0x90, 0x00]) // MPEG sync frame
@@ -179,8 +179,104 @@ describe('writeID3Tags', () => {
       expect(findFrame(tagData, 'TPE1')).not.toBe(-1)
       expect(findFrame(tagData, 'TALB')).not.toBe(-1)
     })
+
+    it('should encode BMP unicode (Chinese) as UTF-16BE unchanged', () => {
+      const result = writeID3Tags({ title: '你好世界' }, dummyAudio)
+      const tagData = result.slice(10)
+      const offset = findFrame(tagData, 'TIT2')
+      expect(offset).not.toBe(-1)
+      const frameSize = readFrameSize(tagData, offset)
+      // 10 字节帧头 + 1 字节编码标志 + BOM(2) + 每字符 2 字节大端
+      const textBytes = tagData.slice(offset + 11, offset + 10 + frameSize)
+      expect(Array.from(textBytes)).toEqual([
+        0xfe, 0xff,
+        0x4f, 0x60, // 你
+        0x59, 0x7d, // 好
+        0x4e, 0x16, // 世
+        0x75, 0x4c  // 界
+      ])
+    })
+
+    it('should encode astral characters (emoji) as UTF-16 surrogate pairs', () => {
+      const result = writeID3Tags({ title: '🎵' }, dummyAudio)
+      const tagData = result.slice(10)
+      const offset = findFrame(tagData, 'TIT2')
+      expect(offset).not.toBe(-1)
+      const frameSize = readFrameSize(tagData, offset)
+      // 10 字节帧头 + 1 字节编码标志 + BOM(2) + 代理对(4)
+      const textBytes = tagData.slice(offset + 11, offset + 10 + frameSize)
+      expect(textBytes.length).toBe(6)
+      // 🎵 = U+1F3B5 → 代理对 0xD83C 0xDFB5
+      expect(Array.from(textBytes.slice(2))).toEqual([0xd8, 0x3c, 0xdf, 0xb5])
+      // 剥离 BOM 后用 UTF-16BE 解码应还原 '🎵'
+      const decoded = new TextDecoder('utf-16be').decode(textBytes.slice(2))
+      expect(decoded).toBe('🎵')
+    })
   })
 })
+
+// -----------------------------------------------------------------------
+// stripExistingId3Header
+// -----------------------------------------------------------------------
+describe('stripExistingId3Header', () => {
+  it('should strip a valid ID3v2 header and return the payload', () => {
+    const header = new Uint8Array([
+      0x49, 0x44, 0x33, // 'ID3'
+      0x03, 0x00, 0x00, // version + revision + flags
+      0x00, 0x00, 0x00, 0x05 // syncsafe size = 5
+    ])
+    const tagBody = new Uint8Array([0xaa, 0xbb, 0xcc, 0xdd, 0xee]) // 头部声明的 5 字节标签体
+    const payload = new Uint8Array([1, 2, 3, 4, 5]) // 剥头后保留的正文（音频帧）
+    const data = new Uint8Array(
+      header.length + tagBody.length + payload.length
+    )
+    data.set(header, 0)
+    data.set(tagBody, header.length)
+    data.set(payload, header.length + tagBody.length)
+    const stripped = stripExistingId3Header(data)
+    expect(Array.from(stripped)).toEqual(Array.from(payload))
+  })
+
+  it('should return data unchanged when no ID3 magic is present', () => {
+    const data = new Uint8Array([
+      0x4d, 0x50, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+    ])
+    const stripped = stripExistingId3Header(data)
+    expect(stripped).toEqual(data)
+  })
+
+  it('should not throw and return data unchanged when shorter than 10 bytes', () => {
+    const data = new Uint8Array([0x49, 0x44, 0x33])
+    let stripped: Uint8Array
+    expect(() => {
+      stripped = stripExistingId3Header(data)
+    }).not.toThrow()
+    expect(stripped!).toEqual(data)
+  })
+
+  it('should return data unchanged when declared size exceeds data length', () => {
+    // 头部声明 1000 字节正文，但实际数据不够（syncsafe 0x07D0 = 2000）
+    const data = new Uint8Array(15)
+    data.set(
+      [0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x07, 0xd0],
+      0
+    )
+    const stripped = stripExistingId3Header(data)
+    expect(stripped).toEqual(data)
+  })
+})
+
+/**
+ * 读取帧头（10 字节）中的 4 字节帧大小。
+ */
+function readFrameSize(tagData: Uint8Array, frameOffset: number): number {
+  return (
+    (tagData[frameOffset + 4] << 24) |
+    (tagData[frameOffset + 5] << 16) |
+    (tagData[frameOffset + 6] << 8) |
+    tagData[frameOffset + 7]
+  )
+}
 
 /**
  * Find a frame by its 4-byte identifier within tag data.

@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { renderFilenameTemplate, sanitizeFileName, DEFAULT_TEMPLATE, deriveMetadataFromFilename } from './template'
+import { renderFilenameTemplate, sanitizeFileName, isWindowsReservedName, DEFAULT_TEMPLATE, deriveMetadataFromFilename } from './template'
 
 describe('sanitizeFileName', () => {
   it('should replace illegal Windows chars with underscores', () => {
@@ -25,6 +25,14 @@ describe('sanitizeFileName', () => {
 
   it('should handle empty string', () => {
     expect(sanitizeFileName('')).toBe('')
+  })
+
+  it('should trim trailing dot', () => {
+    expect(sanitizeFileName('My Song.')).toBe('My Song')
+  })
+
+  it('should trim trailing dot and spaces', () => {
+    expect(sanitizeFileName('My Song. ')).toBe('My Song')
   })
 })
 
@@ -77,6 +85,25 @@ describe('renderFilenameTemplate', () => {
     expect(result).toBe('my-filename')
   })
 
+  it('should prefix Windows reserved name with underscore', () => {
+    expect(renderFilenameTemplate('CON', vars)).toBe('_CON')
+    expect(renderFilenameTemplate('{title}', { ...vars, title: 'nul' })).toBe('_nul')
+    expect(renderFilenameTemplate('COM1', vars)).toBe('_COM1')
+  })
+
+  it('should prefix reserved name stem while keeping extension', () => {
+    expect(renderFilenameTemplate('{title}', { ...vars, title: 'con.mp3' })).toBe('_con.mp3')
+  })
+
+  it('should trim trailing dot from rendered name', () => {
+    expect(renderFilenameTemplate('My Song.', vars)).toBe('My Song')
+    expect(renderFilenameTemplate('My Song. ', vars)).toBe('My Song')
+  })
+
+  it('should leave ordinary names unchanged', () => {
+    expect(renderFilenameTemplate('AC_DC - Highway to Hell', vars)).toBe('AC_DC - Highway to Hell')
+  })
+
   it('should use DEFAULT_TEMPLATE', () => {
     expect(DEFAULT_TEMPLATE).toBe('{artist} - {title}')
   })
@@ -105,5 +132,21 @@ describe('deriveMetadataFromFilename', () => {
 
   it('should return null for an empty string', () => {
     expect(deriveMetadataFromFilename('')).toBeNull()
+  })
+})
+
+describe('isWindowsReservedName', () => {
+  it('should detect reserved device names case-insensitively', () => {
+    expect(isWindowsReservedName('CON')).toBe(true)
+    expect(isWindowsReservedName('com3')).toBe(true)
+  })
+
+  it('should match the stem before the last dot', () => {
+    expect(isWindowsReservedName('nul.mp3')).toBe(true)
+  })
+
+  it('should not flag ordinary names', () => {
+    expect(isWindowsReservedName('Console')).toBe(false)
+    expect(isWindowsReservedName('')).toBe(false)
   })
 })

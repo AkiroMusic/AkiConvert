@@ -6,6 +6,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
+import { resolveConcurrency } from '../utils/concurrency'
+import { basenameFromPath } from '../utils/path'
 import FileItem from './FileItem'
 
 interface Props {
@@ -95,8 +97,9 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       }
     })
 
-    const pendingFiles = files.filter((f) => f.status === 'pending')
-    const limit = useAppStore.getState().settings.concurrentLimit || 3
+    const pendingFiles = files.filter((f) => f.status === 'pending' || f.status === 'converting')
+    const settings = useAppStore.getState().settings
+    const limit = resolveConcurrency({ autoConcurrent: settings.autoConcurrent, concurrentLimit: settings.concurrentLimit })
 
     for (let i = 0; i < pendingFiles.length; i += limit) {
       // Check for pause — if paused, stop processing
@@ -127,9 +130,6 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             .then((result) => ({ file, result }))
         })
       )
-
-      // Check again after batch
-      if (pausedRef.current) break
 
       for (const { file, result } of results) {
         if (result.success) {
@@ -190,6 +190,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
     pausedRef.current = true
     setPaused(true)
     window.formatConverter.cancelConversions().catch(() => {})
+    // 将卡在 converting 状态的文件还原为 pending，便于恢复时重试
+    useAppStore.getState().resetConvertingToPending()
   }, [setPaused])
 
   const handleResume = useCallback(() => {
@@ -222,7 +224,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
 
     const result = await window.formatConverter.downloadAsZip({
       filePaths: successFiles.map((f) => f.outputPath || f.filePath),
-      fileNames: successFiles.map((f) => f.fileName)
+      fileNames: successFiles.map((f) => basenameFromPath(f.outputPath || f.filePath))
     })
 
     if (result.success) {

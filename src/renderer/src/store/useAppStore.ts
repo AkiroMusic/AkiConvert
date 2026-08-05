@@ -113,6 +113,7 @@ interface AppState {
   // Pause / Resume
   isPaused: boolean
   setPaused: (paused: boolean) => void
+  resetConvertingToPending: () => void
 
   // Quality settings
   setBitrate: (bitrate: string) => void
@@ -365,6 +366,14 @@ export const useAppStore = create<AppState>((set) => ({
 
   // === Pause / Resume ===
   setPaused: (paused) => set({ isPaused: paused }),
+
+  // 暂停时把正在转换的文件重置回待处理状态，避免取消后永远卡在 converting
+  resetConvertingToPending: () =>
+    set((state) => ({
+      files: state.files.map((f) =>
+        f.status === 'converting' ? { ...f, status: 'pending' as const, progress: 0 } : f
+      )
+    })),
 
   // === Cancel ===
   cancelFile: (filePath) =>

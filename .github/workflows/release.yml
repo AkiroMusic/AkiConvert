@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - run: npm test
 
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npx electron-vite build
       - run: npx electron-builder --win --publish=never
         env:
@@ -52,11 +52,16 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
+      # macOS Universal 需要同时打包 x64 + arm64 的 FFmpeg；
+      # postinstall 只下载当前 runner 架构（x64），必须显式补全双架构
+      - run: npm run download:ffmpeg:all
       - run: npx electron-vite build
       - run: npx electron-builder --mac --universal --publish=never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # CI 无签名证书：关闭身份自动发现，避免 electron-builder 探测失败
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - uses: actions/upload-artifact@v4
         with:
           name: release-macos
@@ -73,7 +78,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npx electron-vite build
       - run: npx electron-builder --linux --publish=never
         env:
@@ -99,6 +104,7 @@ jobs:
           files: |
             *.exe
             *.dmg
+            *.AppImage
             *.blockmap
             *.yml
           generate_release_notes: true

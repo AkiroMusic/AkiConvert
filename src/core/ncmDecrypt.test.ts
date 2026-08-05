@@ -493,7 +493,7 @@ describe('parseNCM', () => {
     const warnings: string[] = []
 
     await expect(
-      parseNCM(fileBytes.buffer, {
+      parseNCM(fileBytes.buffer as ArrayBuffer, {
         onProgress: (p) => { progressValues.push(p) },
         onWarning: (w) => { warnings.push(w) }
       })

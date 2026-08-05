@@ -57,7 +57,7 @@ describe('Conversion pipeline — NCM structural validation', () => {
     blocks.push(new Uint8Array([0x64, 0x00, 0x00, 0x00]))
 
     const buf = concatBlocks(blocks)
-    await expect(parseNCM(buf.buffer)).rejects.toThrow('incomplete metadata')
+    await expect(parseNCM(buf.buffer as ArrayBuffer)).rejects.toThrow('incomplete metadata')
   })
 })
 

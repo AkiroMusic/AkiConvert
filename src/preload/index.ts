@@ -147,6 +147,9 @@ const formatConverterAPI = {
   getFfmpegStatus: (): Promise<{ available: boolean; ffmpegPath: string | null; ffprobePath: string | null; reason?: string }> =>
     ipcRenderer.invoke('ffmpeg:getStatus'),
 
+  recheckFfmpeg: (): Promise<{ available: boolean; ffmpegPath: string | null; ffprobePath: string | null; reason?: string }> =>
+    ipcRenderer.invoke('ffmpeg:recheck'),
+
   onFfmpegStatusChanged: (
     callback: (status: { available: boolean; ffmpegPath: string | null; ffprobePath: string | null; reason?: string }) => void
   ): (() => void) => {

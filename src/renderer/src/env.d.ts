@@ -5,6 +5,11 @@
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
+// Make this file a module so `declare global` below is honored.
+// Without this, the Window augmentation is silently ignored and
+// `window.formatConverter` is not typed anywhere in the renderer.
+export {}
+
 interface FfmpegStatusData {
   available: boolean
   ffmpegPath: string | null
@@ -124,6 +129,7 @@ interface FormatConverterAPI {
 
   extractLyrics(filePath: string): Promise<string | null>
   getFfmpegStatus(): Promise<FfmpegStatusData>
+  recheckFfmpeg(): Promise<FfmpegStatusData>
   onFfmpegStatusChanged(callback: (status: FfmpegStatusData) => void): () => void
   onFilesOpenedFromOs(callback: (filePaths: string[]) => void): () => void
   getSystemTheme(): Promise<'dark' | 'light'>

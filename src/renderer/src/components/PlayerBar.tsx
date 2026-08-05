@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
+import { FileEntry } from '../store/useAppStore'
 import { formatTime, formatVolume } from '../utils/player'
 
 function PlayerBar(): JSX.Element {

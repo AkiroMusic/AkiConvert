@@ -66,7 +66,7 @@ const DEFAULT_PRESETS: Preset[] = [
   }
 ]
 
-interface AppSettings {
+type AppSettings = {
   language: string
   outputDir: string
   filenameTemplate: string
@@ -86,6 +86,7 @@ interface AppSettings {
   presets: Preset[]
   concurrentLimit: number
   duplicateAction: string
+  customFfmpegPath: string
   embedCompanionLyrics: boolean
   loudnormEnabled: boolean
   loudnormTarget: number
@@ -113,6 +114,7 @@ const store = new SimpleStore<AppSettings>({
     notificationsEnabled: true,
     selectedPreset: 'standard',
     presets: DEFAULT_PRESETS,
+    customFfmpegPath: '',
     embedCompanionLyrics: true,
     loudnormEnabled: false,
     loudnormTarget: -14

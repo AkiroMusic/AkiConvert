@@ -75,7 +75,7 @@ function TitleBar(): JSX.Element {
         WebkitUserSelect: 'none',
         flexShrink: 0,
         position: 'relative'
-      }}
+      } as React.CSSProperties}
     >
       {/* macOS traffic light spacing */}
       {platform === 'darwin' && <div style={{ width: '78px', flexShrink: 0 }} />}
@@ -106,7 +106,7 @@ function TitleBar(): JSX.Element {
           display: 'flex',
           alignItems: 'center',
           WebkitAppRegion: 'no-drag'
-        }}
+        } as React.CSSProperties}
       >
         <LanguageSwitcher />
 

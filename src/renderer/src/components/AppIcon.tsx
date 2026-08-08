@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * Application icon component. Uses single transparent icon.

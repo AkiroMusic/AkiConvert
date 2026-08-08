@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -138,7 +138,7 @@ export function registerSettingsHandlers(): void {
     try {
       const result = await dialog.showSaveDialog({
         title: 'Export Settings',
-        defaultPath: 'format-converter-settings.json',
+        defaultPath: 'akiconvert-settings.json',
         filters: [{ name: 'JSON Settings', extensions: ['json'] }]
       })
       if (result.canceled || !result.filePath) {

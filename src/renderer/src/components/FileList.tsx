@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -78,7 +78,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
     if (files.length === 0 || isConverting) return
     let dir = outputDir
     if (!dir) {
-      dir = await window.formatConverter.selectFolder()
+      dir = await window.akiConvert.selectFolder()
       if (!dir) return
       useAppStore.getState().setOutputDir(dir)
     }
@@ -91,7 +91,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
 
     setConverting(true)
 
-    const unsub = window.formatConverter.onConvertProgress(({ filePath, progress }) => {
+    const unsub = window.akiConvert.onConvertProgress(({ filePath, progress }) => {
       if (!pausedRef.current) {
         updateFileProgress(filePath, progress)
       }
@@ -113,7 +113,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       const results = await Promise.all(
         batch.map((file) => {
           const settings = useAppStore.getState().settings
-          return window.formatConverter
+          return window.akiConvert
             .convertFile({
               filePath: file.filePath,
               outputDir: dir || '',
@@ -189,7 +189,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   const handlePause = useCallback(() => {
     pausedRef.current = true
     setPaused(true)
-    window.formatConverter.cancelConversions().catch(() => {})
+    window.akiConvert.cancelConversions().catch(() => {})
     // 将卡在 converting 状态的文件还原为 pending，便于恢复时重试
     useAppStore.getState().resetConvertingToPending()
   }, [setPaused])
@@ -222,7 +222,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
     const successFiles = useAppStore.getState().files.filter((f) => f.status === 'success')
     if (successFiles.length === 0) return
 
-    const result = await window.formatConverter.downloadAsZip({
+    const result = await window.akiConvert.downloadAsZip({
       filePaths: successFiles.map((f) => f.outputPath || f.filePath),
       fileNames: successFiles.map((f) => basenameFromPath(f.outputPath || f.filePath))
     })

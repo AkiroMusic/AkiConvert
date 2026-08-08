@@ -1,5 +1,5 @@
 ﻿/**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * KGG v5 decoder — entry point.

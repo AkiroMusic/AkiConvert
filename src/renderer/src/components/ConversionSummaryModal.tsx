@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * Modal shown after a batch conversion completes: success/fail counts,
@@ -29,7 +29,7 @@ function ConversionSummaryModal({ success, fail, total, durationMs, onClose }: P
     if (success > 0) parts.push(t('notification.successCount', { count: success }))
     if (fail > 0) parts.push(t('notification.failCount', { count: fail }))
     if (parts.length > 0) {
-      window.formatConverter.showNotification({
+      window.akiConvert.showNotification({
         title: t('notification.complete'),
         body: parts.join(' · ')
       }).catch(() => {})

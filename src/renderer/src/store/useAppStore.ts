@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -378,7 +378,7 @@ export const useAppStore = create<AppState>((set) => ({
   // === Cancel ===
   cancelFile: (filePath) =>
     set((state) => {
-      window.formatConverter.cancelConvert(filePath).catch(() => {})
+      window.akiConvert.cancelConvert(filePath).catch(() => {})
       return {
         cancellingFiles: [...state.cancellingFiles, filePath],
         files: state.files.map((f) =>
@@ -391,56 +391,56 @@ export const useAppStore = create<AppState>((set) => ({
   setBitrate: (bitrate) =>
     set((state) => {
       const newSettings = { ...state.settings, bitrate }
-      window.formatConverter.setSettings({ bitrate }).catch(() => {})
+      window.akiConvert.setSettings({ bitrate }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setVbrEnabled: (vbrEnabled) =>
     set((state) => {
       const newSettings = { ...state.settings, vbrEnabled }
-      window.formatConverter.setSettings({ vbrEnabled }).catch(() => {})
+      window.akiConvert.setSettings({ vbrEnabled }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setVbrQuality: (vbrQuality) =>
     set((state) => {
       const newSettings = { ...state.settings, vbrQuality }
-      window.formatConverter.setSettings({ vbrQuality }).catch(() => {})
+      window.akiConvert.setSettings({ vbrQuality }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setCompressionLevel: (compressionLevel) =>
     set((state) => {
       const newSettings = { ...state.settings, compressionLevel }
-      window.formatConverter.setSettings({ compressionLevel }).catch(() => {})
+      window.akiConvert.setSettings({ compressionLevel }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setSampleRate: (sampleRate) =>
     set((state) => {
       const newSettings = { ...state.settings, sampleRate }
-      window.formatConverter.setSettings({ sampleRate }).catch(() => {})
+      window.akiConvert.setSettings({ sampleRate }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setBitDepth: (bitDepth) =>
     set((state) => {
       const newSettings = { ...state.settings, bitDepth }
-      window.formatConverter.setSettings({ bitDepth }).catch(() => {})
+      window.akiConvert.setSettings({ bitDepth }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setQmcEkey: (qmcEkey) =>
     set((state) => {
       const newSettings = { ...state.settings, qmcEkey }
-      window.formatConverter.setSettings({ qmcEkey }).catch(() => {})
+      window.akiConvert.setSettings({ qmcEkey }).catch(() => {})
       return { settings: newSettings }
     }),
 
   setAutoConcurrent: (autoConcurrent) =>
     set((state) => {
       const newSettings = { ...state.settings, autoConcurrent }
-      window.formatConverter.setSettings({ autoConcurrent }).catch(() => {})
+      window.akiConvert.setSettings({ autoConcurrent }).catch(() => {})
       return { settings: newSettings }
     })
 }))

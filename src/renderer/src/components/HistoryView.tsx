@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -31,7 +31,7 @@ function HistoryView(): JSX.Element {
   const fetchHistory = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await window.formatConverter.getHistory()
+      const data = await window.akiConvert.getHistory()
       setRecords(data)
     } catch {
       // ignore
@@ -44,7 +44,7 @@ function HistoryView(): JSX.Element {
   }, [fetchHistory])
 
   const handleClear = useCallback(async () => {
-    await window.formatConverter.clearHistory()
+    await window.akiConvert.clearHistory()
     setRecords([])
   }, [])
 

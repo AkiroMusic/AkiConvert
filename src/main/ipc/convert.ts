@@ -1,5 +1,5 @@
 ﻿/**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * Multi-format conversion IPC handler.

@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -17,7 +17,7 @@ function LanguageSwitcher(): JSX.Element {
     const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN'
     await i18n.changeLanguage(newLang)
     setSettings({ language: newLang })
-    window.formatConverter?.setSettings({ language: newLang }).catch(() => {})
+    window.akiConvert?.setSettings({ language: newLang }).catch(() => {})
   }, [currentLang, i18n, setSettings])
 
   return (

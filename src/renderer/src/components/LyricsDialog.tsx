@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * Modal dialog for displaying extracted lyrics from an audio file.
@@ -25,7 +25,7 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
     setLoading(true)
     setError(null)
 
-    window.formatConverter.extractLyrics(filePath)
+    window.akiConvert.extractLyrics(filePath)
       .then((result) => {
         if (cancelled) return
         setLyrics(result)

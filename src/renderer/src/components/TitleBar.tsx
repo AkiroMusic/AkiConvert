@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -34,13 +34,13 @@ function TitleBar(): JSX.Element {
 
   // Track maximize state + F11 fullscreen
   useEffect(() => {
-    window.formatConverter?.isMaximized().then(setIsMaximized)
-    const unsub = window.formatConverter?.onMaximizeChange(setIsMaximized)
+    window.akiConvert?.isMaximized().then(setIsMaximized)
+    const unsub = window.akiConvert?.onMaximizeChange(setIsMaximized)
 
     const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === 'F11') {
         e.preventDefault()
-        window.formatConverter?.toggleFullscreen()
+        window.akiConvert?.toggleFullscreen()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -60,11 +60,11 @@ function TitleBar(): JSX.Element {
     const newTheme = nextThemeName(settings.theme)
     setSettings({ theme: newTheme })
     document.documentElement.dataset.theme = newTheme
-    window.formatConverter?.setSettings({ theme: newTheme })
+    window.akiConvert?.setSettings({ theme: newTheme })
   }, [settings.theme, setSettings])
 
   const handleMinimize = (): void => {
-    window.formatConverter?.minimizeWindow()
+    window.akiConvert?.minimizeWindow()
   }
 
   const handleClose = (): void => {
@@ -176,7 +176,7 @@ function TitleBar(): JSX.Element {
               ─
             </button>
             <button
-              onClick={() => window.formatConverter?.toggleMaximize()}
+              onClick={() => window.akiConvert?.toggleMaximize()}
               style={{
                 width: '46px',
                 height: '40px',

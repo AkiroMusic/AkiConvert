@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -73,7 +73,7 @@ if (!gotTheLock) {
 }
 
 app.whenReady().then(async () => {
-  electronApp.setAppUserModelId('com.akiro.format-converter')
+  electronApp.setAppUserModelId('com.akiro.akiconvert')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
@@ -92,7 +92,7 @@ app.whenReady().then(async () => {
 
     // Window title IPC
     ipcMain.handle('window:setTitle', (_event, title: string): void => {
-      mainWindow?.setTitle(title || 'Format Converter')
+      mainWindow?.setTitle(title || 'AkiConvert')
     })
 
     // Dynamic app icon (taskbar / dock) — single transparent icon

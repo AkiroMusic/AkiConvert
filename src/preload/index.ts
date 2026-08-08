@@ -1,11 +1,11 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 
-const formatConverterAPI = {
+const akiConvertAPI = {
   selectNcmFiles: (): Promise<string[]> =>
     ipcRenderer.invoke('dialog:selectNcmFiles'),
 
@@ -188,4 +188,4 @@ const formatConverterAPI = {
     ipcRenderer.invoke('window:setAppIcon', theme)
 }
 
-contextBridge.exposeInMainWorld('formatConverter', formatConverterAPI)
+contextBridge.exposeInMainWorld('akiConvert', akiConvertAPI)

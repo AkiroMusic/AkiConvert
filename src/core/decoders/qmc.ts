@@ -1,5 +1,5 @@
 ﻿/**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * QMC (QQ Music) decoder — QMCv1 (static mask) + QMCv2 (TEA + RC4/Map cipher).

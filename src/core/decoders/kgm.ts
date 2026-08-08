@@ -1,5 +1,5 @@
 ﻿/**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  *
  * KGM / KGMA / VPR (KuGou Music v2 cache) decoder — pure TypeScript.

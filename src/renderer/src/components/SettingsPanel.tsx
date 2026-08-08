@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -82,18 +82,18 @@ function SettingsPanel(): JSX.Element {
   const ffmpegAvailable = useAppStore((s) => s.ffmpegAvailable)
 
   const handleBrowseOutputDir = useCallback(async () => {
-    const dir = await window.formatConverter.selectFolder()
+    const dir = await window.akiConvert.selectFolder()
     if (dir) {
       setOutputDir(dir)
       setSettings({ outputDir: dir })
-      window.formatConverter.setSettings({ outputDir: dir })
+      window.akiConvert.setSettings({ outputDir: dir })
     }
   }, [setOutputDir, setSettings])
 
   const handleTemplateChange = useCallback(
     (value: string) => {
       setSettings({ filenameTemplate: value })
-      window.formatConverter.setSettings({ filenameTemplate: value })
+      window.akiConvert.setSettings({ filenameTemplate: value })
     },
     [setSettings]
   )
@@ -114,15 +114,15 @@ function SettingsPanel(): JSX.Element {
   const [kggScanning, setKggScanning] = useState(false)
 
   useEffect(() => {
-    window.formatConverter.getKggKeyCount().then(setKggKeyCount).catch(() => {})
+    window.akiConvert.getKggKeyCount().then(setKggKeyCount).catch(() => {})
   }, [])
 
   const handleImportKgg = useCallback(async () => {
-    const dbPath = await window.formatConverter.selectKggDatabase()
+    const dbPath = await window.akiConvert.selectKggDatabase()
     if (!dbPath) return
     setKggScanning(true)
     try {
-      const result = await window.formatConverter.importKggKeys(dbPath)
+      const result = await window.akiConvert.importKggKeys(dbPath)
       if (result.success) {
         setKggMessage(t('kgg.importSuccess', { added: result.added, total: result.total }))
         setKggKeyCount(result.total)
@@ -140,7 +140,7 @@ function SettingsPanel(): JSX.Element {
     setKggScanning(true)
     setKggMessage(t('settings.scanning'))
     try {
-      const result = await window.formatConverter.scanKggKeys()
+      const result = await window.akiConvert.scanKggKeys()
       setKggMessage(t('kgg.scanSuccess', { added: result.added, total: result.total }))
       setKggKeyCount(result.total)
     } catch {
@@ -152,7 +152,7 @@ function SettingsPanel(): JSX.Element {
   const [settingsMessage, setSettingsMessage] = useState('')
 
   const handleExportSettings = useCallback(async () => {
-    const result = await window.formatConverter.exportSettings()
+    const result = await window.akiConvert.exportSettings()
     if (result.success) {
       setSettingsMessage(t('settings.exportSuccess'))
     } else {
@@ -162,7 +162,7 @@ function SettingsPanel(): JSX.Element {
   }, [t])
 
   const handleImportSettings = useCallback(async () => {
-    const result = await window.formatConverter.importSettings()
+    const result = await window.akiConvert.importSettings()
     if (result.success) {
       setSettingsMessage(t('settings.importSuccess'))
     } else {
@@ -175,7 +175,7 @@ function SettingsPanel(): JSX.Element {
     (theme: string) => {
       setSettings({ theme })
       document.documentElement.dataset.theme = theme
-      window.formatConverter?.setSettings({ theme })
+      window.akiConvert?.setSettings({ theme })
     },
     [setSettings]
   )
@@ -183,7 +183,7 @@ function SettingsPanel(): JSX.Element {
   const handleNotifToggle = useCallback(() => {
     const next = !settings.notificationsEnabled
     setSettings({ notificationsEnabled: next })
-    window.formatConverter?.setSettings({ notificationsEnabled: next })
+    window.akiConvert?.setSettings({ notificationsEnabled: next })
   }, [settings.notificationsEnabled, setSettings])
 
   // Presets UI
@@ -204,7 +204,7 @@ function SettingsPanel(): JSX.Element {
       bitDepth: preset.bitDepth,
       compressionLevel: preset.compressionLevel
     })
-    window.formatConverter?.setSettings({
+    window.akiConvert?.setSettings({
       selectedPreset: id,
       outputFormat: preset.outputFormat,
       bitrate: preset.bitrate,
@@ -231,7 +231,7 @@ function SettingsPanel(): JSX.Element {
     }
     const updated = [...(presets || []), newPreset]
     setSettings({ presets: updated })
-    window.formatConverter?.setSettings({ presets: updated })
+    window.akiConvert?.setSettings({ presets: updated })
     setPresetNameInput('')
   }, [presetNameInput, settings, presets, setSettings])
 
@@ -245,11 +245,11 @@ function SettingsPanel(): JSX.Element {
   }, [])
 
   const handleSelectFfmpeg = useCallback(async () => {
-    const binPath = await window.formatConverter.selectFfmpegBinary()
+    const binPath = await window.akiConvert.selectFfmpegBinary()
     if (!binPath) return
     setSettings({ customFfmpegPath: binPath })
-    await window.formatConverter.setSettings({ customFfmpegPath: binPath })
-    const status = await window.formatConverter.recheckFfmpeg()
+    await window.akiConvert.setSettings({ customFfmpegPath: binPath })
+    const status = await window.akiConvert.recheckFfmpeg()
     setFfmpegAvailable(status.available)
     if (status.available) {
       showFfmpegMsg(t('ffmpeg.selectSuccess', { path: status.ffmpegPath }), 'ok')
@@ -637,7 +637,7 @@ function SettingsPanel(): JSX.Element {
                 disabled={disabled}
                 onClick={() => {
                   setOutputFormat(opt.value)
-                  window.formatConverter.setSettings({ outputFormat: opt.value })
+                  window.akiConvert.setSettings({ outputFormat: opt.value })
                 }}
                 style={{
                   padding: 'var(--space-1) 10px',
@@ -742,7 +742,7 @@ function SettingsPanel(): JSX.Element {
                     key={rate}
                     onClick={() => {
                       setBitrate(rate)
-                      window.formatConverter.setSettings({ bitrate: rate })
+                      window.akiConvert.setSettings({ bitrate: rate })
                     }}
                     style={{
                       padding: 'var(--space-1) 10px',
@@ -775,7 +775,7 @@ function SettingsPanel(): JSX.Element {
                 checked={settings.vbrEnabled}
                 onChange={(e) => {
                   setVbrEnabled(e.target.checked)
-                  window.formatConverter.setSettings({ vbrEnabled: e.target.checked })
+                  window.akiConvert.setSettings({ vbrEnabled: e.target.checked })
                 }}
                 style={{ accentColor: 'var(--accent)' }}
               />
@@ -796,7 +796,7 @@ function SettingsPanel(): JSX.Element {
                   onChange={(e) => {
                     const val = Number(e.target.value)
                     setVbrQuality(val)
-                    window.formatConverter.setSettings({ vbrQuality: val })
+                    window.akiConvert.setSettings({ vbrQuality: val })
                   }}
                   style={{
                     width: '100%',
@@ -829,7 +829,7 @@ function SettingsPanel(): JSX.Element {
               onChange={(e) => {
                 const val = Number(e.target.value)
                 setCompressionLevel(val)
-                window.formatConverter.setSettings({ compressionLevel: val })
+                window.akiConvert.setSettings({ compressionLevel: val })
               }}
               style={{
                 width: '100%',
@@ -858,7 +858,7 @@ function SettingsPanel(): JSX.Element {
                   key={rate}
                   onClick={() => {
                     setSampleRate(rate)
-                    window.formatConverter.setSettings({ sampleRate: rate })
+                    window.akiConvert.setSettings({ sampleRate: rate })
                   }}
                   style={{
                     padding: 'var(--space-1) 10px',
@@ -893,7 +893,7 @@ function SettingsPanel(): JSX.Element {
                     key={depth}
                     onClick={() => {
                       setBitDepth(depth)
-                      window.formatConverter.setSettings({ bitDepth: depth })
+                      window.akiConvert.setSettings({ bitDepth: depth })
                     }}
                     style={{
                       padding: 'var(--space-1) 10px',
@@ -923,7 +923,7 @@ function SettingsPanel(): JSX.Element {
             checked={settings.embedCompanionLyrics}
             onChange={(e) => {
               setSettings({ embedCompanionLyrics: e.target.checked })
-              window.formatConverter.setSettings({ embedCompanionLyrics: e.target.checked })
+              window.akiConvert.setSettings({ embedCompanionLyrics: e.target.checked })
             }}
             style={{ accentColor: 'var(--accent)' }}
           />
@@ -951,7 +951,7 @@ function SettingsPanel(): JSX.Element {
               checked={settings.loudnormEnabled}
               onChange={(e) => {
                 setSettings({ loudnormEnabled: e.target.checked })
-                window.formatConverter.setSettings({ loudnormEnabled: e.target.checked })
+                window.akiConvert.setSettings({ loudnormEnabled: e.target.checked })
               }}
               style={{ accentColor: 'var(--accent)' }}
             />
@@ -971,7 +971,7 @@ function SettingsPanel(): JSX.Element {
                 onChange={(e) => {
                   const val = parseFloat(e.target.value)
                   setSettings({ loudnormTarget: val })
-                  window.formatConverter.setSettings({ loudnormTarget: val })
+                  window.akiConvert.setSettings({ loudnormTarget: val })
                 }}
                 style={{ width: '100%', accentColor: 'var(--accent)', height: '6px', cursor: 'pointer' }}
               />
@@ -1002,7 +1002,7 @@ function SettingsPanel(): JSX.Element {
           onChange={(e) => {
             const val = Number(e.target.value)
             setConcurrentLimit(val)
-            window.formatConverter.setSettings({ concurrentLimit: val })
+            window.akiConvert.setSettings({ concurrentLimit: val })
           }}
           style={{
             width: '100%',
@@ -1018,7 +1018,7 @@ function SettingsPanel(): JSX.Element {
             checked={settings.autoConcurrent}
             onChange={(e) => {
               setAutoConcurrent(e.target.checked)
-              window.formatConverter.setSettings({ autoConcurrent: e.target.checked })
+              window.akiConvert.setSettings({ autoConcurrent: e.target.checked })
             }}
             style={{ accentColor: 'var(--accent)' }}
           />
@@ -1047,7 +1047,7 @@ function SettingsPanel(): JSX.Element {
                 key={opt.value}
                 onClick={() => {
                   setDuplicateAction(opt.value)
-                  window.formatConverter.setSettings({ duplicateAction: opt.value })
+                  window.akiConvert.setSettings({ duplicateAction: opt.value })
                 }}
                 style={{
                   padding: 'var(--space-1) 10px',
@@ -1092,7 +1092,7 @@ function SettingsPanel(): JSX.Element {
             value={settings.qmcEkey}
             onChange={(e) => {
               setQmcEkey(e.target.value)
-              window.formatConverter.setSettings({ qmcEkey: e.target.value })
+              window.akiConvert.setSettings({ qmcEkey: e.target.value })
             }}
             placeholder={t('settings.qmcEkeyHint')}
             style={{

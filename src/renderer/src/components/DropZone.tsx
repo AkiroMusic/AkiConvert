@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -110,7 +110,7 @@ function DropZone(): JSX.Element {
 
   const handleClick = useCallback(async () => {
     if (isConverting) return
-    const paths = await window.formatConverter.selectFiles()
+    const paths = await window.akiConvert.selectFiles()
     if (paths.length > 0) {
       handleFilesAddedWithEstimate(paths)
     }
@@ -153,7 +153,7 @@ function DropZone(): JSX.Element {
       for (const file of files) {
         const ext = '.' + file.name.split('.').pop()?.toLowerCase()
         if (supportedExtensions.includes(ext)) {
-          const path = window.formatConverter.getPathForFile(file)
+          const path = window.akiConvert.getPathForFile(file)
           if (path) paths.push(path)
         }
       }
@@ -161,7 +161,7 @@ function DropZone(): JSX.Element {
       if (paths.length > 0) {
         // Ensure output directory is selected
         if (!outputDir) {
-          window.formatConverter.selectFolder().then((dir) => {
+          window.akiConvert.selectFolder().then((dir) => {
             if (dir) {
               setOutputDir(dir)
               handleFilesAddedWithEstimate(paths)
@@ -176,7 +176,7 @@ function DropZone(): JSX.Element {
   )
 
   const handleSelectOutputDir = useCallback(async () => {
-    const dir = await window.formatConverter.selectFolder()
+    const dir = await window.akiConvert.selectFolder()
     if (dir) {
       setOutputDir(dir)
     }
@@ -249,7 +249,7 @@ function DropZone(): JSX.Element {
                 key={opt.value}
                 onClick={() => {
                   setOutputFormat(opt.value)
-                  window.formatConverter.setSettings({ outputFormat: opt.value })
+                  window.akiConvert.setSettings({ outputFormat: opt.value })
                 }}
                 style={{
                   padding: '4px 10px',

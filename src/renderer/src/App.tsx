@@ -1,5 +1,5 @@
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
@@ -38,7 +38,7 @@ function App(): JSX.Element {
 
   // ===== Load settings on mount =====
   useEffect(() => {
-    window.formatConverter?.getSettings().then((s) => {
+    window.akiConvert?.getSettings().then((s) => {
       setSettings(s)
       // Sync i18n language with stored setting
       if (s.language) {
@@ -54,14 +54,14 @@ function App(): JSX.Element {
     if (ffmpegChecked.current) return
     ffmpegChecked.current = true
 
-    window.formatConverter?.getFfmpegStatus().then((status) => {
+    window.akiConvert?.getFfmpegStatus().then((status) => {
       setFfmpegAvailable(status.available)
       if (!status.available && status.reason) {
         console.warn('FFmpeg:', status.reason)
       }
     }).catch(() => {})
 
-    const unsub = window.formatConverter?.onFfmpegStatusChanged((status) => {
+    const unsub = window.akiConvert?.onFfmpegStatusChanged((status) => {
       setFfmpegAvailable(status.available)
     })
     return () => { unsub?.() }
@@ -70,7 +70,7 @@ function App(): JSX.Element {
   // ===== System theme support =====
   const resolveSystemTheme = useCallback(async (): Promise<'dark' | 'light'> => {
     try {
-      return await window.formatConverter.getSystemTheme()
+      return await window.akiConvert.getSystemTheme()
     } catch {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
@@ -84,7 +84,7 @@ function App(): JSX.Element {
         theme = await resolveSystemTheme()
       }
       document.documentElement.dataset.theme = theme
-      window.formatConverter?.setAppIcon(theme)
+      window.akiConvert?.setAppIcon(theme)
     }
     apply()
   }, [settings.theme, resolveSystemTheme])
@@ -93,9 +93,9 @@ function App(): JSX.Element {
   useEffect(() => {
     if (settings.theme !== 'system') return
 
-    const unsub = window.formatConverter?.onSystemThemeChanged((systemTheme) => {
+    const unsub = window.akiConvert?.onSystemThemeChanged((systemTheme) => {
       document.documentElement.dataset.theme = systemTheme
-      window.formatConverter?.setAppIcon(systemTheme)
+      window.akiConvert?.setAppIcon(systemTheme)
     })
     // Also listen via CSS media query as fallback
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
@@ -103,7 +103,7 @@ function App(): JSX.Element {
       if (settings.theme === 'system') {
         const t = mq.matches ? 'dark' : 'light'
         document.documentElement.dataset.theme = t
-        window.formatConverter?.setAppIcon(t)
+        window.akiConvert?.setAppIcon(t)
       }
     }
     mq.addEventListener('change', handler)
@@ -116,20 +116,20 @@ function App(): JSX.Element {
   // ===== Window title update (conversion progress) =====
   useEffect(() => {
     if (!isConverting) {
-      window.formatConverter?.setWindowTitle('Format Converter')
+      window.akiConvert?.setWindowTitle('AkiConvert')
       return
     }
     const total = files.length
     const done = files.filter((f) => f.status === 'success' || f.status === 'error').length
     if (total > 0) {
       const pct = Math.round((done / total) * 100)
-      window.formatConverter?.setWindowTitle(`Format Converter (${pct}%)`)
+      window.akiConvert?.setWindowTitle(`AkiConvert (${pct}%)`)
     }
   }, [isConverting, files])
 
   // ===== Listen for files opened via OS file association =====
   useEffect(() => {
-    const unsub = window.formatConverter?.onFilesOpenedFromOs((filePaths) => {
+    const unsub = window.akiConvert?.onFilesOpenedFromOs((filePaths) => {
       const supportedExtensions = [
         '.ncm', '.kwm', '.kgm', '.kgma', '.vpr',
         '.qmc0', '.qmc3', '.qmcflac', '.qmcogg', '.qmc1', '.qmc2', '.tkm',
@@ -175,7 +175,7 @@ function App(): JSX.Element {
       if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
         e.preventDefault()
         if (isConverting) return
-        window.formatConverter.selectFiles().then((paths: string[]) => {
+        window.akiConvert.selectFiles().then((paths: string[]) => {
           if (paths.length > 0) {
             const entries = paths.map((path: string) => {
               const parts = path.replace(/\\/g, '/').split('/')

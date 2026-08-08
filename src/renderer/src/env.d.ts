@@ -1,13 +1,13 @@
 /// <reference types="vite/client" />
 
 /**
- * Format Converter
+ * AkiConvert
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
 // Make this file a module so `declare global` below is honored.
 // Without this, the Window augmentation is silently ignored and
-// `window.formatConverter` is not typed anywhere in the renderer.
+// `window.akiConvert` is not typed anywhere in the renderer.
 export {}
 
 interface FfmpegStatusData {
@@ -55,7 +55,7 @@ interface AppSettingsData {
   loudnormTarget: number
 }
 
-interface FormatConverterAPI {
+interface AkiConvertAPI {
   selectNcmFiles(): Promise<string[]>
   selectFiles(): Promise<string[]>
   selectFolder(): Promise<string | null>
@@ -140,6 +140,6 @@ interface FormatConverterAPI {
 
 declare global {
   interface Window {
-    formatConverter: FormatConverterAPI
+    akiConvert: AkiConvertAPI
   }
 }

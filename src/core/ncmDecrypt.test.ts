@@ -397,14 +397,37 @@ describe('parseNCM', () => {
     await expect(parseNCM(invalid.buffer)).rejects.toThrow('Not a valid NCM file format')
   })
 
-  it('should reject wrong version byte', async () => {
-    const invalid = new Uint8Array(20)
-    // Correct magic
-    invalid[0] = 0x43; invalid[1] = 0x54; invalid[2] = 0x45; invalid[3] = 0x4e
-    invalid[4] = 0x46; invalid[5] = 0x44; invalid[6] = 0x41; invalid[7] = 0x4d
-    // Wrong version
-    invalid[8] = 0x02; invalid[9] = 0x70
-    await expect(parseNCM(invalid.buffer)).rejects.toThrow('Not a valid NCM file format (incorrect version)')
+  it('should accept mobile-client version bytes (issue #2)', async () => {
+    // Files downloaded from the mobile NetEase client carry different
+    // version bytes (e.g. 0x02 0x70) than the desktop client (0x01 0x70).
+    // The version field must be skipped, not validated — matching the
+    // reference implementation (unlock-music.dev/cli). See GitHub issue #2.
+    const blocks: Uint8Array[] = []
+
+    // Magic header
+    blocks.push(new Uint8Array([0x43, 0x54, 0x45, 0x4E, 0x46, 0x44, 0x41, 0x4D]))
+    // Mobile version bytes
+    blocks.push(new Uint8Array([0x02, 0x70]))
+
+    // Key data length: 0 (no key material needed for a parse-level test)
+    blocks.push(new Uint8Array([0x00, 0x00, 0x00, 0x00]))
+
+    // Metadata length: 0 (no metadata)
+    blocks.push(new Uint8Array([0x00, 0x00, 0x00, 0x00]))
+
+    // CRC + gap (9 bytes)
+    blocks.push(new Uint8Array(9).fill(0x00))
+
+    // Image size: 0 (no image)
+    blocks.push(new Uint8Array([0x00, 0x00, 0x00, 0x00]))
+
+    // Audio data (empty is fine — format detection falls back to mp3)
+    blocks.push(new Uint8Array(4).fill(0x00))
+
+    const fileBytes = concatUint8(blocks)
+
+    const result = await parseNCM(fileBytes.buffer as ArrayBuffer)
+    expect(result.songName).toBe('Unknown')
   })
 
   it('should throw on truncated key data', async () => {

@@ -270,7 +270,14 @@ export async function parseNCM(arrayBuffer: ArrayBuffer, options?: ParseNCMOptio
   }
   offset = 8;
 
-  if (data[8] !== 0x01 || data[9] !== 0x70) throw new Error('Not a valid NCM file format (incorrect version)');
+  // Version bytes (2 bytes): NOT validated, only skipped.
+  //
+  // The reference implementation (unlock-music.dev/cli, used by Kugo-Music-
+  // Converter) skips these two bytes without checking their values. The
+  // desktop client writes 0x01 0x70 here, but files downloaded from the
+  // mobile client carry different version bytes. Enforcing 0x01 0x70 made
+  // the whole file undecryptable on AkiConvert while the same file worked
+  // fine in unlock-music-based tools. See GitHub issue #2.
   offset = 10;
 
   if (offset + 4 > data.length) throw new Error('Invalid file format');

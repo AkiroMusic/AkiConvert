@@ -5,7 +5,7 @@
 
 /**
  * 改名守卫测试：防止 "Format Converter" 旧品牌标识符在源码/配置/本地化中回归。
- * 覆盖 v2.0.0 正式更名为 AkiConvert 后的所有关键点。
+ * 覆盖 v2.0.0 起正式更名为 AkiConvert 后的所有关键点。
  */
 
 import { describe, it, expect } from 'vitest'
@@ -31,10 +31,10 @@ function collectFiles(dir: string): string[] {
 }
 
 describe('AkiConvert rename guard', () => {
-  it('package.json 声明 akiconvert / 2.0.0 / AkiConvert 品牌配置', () => {
+  it('package.json 声明 akiconvert / 2.0.1 / AkiConvert 品牌配置', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
     expect(pkg.name).toBe('akiconvert')
-    expect(pkg.version).toBe('2.0.0')
+    expect(pkg.version).toBe('2.0.1')
     expect(pkg.build.productName).toBe('AkiConvert')
     expect(pkg.build.appId).toBe('com.akiro.akiconvert')
     expect(pkg.build.nsis.shortcutName).toBe('AkiConvert')

@@ -1,11 +1,15 @@
 {
-  "name": "format-converter",
-  "version": "1.4.1",
-  "description": "Format Converter - Multi-format audio conversion tool",
+  "name": "akiconvert",
+  "version": "2.0.0",
+  "description": "AkiConvert - Multi-format audio conversion tool",
   "main": "./out/main/index.js",
   "author": "Akiro",
   "license": "GPL-3.0-only",
   "copyright": "Copyright (c) 2026 Akiro",
+  "allowScripts": {
+    "electron": true,
+    "esbuild": true
+  },
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
@@ -21,8 +25,8 @@
     "postinstall": "node scripts/download-ffmpeg.mjs"
   },
   "build": {
-    "appId": "com.akiro.format-converter",
-    "productName": "Format Converter",
+    "appId": "com.akiro.akiconvert",
+    "productName": "AkiConvert",
     "copyright": "Copyright (c) 2026 Akiro",
     "directories": {
       "output": "release"
@@ -176,11 +180,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Format Converter",
-      "artifactName": "Format-Converter-Setup-${version}.${ext}"
+      "shortcutName": "AkiConvert",
+      "artifactName": "AkiConvert-Setup-${version}.${ext}"
     },
     "dmg": {
-      "artifactName": "Format-Converter-${version}.${ext}",
+      "artifactName": "AkiConvert-${version}.${ext}",
       "contents": [
         {
           "x": 130,
@@ -228,7 +232,6 @@
     "autoprefixer": "^10.4.20",
     "electron": "^33.3.1",
     "electron-builder": "^25.1.8",
-    "electron-icon-builder": "^2.0.1",
     "electron-vite": "^2.3.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
@@ -236,5 +239,9 @@
     "vite": "^5.4.0",
     "vitest": "^2.1.8",
     "@types/sql.js": "^1.4.9"
+  },
+  "allowScripts": {
+    "electron": true,
+    "esbuild": true
   }
 }

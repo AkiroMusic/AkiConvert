@@ -40,7 +40,9 @@ describe('AkiConvert rename guard', () => {
     expect(pkg.build.nsis.shortcutName).toBe('AkiConvert')
     expect(pkg.build.nsis.artifactName).toBe('AkiConvert-Setup-${version}.${ext}')
     expect(pkg.build.dmg.artifactName).toBe('AkiConvert-${version}.${ext}')
-    expect(pkg.allowScripts).toEqual({ electron: true, esbuild: true })
+    // allowScripts 是 npm approve-scripts 的累积结果（随依赖变化增加条目），
+    // 这里只校验核心授权项必须存在，不做精确相等断言
+    expect(pkg.allowScripts).toEqual(expect.objectContaining({ electron: true, esbuild: true }))
     expect(pkg.devDependencies['electron-icon-builder']).toBeUndefined()
   })
 

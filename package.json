@@ -8,7 +8,8 @@
   "copyright": "Copyright (c) 2026 Akiro",
   "allowScripts": {
     "electron": true,
-    "esbuild": true
+    "esbuild": true,
+    "electron-winstaller@5.4.0": true
   },
   "scripts": {
     "dev": "electron-vite dev",
@@ -216,32 +217,28 @@
     ]
   },
   "dependencies": {
+    "i18next": "^24.2.2",
     "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.4.1",
-    "i18next": "^24.2.2",
-    "zustand": "^5.0.3",
-    "sql.js": "^1.11.0"
+    "sql.js": "^1.11.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@electron-toolkit/utils": "^3.0.0",
+    "@electron-toolkit/utils": "^4.0.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@types/sql.js": "^1.4.9",
+    "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
-    "electron": "^33.3.1",
-    "electron-builder": "^25.1.8",
-    "electron-vite": "^2.3.0",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
-    "vite": "^5.4.0",
-    "vitest": "^2.1.8",
-    "@types/sql.js": "^1.4.9"
-  },
-  "allowScripts": {
-    "electron": true,
-    "esbuild": true
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10"
   }
 }

@@ -69,7 +69,7 @@ export function getBundledDir(): string {
 // Probe
 // ---------------------------------------------------------------------------
 
-function probeBinary(binPath: string): Promise<boolean> {
+export function probeBinary(binPath: string): Promise<boolean> {
   return new Promise((resolve) => {
     execFile(binPath, ['-version'], { timeout: 8000 }, (err) => {
       resolve(!err)

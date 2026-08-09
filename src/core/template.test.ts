@@ -55,7 +55,28 @@ describe('renderFilenameTemplate', () => {
 
   it('should render with album', () => {
     const result = renderFilenameTemplate('{album}/{artist} - {title}', vars)
-    expect(result).toBe('Test Album/Test Artist - Test Song')
+    // 安全加固后：模板字面字符中的 `/` 会被整体净化替换为 `_`
+    expect(result).toBe('Test Album_Test Artist - Test Song')
+  })
+
+  it('should neutralize ../ path traversal in template literal', () => {
+    expect(renderFilenameTemplate('../../{title}', vars)).toBe('.._.._Test Song')
+    expect(renderFilenameTemplate('..\\..\\{title}', vars)).toBe('.._.._Test Song')
+  })
+
+  it('should neutralize absolute path attempts in template literal', () => {
+    expect(renderFilenameTemplate('C:\\Users\\evil\\{title}', vars)).toBe('C__Users_evil_Test Song')
+    expect(renderFilenameTemplate('/tmp/evil/{title}', vars)).toBe('_tmp_evil_Test Song')
+  })
+
+  it('should neutralize .. in variable values', () => {
+    // `..` 经 sanitize 后结尾点被剔除为空串，触发 fallback，不会保留 `..` 名
+    const result = renderFilenameTemplate('{title}', { artist: '..', title: '..', album: '..' })
+    expect(result).not.toBe('..')
+    expect(result).not.toMatch(/[\\/]/)
+    // 含路径分隔符的变量值被整体净化，无法构成穿越
+    expect(renderFilenameTemplate('{title}', { ...vars, title: '../evil' })).toBe('.._evil')
+    expect(renderFilenameTemplate('{title}', { ...vars, title: '..\\..\\evil' })).toBe('.._.._evil')
   })
 
   it('should sanitize illegal characters', () => {

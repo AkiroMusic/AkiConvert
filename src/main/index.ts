@@ -162,20 +162,20 @@ app.whenReady().then(async () => {
     // result as soon as the check completes.
     refreshFfmpegStatus()
 
-  // Forward maximize/unmaximize events to renderer
-  mainWindow.on('maximize', () => {
-    mainWindow?.webContents.send('window:maximizeChanged', true)
-  })
-  mainWindow.on('unmaximize', () => {
-    mainWindow?.webContents.send('window:maximizeChanged', false)
-  })
+    // Forward maximize/unmaximize events to renderer
+    mainWindow.on('maximize', () => {
+      mainWindow?.webContents.send('window:maximizeChanged', true)
+    })
+    mainWindow.on('unmaximize', () => {
+      mainWindow?.webContents.send('window:maximizeChanged', false)
+    })
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      mainWindow = createWindow()
-    }
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        mainWindow = createWindow()
+      }
+    })
   })
-})
 
 // ---- macOS: open-file event (file association / drag to dock icon) ----
 app.on('open-file', (event, filePath) => {

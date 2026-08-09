@@ -213,7 +213,14 @@ function simpleMakeKey(salt: number, length: number): Uint8Array {
 }
 
 function qmcDeriveKey(b64String: string): Uint8Array {
-  let rawDec = base64ToBytes(b64String)
+  let rawDec: Uint8Array
+  try {
+    rawDec = base64ToBytes(b64String)
+  } catch {
+    // 非法 base64（恶意/损坏文件内嵌的 ekey）：无法派生 v2 密钥，
+    // 返回空数组，由 decryptBuffer 优雅降级为 v1 静态掩码。
+    return new Uint8Array(0)
+  }
   if (rawDec.length < 16) return rawDec
   const originalRawDec = new Uint8Array(rawDec)
   try {
@@ -408,18 +415,22 @@ function decryptV2Buffer(qmcBuf: Uint8Array, ekeyB64: string): Uint8Array {
  * For v2, the ekey must be provided via options.ekey.
  */
 export function decryptBuffer(qmcBuf: Uint8Array, options?: DecoderOptions): DecoderResult {
-  // Try v2 first (if ekey provided), fall back to v1
+  // Try v2 first (if ekey provided), fall back to v1 on any failure
   if (options?.ekey) {
-    const detected = detectKey(qmcBuf)
-    let audio: Uint8Array
-    if (detected) {
-      const cipherText = qmcBuf.slice(0, detected.audioLen)
-      audio = decryptV2Buffer(cipherText, detected.ekey)
-    } else {
-      audio = decryptV2Buffer(qmcBuf, options.ekey)
+    try {
+      const detected = detectKey(qmcBuf)
+      let audio: Uint8Array
+      if (detected) {
+        const cipherText = qmcBuf.slice(0, detected.audioLen)
+        audio = decryptV2Buffer(cipherText, detected.ekey)
+      } else {
+        audio = decryptV2Buffer(qmcBuf, options.ekey)
+      }
+      const format = detectAudioFormat(audio)
+      return { audio, format }
+    } catch {
+      // 无效 ekey（如非法 base64）或 v2 解密失败：优雅降级为 v1 静态掩码
     }
-    const format = detectAudioFormat(audio)
-    return { audio, format }
   }
 
   // QMCv1 — static mask

@@ -10,10 +10,10 @@ import { isSafeExternalUrl } from './ipc/url-safety'
 
 export function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
-    width: 1020,
-    height: 760,
-    minWidth: 960,
-    minHeight: 680,
+    width: 1120,
+    height: 800,
+    minWidth: 1000,
+    minHeight: 700,
     backgroundColor: '#0E1016',
     show: false,
     frame: false,

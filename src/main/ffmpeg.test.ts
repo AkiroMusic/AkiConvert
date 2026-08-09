@@ -253,9 +253,11 @@ describe('run (high-level conversion)', () => {
   ) {
     probeProc.stdout.emit('data', Buffer.from('120.5'))
     probeProc.emit('close', 0)
-    // Emit ffmpeg close on next microtask so run() resumes from
-    // probeDuration await and runFfmpeg registers its listener first
-    await new Promise(process.nextTick)
+    // Deterministically wait until run() has resumed past probeDuration and
+    // runFfmpeg has spawned its process (and registered the close listener).
+    // A bare process.nextTick was once enough but is fragile across vitest
+    // versions — vi.waitFor makes the ordering explicit.
+    await vi.waitFor(() => expect(spawn).toHaveBeenCalledTimes(2))
     ffmpegProc.emit('close', 0)
     return promise
   }
@@ -274,7 +276,7 @@ describe('run (high-level conversion)', () => {
     probeProc.emit('close', 0)
 
     // Wait for run() to resume and call runFfmpeg before emitting
-    await new Promise(process.nextTick)
+    await vi.waitFor(() => expect(spawn).toHaveBeenCalledTimes(2))
 
     // Complete ffmpeg conversion
     ffmpegProc.emit('close', 0)
@@ -297,7 +299,7 @@ describe('run (high-level conversion)', () => {
     probeProc.emit('close', 0)
 
     // Wait for run() to resume and call runFfmpeg before emitting
-    await new Promise(process.nextTick)
+    await vi.waitFor(() => expect(spawn).toHaveBeenCalledTimes(2))
 
     ffmpegProc.stderr.emit('data', Buffer.from('Conversion failed'))
     ffmpegProc.emit('close', 1)

@@ -74,6 +74,12 @@ export function renderFilenameTemplate(
     .replace(/\{title\}/g, safe.title)
     .replace(/\{album\}/g, safe.album)
 
+  // 安全加固：模板字符串本身的字面字符（非变量值）同样可能携带路径
+  // 分隔符或 `..`（例如被恶意 settings.json 注入的模板）。对渲染结果
+  // 整体再做一次净化，使 `/`、`\`、`:` 等一律替换为 `_`，`..` 无法
+  // 构成路径穿越。变量值已在上方单独净化，此处是第二道防线。
+  result = sanitizeFileName(result)
+
   if (!result || result.trim() === '') {
     result = `${safe.artist} - ${safe.title}`
   }

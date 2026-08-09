@@ -163,7 +163,8 @@ describe('Conversion pipeline — filename generation', () => {
       title: 'Song',
       album: 'Album'
     })
-    expect(name).toBe('Album/Artist - Song')
+    // 安全加固后：模板字面字符中的 `/` 会被整体净化替换为 `_`
+    expect(name).toBe('Album_Artist - Song')
   })
 
   it('should fallback for empty template', () => {

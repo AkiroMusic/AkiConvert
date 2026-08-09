@@ -97,7 +97,7 @@ npm install
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Electron 33 + electron-vite |
+| Framework | Electron 43 + electron-vite |
 | Frontend | React 18 + TypeScript + Tailwind CSS |
 | State | Zustand |
 | i18n | i18next + react-i18next |

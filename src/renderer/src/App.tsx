@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
 import { useAppStore } from './store/useAppStore'
+import { getAllSupportedExts } from '../../core/supportedFormats'
 import TitleBar from './components/TitleBar'
 import Sidebar from './components/Sidebar'
 import DropZone from './components/DropZone'
@@ -130,11 +131,7 @@ function App(): JSX.Element {
   // ===== Listen for files opened via OS file association =====
   useEffect(() => {
     const unsub = window.akiConvert?.onFilesOpenedFromOs((filePaths) => {
-      const supportedExtensions = [
-        '.ncm', '.kwm', '.kgm', '.kgma', '.vpr',
-        '.qmc0', '.qmc3', '.qmcflac', '.qmcogg', '.qmc1', '.qmc2', '.tkm',
-        '.mp3', '.flac', '.wav', '.m4a', '.aac', '.ogg', '.opus'
-      ]
+      const supportedExtensions = getAllSupportedExts()
 
       const validPaths = filePaths.filter((path) => {
         const dot = path.lastIndexOf('.')
@@ -309,6 +306,15 @@ function App(): JSX.Element {
         <span>&copy; 2026 Akiro (AkiroMusic)</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <a
+            href="mailto:akiromusic@qq.com"
+            style={{ color: 'var(--accent)', textDecoration: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline' }}
+            onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none' }}
+          >
+            akiromusic@qq.com
+          </a>
+          <span style={{ opacity: 0.3 }}>|</span>
+          <a
             href="https://akiromusic.com"
             target="_blank"
             rel="noopener noreferrer"
@@ -317,15 +323,6 @@ function App(): JSX.Element {
             onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none' }}
           >
             akiromusic.com
-          </a>
-          <span style={{ opacity: 0.3 }}>|</span>
-          <a
-            href="mailto:akiromusic@qq.com"
-            style={{ color: 'var(--accent)', textDecoration: 'none' }}
-            onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline' }}
-            onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none' }}
-          >
-            akiromusic@qq.com
           </a>
         </span>
       </div>

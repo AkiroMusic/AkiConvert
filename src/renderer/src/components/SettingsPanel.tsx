@@ -8,6 +8,21 @@ import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import LanguageSwitcher from './LanguageSwitcher'
 
+// 分组标题统一样式（与现有 Quality/Loudness/KeyManagement 的 h3 保持一致）
+const sectionTitleStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-display)',
+  fontSize: '16px',
+  color: 'var(--text-primary)',
+  marginBottom: 'var(--space-6)',
+  fontWeight: 600
+}
+
+// 分组卡片样式：与转换页面两块（DropZone / FileList）相同的 double-bezel 发光卡片
+const groupCardStyle: React.CSSProperties = {
+  padding: 'var(--space-6)',
+  marginBottom: 'var(--space-6)'
+}
+
 function InfoTooltip({ text }: { text: string }): JSX.Element {
   const [show, setShow] = useState(false)
   const [tooltipPos, setTooltipPos] = useState<React.CSSProperties>({})
@@ -259,7 +274,7 @@ function SettingsPanel(): JSX.Element {
   }, [setSettings, setFfmpegAvailable, showFfmpegMsg, t])
 
   return (
-    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+    <div style={{ padding: 'var(--space-6)' }}>
       <h2
         style={{
           fontFamily: 'var(--font-display)',
@@ -273,6 +288,9 @@ function SettingsPanel(): JSX.Element {
       >
         {t('settings.title')}
       </h2>
+
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.generalSection')}</h3>
 
       {/* Settings Import / Export */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
@@ -375,10 +393,11 @@ function SettingsPanel(): JSX.Element {
       </div>
 
       {/* FFmpeg Status & Path Selection */}
+      </div>
+
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.ffmpeg')}</h3>
       <div style={{ marginBottom: 'var(--space-6)' }}>
-        <label style={{ display: 'block', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
-          {t('settings.ffmpeg')}
-        </label>
         <div
           style={{
             padding: 'var(--space-2) var(--space-3)',
@@ -454,10 +473,11 @@ function SettingsPanel(): JSX.Element {
       </div>
 
       {/* Conversion Presets */}
+      </div>
+
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.presets')}</h3>
       <div style={{ marginBottom: 'var(--space-6)' }}>
-        <label style={{ display: 'block', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
-          {t('settings.presets')}
-        </label>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-2)' }}>
           {presets?.map((p) => {
             const isActive = selectedPreset === p.id
@@ -523,6 +543,11 @@ function SettingsPanel(): JSX.Element {
           </div>
         )}
       </div>
+
+      </div>
+
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.outputSection')}</h3>
 
       {/* Output Directory */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
@@ -712,20 +737,11 @@ function SettingsPanel(): JSX.Element {
           </div>
         )}
       </div>
+      </div>
 
       {/* Quality Settings */}
-      <div style={{ marginBottom: 'var(--space-6)' }}>
-        <h3
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '16px',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-6)',
-            fontWeight: 600
-          }}
-        >
-          {t('settings.qualitySection')}
-        </h3>
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.qualitySection')}</h3>
 
         {/* Bitrate (lossy only) */}
         {isLossy && (
@@ -913,7 +929,6 @@ function SettingsPanel(): JSX.Element {
             </div>
           </div>
         )}
-      </div>
 
       {/* Embed companion lyrics */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
@@ -930,20 +945,11 @@ function SettingsPanel(): JSX.Element {
           {t('lyrics.embedSetting')}
         </label>
       </div>
+      </div>
 
       {/* Loudness Normalization */}
-      <div style={{ marginBottom: 'var(--space-6)' }}>
-        <h3
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '16px',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-6)',
-            fontWeight: 600
-          }}
-        >
-          {t('loudness.title')}
-        </h3>
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('loudness.title')}</h3>
         <div style={{ marginBottom: 'var(--space-5)' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <input
@@ -986,6 +992,9 @@ function SettingsPanel(): JSX.Element {
           )}
         </div>
       </div>
+
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>{t('settings.processingSection')}</h3>
 
       {/* Max Concurrent Conversions + Auto */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
@@ -1066,18 +1075,11 @@ function SettingsPanel(): JSX.Element {
           })}
         </div>
       </div>
+      </div>
 
       {/* Key Management */}
-      <div style={{ marginBottom: 'var(--space-6)' }}>
-        <h3
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '16px',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-6)',
-            fontWeight: 600
-          }}
-        >
+      <div className="double-bezel spring-in" style={groupCardStyle}>
+        <h3 style={sectionTitleStyle}>
           {t('settings.keyManagement')}
           <InfoTooltip text={t('tooltip.keyManagement')} />
         </h3>

@@ -3,7 +3,7 @@
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
 
-A cross-platform desktop audio format converter built with Electron. Decrypts proprietary music formats (NCM, KWM, KGM, QMC) and converts between standard audio formats — all processing is done **entirely offline** on your local machine.
+A cross-platform desktop audio format converter built with Electron. Decrypts proprietary music formats (NCM, KWM, KGM, QMC, KGG) and converts between standard audio formats — all processing is done **entirely offline** on your local machine.
 
 > **Developer**: [Akiro](https://akiromusic.com) (AkiroMusic) · Contact: [akiromusic@qq.com](mailto:akiromusic@qq.com)
 
@@ -15,7 +15,7 @@ A cross-platform desktop audio format converter built with Electron. Decrypts pr
 
 | Category | Capabilities |
 |----------|-------------|
-| **Format Support** | Decrypt `.ncm` (NetEase), `.kwm`/`.kgm` (Kuwo/Kugou), `.qmc` (QQ Music); convert to MP3, FLAC, WAV, OGG, M4A, AAC, AIFF, ALAC, Opus |
+| **Format Support** | Decrypt `.ncm` (NetEase), `.kwm`/`.kgm` (Kuwo/Kugou), `.qmc` (QQ Music), `.kgg` (Kugou V5); convert to MP3, FLAC, WAV, OGG, M4A, AAC, AIFF, ALAC, Opus |
 | **Batch Processing** | Queue hundreds of files, configurable concurrency (auto or manual 1–10), real-time progress bars |
 | **Metadata Preservation** | Automatically writes title, artist, album, cover art, track number, genre, and year as ID3v2 tags |
 | **Audio Preview** | Built-in player with play queue, previous/next, volume control, seek, and lyrics display |
@@ -148,7 +148,7 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
 
-一款基于 Electron 构建的跨平台桌面音频格式转换工具。解密专有音乐格式（NCM、KWM、KGM、QMC），并在标准音频格式之间进行转换——**所有处理完全在本地离线完成**。
+一款基于 Electron 构建的跨平台桌面音频格式转换工具。解密专有音乐格式（NCM、KWM、KGM、QMC、KGG），并在标准音频格式之间进行转换——**所有处理完全在本地离线完成**。
 
 > **开发者**：[Akiro](https://akiromusic.com)（AkiroMusic）· 联系：[akiromusic@qq.com](mailto:akiromusic@qq.com)
 
@@ -160,7 +160,7 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
 | 类别 | 能力 |
 |------|------|
-| **格式支持** | 解密 `.ncm`（网易云）、`.kwm`/`.kgm`（酷我/酷狗）、`.qmc`（QQ 音乐）；输出 MP3、FLAC、WAV、OGG、M4A、AAC、AIFF、ALAC、Opus |
+| **格式支持** | 解密 `.ncm`（网易云）、`.kwm`/`.kgm`（酷我/酷狗）、`.qmc`（QQ 音乐）、`.kgg`（酷狗 V5）；输出 MP3、FLAC、WAV、OGG、M4A、AAC、AIFF、ALAC、Opus |
 | **批量处理** | 队列容纳数百文件，可调节并发数（自动或手动 1–10），实时进度条 |
 | **元数据保留** | 自动写入标题、艺术家、专辑、封面图、音轨号、流派、年份等 ID3v2 标签 |
 | **音频预览** | 内置播放器，支持播放队列、上下曲、音量控制、进度拖拽和歌词显示 |

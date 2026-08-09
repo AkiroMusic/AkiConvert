@@ -6,6 +6,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore, FileEntry } from '../store/useAppStore'
+import { getAllSupportedExts } from '../../../core/supportedFormats'
 
 /**
  * Rough estimate of output file size based on input format and target output format.
@@ -84,23 +85,23 @@ function DropZone(): JSX.Element {
   )
 
   const handleFilesAddedWithEstimate = useCallback(
-    (paths: string[]) => {
+    (paths: { path: string; size: number }[]) => {
       const outputFormat = settings.outputFormat
       const bitrate = settings.bitrate || '192k'
       const vbrEnabled = settings.vbrEnabled || false
       const vbrQuality = settings.vbrQuality ?? 5
 
-      const entries: FileEntry[] = paths.map((path) => {
+      const entries: FileEntry[] = paths.map(({ path, size }) => {
         const parts = path.replace(/\\/g, '/').split('/')
         const fileName = parts[parts.length - 1]
         return {
           id: crypto.randomUUID(),
           filePath: path,
           fileName,
-          fileSize: 0,
+          fileSize: size,
           status: 'pending',
           progress: 0,
-          estimatedOutputSize: estimateOutputSize(0, outputFormat, bitrate, vbrEnabled, vbrQuality)
+          estimatedOutputSize: estimateOutputSize(size, outputFormat, bitrate, vbrEnabled, vbrQuality)
         }
       })
       addFiles(entries)
@@ -112,7 +113,8 @@ function DropZone(): JSX.Element {
     if (isConverting) return
     const paths = await window.akiConvert.selectFiles()
     if (paths.length > 0) {
-      handleFilesAddedWithEstimate(paths)
+      // 文件选择对话框不返回大小，估计功能退化为 undefined（不显示）
+      handleFilesAddedWithEstimate(paths.map((path) => ({ path, size: 0 })))
     }
   }, [handleFilesAddedWithEstimate, isConverting])
 
@@ -142,33 +144,30 @@ function DropZone(): JSX.Element {
       if (isConverting) return
 
       const files = Array.from(e.dataTransfer.files)
-      const paths: string[] = []
+      const dropped: { path: string; size: number }[] = []
 
-      const supportedExtensions = [
-        '.ncm', '.kwm', '.kgm', '.kgma', '.vpr',
-        '.qmc0', '.qmc3', '.qmcflac', '.qmcogg', '.qmc1', '.qmc2', '.tkm',
-        '.mp3', '.flac', '.wav', '.m4a', '.aac', '.ogg', '.opus'
-      ]
+      // 与 supportedFormats.ts 单一事实源保持一致，避免硬编码列表漂移
+      const supportedExtensions = getAllSupportedExts()
 
       for (const file of files) {
         const ext = '.' + file.name.split('.').pop()?.toLowerCase()
         if (supportedExtensions.includes(ext)) {
           const path = window.akiConvert.getPathForFile(file)
-          if (path) paths.push(path)
+          if (path) dropped.push({ path, size: file.size })
         }
       }
 
-      if (paths.length > 0) {
+      if (dropped.length > 0) {
         // Ensure output directory is selected
         if (!outputDir) {
           window.akiConvert.selectFolder().then((dir) => {
             if (dir) {
               setOutputDir(dir)
-              handleFilesAddedWithEstimate(paths)
+              handleFilesAddedWithEstimate(dropped)
             }
           })
         } else {
-          handleFilesAddedWithEstimate(paths)
+          handleFilesAddedWithEstimate(dropped)
         }
       }
     },

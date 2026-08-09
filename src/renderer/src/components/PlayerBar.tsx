@@ -67,7 +67,9 @@ function PlayerBar(): JSX.Element {
       return
     }
 
-    const audio = new Audio(`file://${currentFile.outputPath}`)
+    // 使用 file:// 协议时必须对路径做 URL 编码（空格/中文/特殊字符），
+    // 否则 Chromium 可能无法解析含特殊字符的本地路径。
+    const audio = new Audio('file:///' + encodeURI(currentFile.outputPath.replace(/\\/g, '/')))
     audio.volume = volume
     audioRef.current = audio
 
@@ -145,7 +147,14 @@ function PlayerBar(): JSX.Element {
   // Keyboard shortcut: Space to toggle play
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
-      if (e.code === 'Space' && currentPreviewId && !e.target) {
+      // 仅在未聚焦输入/文本域时响应，避免与文本框空格输入冲突
+      const target = e.target as HTMLElement | null
+      const isTyping =
+        target !== null &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      if (e.code === 'Space' && currentPreviewId && !isTyping) {
         e.preventDefault()
         togglePlay()
       }

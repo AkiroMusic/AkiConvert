@@ -13,11 +13,12 @@
  * Web 两种编译环境下直接使用。
  */
 
-/** 加密音频格式（含 vpr/tkm —— 它们已有可用的解码器） */
+/** 加密音频格式（含 vpr/tkm/kgg —— 它们已有可用的解码器） */
 export const ENCRYPTED_EXTS: string[] = [
   '.ncm', '.kwm', '.kgm', '.kgma',
   '.vpr', '.qmc0', '.qmc3', '.qmcflac',
   '.qmcogg', '.qmc1', '.qmc2', '.tkm',
+  '.kgg',
 ]
 
 /** 普通（未加密）音频格式 */
@@ -25,6 +26,17 @@ export const PLAIN_AUDIO_EXTS: string[] = [
   '.mp3', '.flac', '.wav', '.m4a',
   '.aac', '.ogg', '.opus', '.aiff',
   '.alac', '.wma', '.ape',
+]
+
+/**
+ * 可输出的音频格式（不含 "source" 占位符）。
+ * 与 ffmpeg.ts 的 FfmpegOptions["format"] 联合类型保持一致，是输出格式的
+ * 单一事实源：convert.ts 的白名单与 settings.ts 的 outputFormat 校验器
+ * 都应引用此列表，避免两份硬编码列表漂移。
+ */
+export const OUTPUT_FORMATS: string[] = [
+  'mp3', 'flac', 'wav', 'm4a',
+  'aac', 'ogg', 'opus', 'aiff', 'alac',
 ]
 
 /**

@@ -11,6 +11,7 @@ import { describe, it, expect } from 'vitest'
 import {
   ENCRYPTED_EXTS,
   PLAIN_AUDIO_EXTS,
+  OUTPUT_FORMATS,
   getAllSupportedExts,
   isEncryptedExt,
   isPlainAudioExt,
@@ -18,12 +19,20 @@ import {
 } from './supportedFormats'
 
 describe('ENCRYPTED_EXTS', () => {
-  it('should contain exactly the 12 known encrypted extensions', () => {
+  it('should contain exactly the 13 known encrypted extensions', () => {
     expect(ENCRYPTED_EXTS).toEqual([
       '.ncm', '.kwm', '.kgm', '.kgma',
       '.vpr', '.qmc0', '.qmc3', '.qmcflac',
       '.qmcogg', '.qmc1', '.qmc2', '.tkm',
+      '.kgg',
     ])
+  })
+
+  it('should include .kgg (decoder + key import pipeline exist)', () => {
+    expect(ENCRYPTED_EXTS).toContain('.kgg')
+    expect(isEncryptedExt('.kgg')).toBe(true)
+    expect(isEncryptedExt('KGG')).toBe(true)
+    expect(isSupportedExt('.kgg')).toBe(true)
   })
 })
 
@@ -43,10 +52,34 @@ describe('PLAIN_AUDIO_EXTS', () => {
   })
 })
 
+describe('OUTPUT_FORMATS', () => {
+  it('should contain exactly the 9 output formats', () => {
+    expect(OUTPUT_FORMATS).toEqual([
+      'mp3', 'flac', 'wav', 'm4a',
+      'aac', 'ogg', 'opus', 'aiff', 'alac',
+    ])
+  })
+
+  it('should have no duplicates', () => {
+    expect(new Set(OUTPUT_FORMATS).size).toBe(OUTPUT_FORMATS.length)
+  })
+
+  it('should not contain path separators or dots (prevents traversal via format string)', () => {
+    for (const f of OUTPUT_FORMATS) {
+      expect(f).not.toMatch(/[\\/]/)
+      expect(f).not.toContain('.')
+    }
+  })
+
+  it('should not include the "source" sentinel', () => {
+    expect(OUTPUT_FORMATS).not.toContain('source')
+  })
+})
+
 describe('getAllSupportedExts', () => {
   it('should merge encrypted and plain extensions without duplicates', () => {
     const all = getAllSupportedExts()
-    expect(all).toHaveLength(23)
+    expect(all).toHaveLength(24)
     expect(new Set(all).size).toBe(all.length)
     for (const ext of [...ENCRYPTED_EXTS, ...PLAIN_AUDIO_EXTS]) {
       expect(all).toContain(ext)
@@ -129,7 +162,9 @@ describe('isSupportedExt', () => {
   })
 
   it('should NOT support Phase 2 key-required extensions', () => {
-    for (const ext of ['.mflac', '.mflac0', '.mgg', '.kgg']) {
+    // .kgg 已激活（见 ENCRYPTED_EXTS）；.mflac/.mflac0/.mgg 等 QMCv2 变体
+    // 虽有解码器但尚未接入格式列表，仍视为不支持
+    for (const ext of ['.mflac', '.mflac0', '.mflac2', '.mgg', '.mgg1', '.bkc']) {
       expect(isSupportedExt(ext)).toBe(false)
     }
   })

@@ -7,9 +7,9 @@
 
 import { ipcMain, BrowserWindow, app } from "electron"
 import { readFile, writeFile, rm } from "fs/promises"
-import { join, dirname, extname, basename } from "path"
+import { join, dirname, extname, basename, resolve, relative, isAbsolute, sep } from "path"
 import { existsSync, mkdirSync, mkdtempSync, statSync } from "fs"
-import { createHash } from "crypto"
+import { createHash, randomUUID } from "crypto"
 import { tmpdir } from "os"
 import * as ncm from "../../core/ncmDecrypt"
 import * as decoders from "../../core/decoders"
@@ -18,14 +18,30 @@ import { renderFilenameTemplate, deriveMetadataFromFilename } from "../../core/t
 import { run, runFfmpeg, FfmpegOptions, extractLyrics } from "../ffmpeg"
 import { HistoryStore } from "../history"
 import { settingsStore } from "./settings"
-import { isEncryptedExt, isPlainAudioExt } from '../../core/supportedFormats'
+import { isEncryptedExt, isPlainAudioExt, OUTPUT_FORMATS } from '../../core/supportedFormats'
+import { loadKeysMap } from '../kggKeys'
+import { memoryKeyProvider } from '../../core/decoders/kgg'
 
 // ---------------------------------------------------------------------------
 // Module-level state
 // ---------------------------------------------------------------------------
 
-const pendingConversions = new Map<string, AbortController>()
+interface PendingConversion {
+  controller: AbortController
+  filePath: string
+}
+
+// 以转换任务 ID（uuid）为 key：同一路径并发/重复转换时各自持有独立的
+// AbortController，取消一个不会误杀另一个（L1）。
+const pendingConversions = new Map<string, PendingConversion>()
 const historyStore = new HistoryStore(app.getPath("userData"))
+
+// 输出格式白名单：与 ffmpeg.ts 的 FfmpegOptions["format"] 保持一致，
+// 并收敛到 supportedFormats.ts 的 OUTPUT_FORMATS（单一事实源）。
+// 渲染进程传入的 outputFormat 在运行时必须落在白名单内，防止通过
+// 格式字符串（如 `../x`、`/tmp/x`）构成路径穿越。`source` 表示保持
+// 源格式，会被替换为源格式后再次校验。
+const ALLOWED_OUTPUT_FORMATS = new Set<string>(["source", ...OUTPUT_FORMATS])
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -39,18 +55,19 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
   // ---- convert:cancelAll ----
   ipcMain.handle("convert:cancelAll", async (): Promise<void> => {
-    for (const [filePath, controller] of pendingConversions) {
+    for (const { controller } of pendingConversions.values()) {
       controller.abort()
-      pendingConversions.delete(filePath)
     }
+    pendingConversions.clear()
   })
 
   // ---- convert:cancel ----
   ipcMain.handle("convert:cancel", async (_event, filePath: string): Promise<void> => {
-    const controller = pendingConversions.get(filePath)
-    if (controller) {
-      controller.abort()
-      pendingConversions.delete(filePath)
+    for (const [taskId, entry] of pendingConversions) {
+      if (entry.filePath === filePath) {
+        entry.controller.abort()
+        pendingConversions.delete(taskId)
+      }
     }
   })
 
@@ -72,6 +89,8 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         compressionLevel?: number
         sampleRate?: string
         bitDepth?: string
+        // 手动指定的歌词文件路径（可选，来自渲染进程 FileEntry.lyricsPath）
+        lyricsPath?: string
       }
     ): Promise<{
       success: boolean
@@ -88,12 +107,13 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
       const startTime = Date.now()
       const controller = new AbortController()
       const { filePath } = payload
+      const taskId = randomUUID()
       let tempDir: string | null = null
       // Hoisted so the catch block can enrich error messages with decrypt context
       let isEncrypted = false
       let decryptionVerified = true
 
-      pendingConversions.set(filePath, controller)
+      pendingConversions.set(taskId, { controller, filePath })
 
       try {
         const {
@@ -163,11 +183,14 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
             album = result.album
             coverImage = result.image
           } else {
+            // KGG 解密需要 keyProvider：每次转换时从 userData 下的 kgg.keys
+            // 重新加载密钥（用户可能通过设置面板导入/扫描更新密钥）。
+            // 仅当源文件是 KGG 时才加载，避免无关格式的多余磁盘 I/O。
+            const kggKeysPath = join(app.getPath("userData"), "kgg.keys")
+            const keyMap = existsSync(kggKeysPath) ? loadKeysMap(kggKeysPath) : new Map<string, string>()
             const result = decoders.decryptBuffer(ext, data, {
               ekey: settingsStore.store.qmcEkey,
-              // KGG 接入点：kggKeys 模块目前仅导出 loadKeysMap() 等函数，
-              // 尚未提供符合 KeyProvider 接口（{ find(id), count() }）的封装，
-              // 待 kggKeys 提供 provider 工厂后再在此挂载 keyProvider
+              keyProvider: memoryKeyProvider(keyMap)
             })
             audio = result.audio
             sourceFormat = result.format
@@ -208,6 +231,13 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         // --- Determine effective output format ---
         const effectiveFormat = outputFormat === "source" ? sourceFormat : outputFormat
 
+        // 安全加固：输出格式运行时白名单校验。outputFormat 来自渲染进程
+        // （可被恶意 settings.json 注入），必须确认其落在合法格式集合内，
+        // 防止 `../x`、`/tmp/x` 等含路径分隔符的字符串越界写出。
+        if (!ALLOWED_OUTPUT_FORMATS.has(effectiveFormat)) {
+          return { success: false, errorMessage: `Unsupported output format: ${outputFormat}` }
+        }
+
         // --- Generate output filename ---
         const outputFileName = renderFilenameTemplate(filenameTemplate, {
           artist,
@@ -216,6 +246,18 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         })
         const outputFileNameWithExt = outputFileName + "." + effectiveFormat
         let outputPath = join(outputDir, outputFileNameWithExt)
+
+        // 安全加固：输出路径必须位于 outputDir 之内（防御性兜底）。
+        // 即使模板净化被绕过，join 后的路径一旦 resolve 到 outputDir 之外
+        // 也直接拒绝，杜绝任意文件写入。用 path.relative 判定而非
+        // startsWith(dir + sep)：后者在 outputDir 为盘符根目录（如 `D:\`）
+        // 时会因拼接出 `D:\\` 而误拒 `D:\file.flac` 这类合法路径。
+        const resolvedOutputDir = resolve(outputDir)
+        const resolvedOutputPath = resolve(outputPath)
+        const rel = relative(resolvedOutputDir, resolvedOutputPath)
+        if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) {
+          return { success: false, errorMessage: "Output path escapes the output directory" }
+        }
 
         const outputDirPath = dirname(outputPath)
         if (!existsSync(outputDirPath)) {
@@ -248,16 +290,23 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
         sendProgress(0.65)
 
-        // --- Detect companion lyrics files ---
+        // --- Detect lyrics to embed ---
+        // 优先级：用户手动指定的歌词文件（payload.lyricsPath，不依赖
+        // embedCompanionLyrics 开关）> 同目录同名 .lrc/.txt 自动匹配。
+        // 未指定且开关关闭时保持原行为（不嵌入歌词）。
         let companionLyrics: string | null = null
-        if (settingsStore.store.embedCompanionLyrics) {
+        if (payload.lyricsPath && payload.lyricsPath.length > 0) {
+          if (existsSync(payload.lyricsPath)) {
+            companionLyrics = sanitizeLyrics(await readFile(payload.lyricsPath, 'utf-8'))
+          }
+        } else if (settingsStore.store.embedCompanionLyrics) {
           const basePath = filePath.replace(/\.[^.]+$/, '')
           const lrcPath = basePath + '.lrc'
           const txtPath = basePath + '.txt'
           if (existsSync(lrcPath)) {
-            companionLyrics = await readFile(lrcPath, 'utf-8')
+            companionLyrics = sanitizeLyrics(await readFile(lrcPath, 'utf-8'))
           } else if (existsSync(txtPath)) {
-            companionLyrics = await readFile(txtPath, 'utf-8')
+            companionLyrics = sanitizeLyrics(await readFile(txtPath, 'utf-8'))
           }
         }
 
@@ -332,8 +381,8 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
             let coverPath: string | null = null
             if (coverImage) {
-            try { coverPath = await writeCoverTemp(coverImage, tempDir) } catch { /* non-fatal */ }
-          }
+              try { coverPath = await writeCoverTemp(coverImage, tempDir) } catch { /* non-fatal */ }
+            }
 
             const args: string[] = ['-y', '-i', tempInputPath]
 
@@ -432,7 +481,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
           errorMessage: message
         }
       } finally {
-        pendingConversions.delete(filePath)
+        pendingConversions.delete(taskId)
         // Clean up temp directory if one was created
         if (tempDir) {
           try {
@@ -455,6 +504,18 @@ function detectImageMime(image: Uint8Array): string {
   if (image[0] === 0xff && image[1] === 0xd8) return "image/jpeg"
   if (image[0] === 0x89 && image[1] === 0x50) return "image/png"
   return "image/jpeg"
+}
+
+/**
+ * Sanitize lyrics text before embedding into metadata tags.
+ * Strips control characters (except \n and \t) that would pollute
+ * ID3/Vorbis tags, and normalizes \r\n → \n.
+ */
+function sanitizeLyrics(lyrics: string): string {
+  return lyrics
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
 }
 
 /**

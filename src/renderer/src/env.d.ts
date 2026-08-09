@@ -61,6 +61,7 @@ interface AkiConvertAPI {
   selectFolder(): Promise<string | null>
   selectPlainAudio(): Promise<string[]>
   selectKggDatabase(): Promise<string | null>
+  selectLyricsFile(): Promise<string | null>
 
   convertFile(payload: {
     filePath: string
@@ -74,6 +75,7 @@ interface AkiConvertAPI {
     compressionLevel?: number
     sampleRate?: string
     bitDepth?: string
+    lyricsPath?: string
   }): Promise<{
     success: boolean
     outputPath?: string

@@ -21,6 +21,9 @@ const akiConvertAPI = {
   selectKggDatabase: (): Promise<string | null> =>
     ipcRenderer.invoke('dialog:selectKggDatabase'),
 
+  selectLyricsFile: (): Promise<string | null> =>
+    ipcRenderer.invoke('dialog:selectLyricsFile'),
+
   convertFile: (payload: {
     filePath: string
     outputDir: string
@@ -33,6 +36,7 @@ const akiConvertAPI = {
     compressionLevel?: number
     sampleRate?: string
     bitDepth?: string
+    lyricsPath?: string
   }): Promise<{
     success: boolean
     outputPath?: string

@@ -20,6 +20,7 @@ export interface FileEntry {
   outputPath?: string
   errorMessage?: string
   estimatedOutputSize?: number
+  lyricsPath?: string
 }
 
 export interface Preset {
@@ -84,6 +85,7 @@ interface AppState {
   setSettings: (settings: Partial<AppSettings>) => void
   setCurrentPreview: (id: string | null) => void
   resetStats: () => void
+  setLyricsPath: (id: string, lyricsPath?: string) => void
 
   // Selection
   toggleSelect: (id: string) => void
@@ -259,6 +261,14 @@ export const useAppStore = create<AppState>((set) => ({
 
   resetStats: () =>
     set({ stats: { total: 0, success: 0, fail: 0 } }),
+
+  // === Lyrics ===
+  setLyricsPath: (id, lyricsPath) =>
+    set((state) => ({
+      files: state.files.map((f) =>
+        f.id === id ? { ...f, lyricsPath } : f
+      )
+    })),
 
   // === New: Selection ===
   toggleSelect: (id) =>

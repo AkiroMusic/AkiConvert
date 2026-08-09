@@ -125,7 +125,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               vbrQuality: settings.vbrQuality,
               compressionLevel: settings.compressionLevel,
               sampleRate: settings.sampleRate,
-              bitDepth: settings.bitDepth
+              bitDepth: settings.bitDepth,
+              lyricsPath: file.lyricsPath
             })
             .then((result) => ({ file, result }))
         })

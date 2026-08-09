@@ -30,6 +30,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
   const toggleSelect = useAppStore((s) => s.toggleSelect)
   const retryFile = useAppStore((s) => s.retryFile)
   const cancelFile = useAppStore((s) => s.cancelFile)
+  const setLyricsPath = useAppStore((s) => s.setLyricsPath)
 
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
   const [lyricsDialogPath, setLyricsDialogPath] = useState<string | null>(null)
@@ -49,6 +50,17 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
   const handleRetry = useCallback(() => {
     retryFile(file.id)
   }, [retryFile, file.id])
+
+  const handleSelectLyrics = useCallback(async () => {
+    const path = await window.akiConvert.selectLyricsFile()
+    if (path) {
+      setLyricsPath(file.id, path)
+    }
+  }, [setLyricsPath, file.id])
+
+  const handleClearLyrics = useCallback(() => {
+    setLyricsPath(file.id, undefined)
+  }, [setLyricsPath, file.id])
 
   const handleDragStart = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -144,6 +156,33 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
       })
     }
 
+    // 手动指定歌词文件（pending/error 可设置，转换时嵌入）
+    if (file.status === 'pending' || file.status === 'error') {
+      items.push({
+        label: file.lyricsPath ? t('lyrics.changeFile') : t('lyrics.selectFile'),
+        onClick: handleSelectLyrics,
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+          </svg>
+        )
+      })
+      if (file.lyricsPath) {
+        items.push({
+          label: t('lyrics.clearFile'),
+          onClick: handleClearLyrics,
+          icon: (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )
+        })
+      }
+    }
+
     items.push({ label: '', onClick: () => {}, separator: true })
 
     items.push({
@@ -159,7 +198,7 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
     })
 
     return items
-  }, [file, t, handleRetry, handleRemove])
+  }, [file, t, handleRetry, handleRemove, handleSelectLyrics, handleClearLyrics])
 
   return (
     <>
@@ -286,6 +325,11 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
               {file.estimatedOutputSize != null && file.estimatedOutputSize > 0 && (
                 <span style={{ marginLeft: 'var(--space-2)', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
                   {t('sizeEstimate.label', { size: formatFileSize(file.estimatedOutputSize) })}
+                </span>
+              )}
+              {file.lyricsPath && (
+                <span style={{ marginLeft: 'var(--space-2)', color: 'var(--text-tertiary)' }}>
+                  {t('lyrics.attached')}
                 </span>
               )}
             </>

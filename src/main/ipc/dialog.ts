@@ -65,6 +65,19 @@ export function registerDialogHandlers(): void {
     return result.canceled ? null : result.filePaths[0]
   })
 
+  // 歌词文件手动指定（转换时嵌入用，仅允许 .lrc/.txt）
+  ipcMain.handle('dialog:selectLyricsFile', async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'Select Lyrics File',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Lyrics Files', extensions: ['lrc', 'txt'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    })
+    return result.canceled ? null : (result.filePaths[0] ?? null)
+  })
+
   // FFmpeg binary manual selection
   ipcMain.handle('dialog:selectFfmpegBinary', async () => {
     const isWin = process.platform === 'win32'

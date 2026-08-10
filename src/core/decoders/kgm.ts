@@ -6,7 +6,7 @@
  */
 
 import { DecoderResult } from './types'
-import { readUint32LE, detectAudioFormat } from './utils'
+import { readUint32LE, detectAudioFormat, buffersEqual } from './utils'
 
 const KGM_HEADER = new Uint8Array([0x7C, 0xD5, 0x32, 0xEB, 0x86, 0x02, 0x7F, 0x4B, 0xA8, 0xAF, 0xA6, 0x8E, 0x0F, 0xFF, 0x99, 0x14])
 const VPR_HEADER = new Uint8Array([0x05, 0x28, 0xBC, 0x96, 0xE9, 0xE4, 0x5A, 0x43, 0x91, 0xAA, 0xBD, 0xD0, 0x7A, 0xF5, 0x36, 0x31])
@@ -123,13 +123,3 @@ export function decryptBuffer(kgmBuf: Uint8Array): DecoderResult {
   const format = detectAudioFormat(audio)
   return { audio, format }
 }
-
-function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
-}
-
-export { KGM_HEADER, VPR_HEADER }

@@ -24,7 +24,7 @@ export interface ResolveOptions {
 // Detect packaged mode safely across Electron / test / script environments
 // ---------------------------------------------------------------------------
 
-function isPackaged(): boolean {
+export function isPackaged(): boolean {
   try {
     // In vitest / plain Node: require('electron') throws -> caught -> false
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -40,13 +40,13 @@ function isPackaged(): boolean {
 // ---------------------------------------------------------------------------
 
 // darwin 需要区分 x64 / arm64（Universal 构建同时打包两种架构的二进制）
-function platformDir(platform: NodeJS.Platform, arch: string): string {
+export function platformDir(platform: NodeJS.Platform, arch: string): string {
   if (platform === 'win32') return 'win32'
   if (platform === 'darwin') return arch === 'arm64' ? 'darwin/arm64' : 'darwin/x64'
   return 'linux'
 }
 
-function binExt(platform: NodeJS.Platform): string {
+export function binExt(platform: NodeJS.Platform): string {
   return platform === 'win32' ? '.exe' : ''
 }
 
@@ -54,7 +54,7 @@ function binExt(platform: NodeJS.Platform): string {
 // Resolve bundled directory
 // ---------------------------------------------------------------------------
 
-function bundledDir(): string {
+export function bundledDir(): string {
   // macOS 按运行架构选择 darwin/x64 或 darwin/arm64
   const pDir = platformDir(process.platform, process.arch)
 

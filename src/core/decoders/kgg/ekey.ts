@@ -13,6 +13,8 @@
  *      8 bytes, then run custom CBC-like TEA on remaining ciphertext.
  */
 
+import { readUint32BE, buffersEqual } from '../utils'
+
 const V2_PREFIX = new TextEncoder().encode('QQMusic EncV2,Key:')
 
 const SIMPLE_KEY = new Uint8Array([
@@ -65,9 +67,6 @@ function decodeBase64(encoded: string): Uint8Array {
 // =====================================================================
 // TEA block decrypt (big-endian)
 // =====================================================================
-function readUint32BE(data: Uint8Array, offset: number): number {
-  return ((data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3]) >>> 0
-}
 
 function writeUint32BE(data: Uint8Array, offset: number, value: number): void {
   data[offset] = (value >>> 24) & 0xff
@@ -182,22 +181,4 @@ function unwrap(encoded: string): Uint8Array {
   return deriveV1(raw)
 }
 
-function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
-}
-
-export {
-  unwrap,
-  deriveV1,
-  decryptTencentTea,
-  teaDecryptBlock,
-  decodeBase64,
-  V2_PREFIX,
-  SIMPLE_KEY,
-  V2_KEY_1,
-  V2_KEY_2,
-}
+export { unwrap }

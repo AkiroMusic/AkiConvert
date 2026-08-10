@@ -7,15 +7,6 @@ import { ipcMain, dialog } from 'electron'
 import { ENCRYPTED_EXTS, PLAIN_AUDIO_EXTS } from '../../core/supportedFormats'
 
 export function registerDialogHandlers(): void {
-  // Legacy handler — kept for backward compatibility
-  ipcMain.handle('dialog:selectNcmFiles', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections'],
-      filters: [{ name: 'NCM Audio Files', extensions: ['ncm'] }]
-    })
-    return result.canceled ? [] : result.filePaths
-  })
-
   // Multi-format file selection (Phase 1 — no external key needed)
   ipcMain.handle('dialog:selectFiles', async () => {
     const result = await dialog.showOpenDialog({
@@ -36,21 +27,6 @@ export function registerDialogHandlers(): void {
       properties: ['openDirectory']
     })
     return result.canceled ? null : result.filePaths[0]
-  })
-
-  // Plain audio file selection (non-encrypted formats)
-  ipcMain.handle('dialog:selectPlainAudio', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections'],
-      filters: [
-        {
-          name: 'Audio Files',
-          extensions: PLAIN_AUDIO_EXTS.map((e) => e.slice(1))
-        },
-        { name: 'All Files', extensions: ['*'] }
-      ]
-    })
-    return result.canceled ? [] : result.filePaths
   })
 
   // KGG key database selection

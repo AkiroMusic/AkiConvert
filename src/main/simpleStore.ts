@@ -108,10 +108,6 @@ export class SimpleStore<T extends StoredData> {
     return { ...this.data }
   }
 
-  get<K extends keyof T>(key: K): T[K] {
-    return this.data[key]
-  }
-
   set<K extends keyof T>(key: K, value: T[K]): void {
     this.data[key] = value
     this.save()

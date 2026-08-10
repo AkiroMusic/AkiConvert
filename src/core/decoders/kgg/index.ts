@@ -63,31 +63,6 @@ function sniffFormat(probe: Uint8Array): string {
   return "mp3"
 }
 
-export function parseKeyMap(text: string): Map<string, string> {
-  const map = new Map<string, string>()
-  const lines = text.split(/\r?\n/)
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim()
-    if (line.length === 0) continue
-    const sep = line.indexOf("$")
-    if (sep <= 0 || sep !== line.lastIndexOf("$")) {
-      throw new Error("Invalid kgg.key line " + (i + 1) + ": " + line.slice(0, 40))
-    }
-    const id = line.slice(0, sep)
-    const key = line.slice(sep + 1)
-    if (id.length === 0 || key.length === 0) {
-      throw new Error("Invalid kgg.key line " + (i + 1) + ": " + line.slice(0, 40))
-    }
-    map.set(id, key)
-  }
-  return map
-}
-
-export function serializeKeyMap(map: Map<string, string>): string {
-  const sorted = Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b))
-  return sorted.map(([id, key]) => id + "$" + key).join("\n") + "\n"
-}
-
 export function memoryKeyProvider(map: Map<string, string>): KeyProvider {
   return {
     find(id: string): string | null {
@@ -98,5 +73,3 @@ export function memoryKeyProvider(map: Map<string, string>): KeyProvider {
     },
   }
 }
-
-export { header, ekey, qmc2, PROBE_SIZE }

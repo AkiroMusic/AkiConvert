@@ -8,6 +8,8 @@
 // Make this file a module so `declare global` below is honored.
 // Without this, the Window augmentation is silently ignored and
 // `window.akiConvert` is not typed anywhere in the renderer.
+import type { AppSettings, HistoryRecord, Preset } from '../../shared/types'
+
 export {}
 
 interface FfmpegStatusData {
@@ -17,49 +19,9 @@ interface FfmpegStatusData {
   reason?: string
 }
 
-interface PresetData {
-  id: string
-  name: string
-  outputFormat: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-}
-
-interface AppSettingsData {
-  language: string
-  outputDir: string
-  filenameTemplate: string
-  theme: string
-  outputFormat: string
-  concurrentLimit: number
-  duplicateAction: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-  qmcEkey: string
-  kggKeyImportPath: string
-  autoConcurrent: boolean
-  notificationsEnabled: boolean
-  selectedPreset: string
-  presets: PresetData[]
-  customFfmpegPath?: string
-  embedCompanionLyrics: boolean
-  loudnormEnabled: boolean
-  loudnormTarget: number
-}
-
 interface AkiConvertAPI {
-  selectNcmFiles(): Promise<string[]>
   selectFiles(): Promise<string[]>
   selectFolder(): Promise<string | null>
-  selectPlainAudio(): Promise<string[]>
   selectKggDatabase(): Promise<string | null>
   selectLyricsFile(): Promise<string | null>
 
@@ -96,17 +58,7 @@ interface AkiConvertAPI {
   cancelConvert(filePath: string): Promise<void>
   cancelConversions(): Promise<void>
 
-  getHistory(): Promise<{
-    ts: number
-    inputPath: string
-    inputName: string
-    targetFormat: string
-    status: 'success' | 'failed'
-    outputName: string | null
-    outputPath: string | null
-    durationMs: number | null
-    error: string | null
-  }[]>
+  getHistory(): Promise<HistoryRecord[]>
 
   clearHistory(): Promise<void>
   scanKggKeys(): Promise<{ added: number; total: number }>
@@ -116,7 +68,7 @@ interface AkiConvertAPI {
   revealInFolder(filePath: string): Promise<void>
   openFile(filePath: string): Promise<void>
   selectFfmpegBinary(): Promise<string | null>
-  getSettings(): Promise<AppSettingsData>
+  getSettings(): Promise<AppSettings>
   setSettings(patch: Record<string, unknown>): Promise<void>
   exportSettings(): Promise<{ success: boolean; error?: string }>
   importSettings(): Promise<{ success: boolean; error?: string }>

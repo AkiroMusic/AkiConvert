@@ -79,103 +79,103 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-    // --- Register IPC handlers ---
-    registerDialogHandlers()
-    registerConvertHandlers(getMainWindow)
-    registerSettingsHandlers()
-    registerShellHandlers()
-    registerHistoryHandlers()
-    registerKggHandlers()
-    registerZipHandlers()
-    registerNotificationHandlers()
-    registerThemeHandlers(getMainWindow)
+  // --- Register IPC handlers ---
+  registerDialogHandlers()
+  registerConvertHandlers(getMainWindow)
+  registerSettingsHandlers()
+  registerShellHandlers()
+  registerHistoryHandlers()
+  registerKggHandlers()
+  registerZipHandlers()
+  registerNotificationHandlers()
+  registerThemeHandlers(getMainWindow)
 
-    // Window title IPC
-    ipcMain.handle('window:setTitle', (_event, title: string): void => {
-      mainWindow?.setTitle(title || 'AkiConvert')
-    })
-
-    // Dynamic app icon (taskbar / dock) — single transparent icon
-    ipcMain.handle('window:setAppIcon', (_event): void => {
-      if (!mainWindow) return
-      // Dev: ../../build/  — Production: process.resourcesPath/extra/
-      const iconPath = app.isPackaged
-        ? join(process.resourcesPath, 'extra', 'icon.png')
-        : join(__dirname, '../../build', 'icon.png')
-      mainWindow.setIcon(nativeImage.createFromPath(iconPath))
-    })
-
-    // FFmpeg status IPC — return cached status (updated async below)
-    ipcMain.handle('ffmpeg:getStatus', async (): Promise<FfmpegStatus> => {
-      return ffmpegStatus
-    })
-
-    // Re-check FFmpeg (e.g. after user sets custom path via Select Binary)
-    ipcMain.handle('ffmpeg:recheck', async (): Promise<FfmpegStatus> => {
-      return await refreshFfmpegStatus()
-    })
-
-    // Window control IPC
-    ipcMain.handle('window:minimize', () => {
-      mainWindow?.minimize()
-    })
-
-    ipcMain.handle('window:maximize', () => {
-      if (mainWindow?.isMaximized()) {
-        mainWindow.unmaximize()
-      } else {
-        mainWindow?.maximize()
-      }
-    })
-
-    ipcMain.handle('window:isMaximized', (): boolean => {
-      return mainWindow?.isMaximized() ?? false
-    })
-
-    ipcMain.handle('window:fullscreen', () => {
-      const isFullScreen = mainWindow?.isFullScreen() ?? false
-      mainWindow?.setFullScreen(!isFullScreen)
-    })
-
-    // Create window first — show UI immediately without waiting for FFmpeg check
-    mainWindow = createWindow()
-
-    // Set initial app icon — single transparent icon
-    {
-      const iconPath = app.isPackaged
-        ? join(process.resourcesPath, 'extra', 'icon.png')
-        : join(__dirname, '../../build', 'icon.png')
-      try { mainWindow.setIcon(nativeImage.createFromPath(iconPath)) } catch { /* best-effort */ }
-    }
-
-    // If launched via file association (first instance on Windows),
-    // check process.argv for file paths
-    const startupPaths = extractFilePathsFromArgv(process.argv)
-    if (startupPaths.length > 0) {
-      mainWindow.webContents.once('did-finish-load', () => {
-        sendFilesToRenderer(startupPaths)
-      })
-    }
-
-    // Run FFmpeg health check in the background — does NOT block the window
-    // The renderer subscribes to 'ffmpeg:statusChanged' and will receive the
-    // result as soon as the check completes.
-    refreshFfmpegStatus()
-
-    // Forward maximize/unmaximize events to renderer
-    mainWindow.on('maximize', () => {
-      mainWindow?.webContents.send('window:maximizeChanged', true)
-    })
-    mainWindow.on('unmaximize', () => {
-      mainWindow?.webContents.send('window:maximizeChanged', false)
-    })
-
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        mainWindow = createWindow()
-      }
-    })
+  // Window title IPC
+  ipcMain.handle('window:setTitle', (_event, title: string): void => {
+    mainWindow?.setTitle(title || 'AkiConvert')
   })
+
+  // Dynamic app icon (taskbar / dock) — single transparent icon
+  ipcMain.handle('window:setAppIcon', (_event): void => {
+    if (!mainWindow) return
+    // Dev: ../../build/  — Production: process.resourcesPath/extra/
+    const iconPath = app.isPackaged
+      ? join(process.resourcesPath, 'extra', 'icon.png')
+      : join(__dirname, '../../build', 'icon.png')
+    mainWindow.setIcon(nativeImage.createFromPath(iconPath))
+  })
+
+  // FFmpeg status IPC — return cached status (updated async below)
+  ipcMain.handle('ffmpeg:getStatus', async (): Promise<FfmpegStatus> => {
+    return ffmpegStatus
+  })
+
+  // Re-check FFmpeg (e.g. after user sets custom path via Select Binary)
+  ipcMain.handle('ffmpeg:recheck', async (): Promise<FfmpegStatus> => {
+    return await refreshFfmpegStatus()
+  })
+
+  // Window control IPC
+  ipcMain.handle('window:minimize', () => {
+    mainWindow?.minimize()
+  })
+
+  ipcMain.handle('window:maximize', () => {
+    if (mainWindow?.isMaximized()) {
+      mainWindow.unmaximize()
+    } else {
+      mainWindow?.maximize()
+    }
+  })
+
+  ipcMain.handle('window:isMaximized', (): boolean => {
+    return mainWindow?.isMaximized() ?? false
+  })
+
+  ipcMain.handle('window:fullscreen', () => {
+    const isFullScreen = mainWindow?.isFullScreen() ?? false
+    mainWindow?.setFullScreen(!isFullScreen)
+  })
+
+  // Create window first — show UI immediately without waiting for FFmpeg check
+  mainWindow = createWindow()
+
+  // Set initial app icon — single transparent icon
+  {
+    const iconPath = app.isPackaged
+      ? join(process.resourcesPath, 'extra', 'icon.png')
+      : join(__dirname, '../../build', 'icon.png')
+    try { mainWindow.setIcon(nativeImage.createFromPath(iconPath)) } catch { /* best-effort */ }
+  }
+
+  // If launched via file association (first instance on Windows),
+  // check process.argv for file paths
+  const startupPaths = extractFilePathsFromArgv(process.argv)
+  if (startupPaths.length > 0) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      sendFilesToRenderer(startupPaths)
+    })
+  }
+
+  // Run FFmpeg health check in the background — does NOT block the window
+  // The renderer subscribes to 'ffmpeg:statusChanged' and will receive the
+  // result as soon as the check completes.
+  refreshFfmpegStatus()
+
+  // Forward maximize/unmaximize events to renderer
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send('window:maximizeChanged', true)
+  })
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send('window:maximizeChanged', false)
+  })
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      mainWindow = createWindow()
+    }
+  })
+})
 
 // ---- macOS: open-file event (file association / drag to dock icon) ----
 app.on('open-file', (event, filePath) => {

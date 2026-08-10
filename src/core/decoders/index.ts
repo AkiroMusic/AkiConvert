@@ -5,7 +5,7 @@
  * Decoder router — picks the right decoder by file extension.
  */
 
-import { DecoderResult, DecoderOptions, FORMAT_METADATA, FormatMetadata } from './types'
+import { DecoderResult, DecoderOptions } from './types'
 import * as kwm from './kwm'
 import * as kgm from './kgm'
 import * as qmc from './qmc'
@@ -43,39 +43,4 @@ export function decryptBuffer(ext: string, buffer: Uint8Array, options?: Decoder
   }
 }
 
-export function pickDecoder(ext: string): string | null {
-  const allExts = Object.keys(FORMAT_METADATA)
-  const match = allExts.find((e) => ext.toLowerCase().endsWith(e))
-  return match || null
-}
-
-export function listSupported(): string[] {
-  return Object.keys(FORMAT_METADATA)
-}
-
-export function listRequiresKey(): string[] {
-  return Object.entries(FORMAT_METADATA)
-    .filter(([_, meta]) => meta.requiresKey)
-    .map(([ext]) => ext)
-}
-
-export function listNoKeyRequired(): string[] {
-  return Object.entries(FORMAT_METADATA)
-    .filter(([_, meta]) => !meta.requiresKey)
-    .map(([ext]) => ext)
-}
-
-export function getMetadata(ext: string): FormatMetadata | null {
-  return FORMAT_METADATA[ext.toLowerCase()] || null
-}
-
-export function listByKeyRequirement(): { withKey: string[]; withoutKey: string[] } {
-  const withKey: string[] = []
-  const withoutKey: string[] = []
-  for (const [ext, meta] of Object.entries(FORMAT_METADATA)) {
-    ;(meta.requiresKey ? withKey : withoutKey).push(ext)
-  }
-  return { withKey, withoutKey }
-}
-
-export { QMC_V1_EXTS, QMC_V2_EXTS, FORMAT_METADATA }
+export { QMC_V1_EXTS, QMC_V2_EXTS }

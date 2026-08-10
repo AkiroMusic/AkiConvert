@@ -103,6 +103,31 @@
           "ext": ".kwm",
           "name": "Kuwo Music Crypted",
           "description": "酷我音乐 KWM 文件"
+        },
+        {
+          "ext": ".mflac",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MFLAC 文件"
+        },
+        {
+          "ext": ".mflac0",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MFLAC0 文件"
+        },
+        {
+          "ext": ".mgg",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MGG 文件"
+        },
+        {
+          "ext": ".bkc",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 BKC 文件"
+        },
+        {
+          "ext": ".kgg",
+          "name": "Kugou Music Crypted",
+          "description": "酷狗音乐 KGG 文件"
         }
       ]
     },
@@ -173,6 +198,31 @@
           "ext": ".kwm",
           "name": "Kuwo Music Crypted",
           "description": "酷我音乐 KWM 文件"
+        },
+        {
+          "ext": ".mflac",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MFLAC 文件"
+        },
+        {
+          "ext": ".mflac0",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MFLAC0 文件"
+        },
+        {
+          "ext": ".mgg",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 MGG 文件"
+        },
+        {
+          "ext": ".bkc",
+          "name": "QQ Music Crypted v2",
+          "description": "QQ音乐 BKC 文件"
+        },
+        {
+          "ext": ".kgg",
+          "name": "Kugou Music Crypted",
+          "description": "酷狗音乐 KGG 文件"
         }
       ]
     },

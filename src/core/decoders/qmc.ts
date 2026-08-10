@@ -6,25 +6,13 @@
  */
 
 import { DecoderResult, DecoderOptions } from './types'
-import { readUint32LE, detectAudioFormat } from './utils'
+import { readUint32LE, readUint32BE, detectAudioFormat, buffersEqual } from './utils'
 
 // =====================================================================
 // Constants
 // =====================================================================
-const V1_OFFSET_BOUNDARY = 0x7fff
 const V2_KEY_SIZE = 128
 const KEY_COMPRESS_INDEX_OFFSET = 71214
-
-const EXT_MAP_V1: Record<string, string> = {
-  '.qmc0': 'mp3', '.qmc3': 'mp3', '.qmcflac': 'flac', '.qmcogg': 'ogg',
-}
-
-const SEED_MAP: number[][] = [
-  [0x4a, 0xd6, 0xca, 0x90, 0x67, 0xf7, 0x52], [0x5e, 0x95, 0x23, 0x9f, 0x13, 0x11, 0x7e],
-  [0x47, 0x74, 0x3d, 0x90, 0xaa, 0x3f, 0x51], [0xc6, 0x09, 0xd5, 0x9f, 0xfa, 0x66, 0xf9],
-  [0xf3, 0xd6, 0xa1, 0x90, 0xa0, 0xf7, 0xf0], [0x1d, 0x95, 0xde, 0x9f, 0x84, 0x11, 0xf4],
-  [0x0e, 0x74, 0xbb, 0x90, 0xbc, 0x3f, 0x92], [0x00, 0x09, 0x5b, 0x9f, 0x62, 0x66, 0xa1],
-]
 
 // =====================================================================
 // QMCv1: Static Box Mask
@@ -52,24 +40,6 @@ const QMC1_STATIC_BOX = new Uint8Array([
 const V1_MASK = new Uint8Array(32768)
 for (let i = 0; i < 32768; i++) {
   V1_MASK[i] = QMC1_STATIC_BOX[(i * i + 27) & 0xff]
-}
-
-class QmcSeed {
-  x = -1
-  y = 8
-  dx = 1
-  index = -1
-
-  nextMask(): number {
-    let ret: number
-    this.index++
-    if (this.x < 0) { this.dx = 1; this.y = (8 - this.y) % 8; ret = 0xc3 }
-    else if (this.x > 6) { this.dx = -1; this.y = 7 - this.y; ret = 0xd8 }
-    else { ret = SEED_MAP[this.y][this.x] }
-    this.x += this.dx
-    if (this.index === 0x8000 || (this.index > 0x8000 && (this.index + 1) % 0x8000 === 0)) return this.nextMask()
-    return ret
-  }
 }
 
 function shiftMix(byte: number, shift: number): number {
@@ -439,52 +409,13 @@ export function decryptBuffer(qmcBuf: Uint8Array, options?: DecoderOptions): Dec
   return { audio, format }
 }
 
-/**
- * Detect whether a QMC file is v1 (no ekey needed) or v2 (ekey required).
- */
-export function detectVariant(qmcBuf: Uint8Array): 'v1' | 'v2' {
-  const key = detectKey(qmcBuf)
-  return key ? 'v2' : 'v1'
-}
-
 // =====================================================================
 // Utilities
 // =====================================================================
-
-function readUint32BE(data: Uint8Array, offset: number): number {
-  return (
-    ((data[offset] << 24) |
-      (data[offset + 1] << 16) |
-      (data[offset + 2] << 8) |
-      data[offset + 3]) >>> 0
-  )
-}
-
-function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
-}
 
 function base64ToBytes(b64: string): Uint8Array {
   const binaryStr = atob(b64)
   const bytes = new Uint8Array(binaryStr.length)
   for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i)
   return bytes
-}
-
-export {
-  decryptV1Buffer,
-  decryptV2Buffer,
-  detectKey,
-  QmcSeed,
-  SEED_MAP,
-  EXT_MAP_V1,
-  keyCompress,
-  shiftMix,
-  V1_OFFSET_BOUNDARY,
-  V2_KEY_SIZE,
-  KEY_COMPRESS_INDEX_OFFSET,
 }

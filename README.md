@@ -242,7 +242,7 @@ npm install
 
 | 层次 | 技术 |
 |------|------|
-| 框架 | Electron 33 + electron-vite |
+| 框架 | Electron 43 + electron-vite |
 | 前端 | React 18 + TypeScript + Tailwind CSS |
 | 状态管理 | Zustand |
 | 国际化 | i18next + react-i18next |

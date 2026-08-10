@@ -4,6 +4,9 @@
  */
 
 import { create } from 'zustand'
+import type { AppSettings, Preset } from '../../../shared/types'
+
+export type { AppSettings, Preset }
 
 export interface FileEntry {
   id: string
@@ -21,44 +24,6 @@ export interface FileEntry {
   errorMessage?: string
   estimatedOutputSize?: number
   lyricsPath?: string
-}
-
-export interface Preset {
-  id: string
-  name: string
-  outputFormat: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-}
-
-export interface AppSettings {
-  language: string
-  outputDir: string
-  filenameTemplate: string
-  theme: string
-  outputFormat: string
-  concurrentLimit: number
-  duplicateAction: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-  qmcEkey: string
-  kggKeyImportPath: string
-  autoConcurrent: boolean
-  notificationsEnabled: boolean
-  selectedPreset: string
-  presets: Preset[]
-  customFfmpegPath?: string
-  embedCompanionLyrics: boolean
-  loudnormEnabled: boolean
-  loudnormTarget: number
 }
 
 interface AppState {

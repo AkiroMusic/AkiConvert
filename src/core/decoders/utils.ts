@@ -18,6 +18,29 @@ export function readUint32LE(data: Uint8Array, offset: number): number {
 }
 
 /**
+ * Read a 32-bit unsigned big-endian integer from a Uint8Array.
+ */
+export function readUint32BE(data: Uint8Array, offset: number): number {
+  return (
+    ((data[offset] << 24) |
+      (data[offset + 1] << 16) |
+      (data[offset + 2] << 8) |
+      data[offset + 3]) >>> 0
+  )
+}
+
+/**
+ * Compare two Uint8Arrays for byte-for-byte equality.
+ */
+export function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
+}
+
+/**
  * Detect audio format by sniffing the header bytes.
  * Returns extension string like "mp3", "flac", "ogg", "wav", "m4a".
  */

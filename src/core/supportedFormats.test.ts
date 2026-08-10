@@ -19,12 +19,13 @@ import {
 } from './supportedFormats'
 
 describe('ENCRYPTED_EXTS', () => {
-  it('should contain exactly the 13 known encrypted extensions', () => {
+  it('should contain exactly the 18 known encrypted extensions', () => {
     expect(ENCRYPTED_EXTS).toEqual([
       '.ncm', '.kwm', '.kgm', '.kgma',
       '.vpr', '.qmc0', '.qmc3', '.qmcflac',
       '.qmcogg', '.qmc1', '.qmc2', '.tkm',
-      '.kgg',
+      '.mflac', '.mflac0', '.mgg', '.bkc',
+      '.kgg', '.kgg.flac',
     ])
   })
 
@@ -79,7 +80,7 @@ describe('OUTPUT_FORMATS', () => {
 describe('getAllSupportedExts', () => {
   it('should merge encrypted and plain extensions without duplicates', () => {
     const all = getAllSupportedExts()
-    expect(all).toHaveLength(24)
+    expect(all).toHaveLength(29)
     expect(new Set(all).size).toBe(all.length)
     for (const ext of [...ENCRYPTED_EXTS, ...PLAIN_AUDIO_EXTS]) {
       expect(all).toContain(ext)
@@ -161,10 +162,16 @@ describe('isSupportedExt', () => {
     expect(isSupportedExt('.NCM')).toBe(true)
   })
 
-  it('should NOT support Phase 2 key-required extensions', () => {
-    // .kgg 已激活（见 ENCRYPTED_EXTS）；.mflac/.mflac0/.mgg 等 QMCv2 变体
-    // 虽有解码器但尚未接入格式列表，仍视为不支持
-    for (const ext of ['.mflac', '.mflac0', '.mflac2', '.mgg', '.mgg1', '.bkc']) {
+  it('should support the activated QMCv2 variants', () => {
+    // .mflac/.mflac0/.mgg/.bkc 已接入 ENCRYPTED_EXTS（QMCv2 解码器已启用）
+    for (const ext of ['.mflac', '.mflac0', '.mgg', '.bkc']) {
+      expect(isSupportedExt(ext)).toBe(true)
+    }
+  })
+
+  it('should NOT support unlisted QMCv2 variants', () => {
+    // .mflac2/.mgg1 等变体虽有解码器能力但尚未列入格式列表，仍视为不支持
+    for (const ext of ['.mflac2', '.mflac4', '.mgg1', '.mgg2', '.mgg4', '.mggl', '.bkcmp3', '.bkcflac']) {
       expect(isSupportedExt(ext)).toBe(false)
     }
   })

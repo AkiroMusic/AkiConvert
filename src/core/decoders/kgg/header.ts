@@ -5,7 +5,7 @@
  * KGG v5 file header parser.
  */
 
-import { readUint32LE } from '../utils'
+import { readUint32LE, buffersEqual } from '../utils'
 
 const MAGIC = new Uint8Array([
   0x7c, 0xd5, 0x32, 0xeb, 0x86, 0x02, 0x7f, 0x4b,
@@ -21,14 +21,6 @@ export interface KggHeader {
   headerLength: number
   cryptoVersion: number
   encryptionKeyId: string
-}
-
-function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
 }
 
 export function parse(prefix: Uint8Array): KggHeader {
@@ -64,4 +56,4 @@ export function parse(prefix: Uint8Array): KggHeader {
   return { headerLength, cryptoVersion: version, encryptionKeyId: id }
 }
 
-export { MAGIC, PREFIX_SIZE, ID_OFFSET, MAX_ID_LENGTH }
+export { MAGIC, PREFIX_SIZE }

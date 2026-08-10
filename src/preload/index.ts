@@ -6,17 +6,11 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 
 const akiConvertAPI = {
-  selectNcmFiles: (): Promise<string[]> =>
-    ipcRenderer.invoke('dialog:selectNcmFiles'),
-
   selectFiles: (): Promise<string[]> =>
     ipcRenderer.invoke('dialog:selectFiles'),
 
   selectFolder: (): Promise<string | null> =>
     ipcRenderer.invoke('dialog:selectFolder'),
-
-  selectPlainAudio: (): Promise<string[]> =>
-    ipcRenderer.invoke('dialog:selectPlainAudio'),
 
   selectKggDatabase: (): Promise<string | null> =>
     ipcRenderer.invoke('dialog:selectKggDatabase'),

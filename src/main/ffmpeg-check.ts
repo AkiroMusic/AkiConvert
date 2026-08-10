@@ -10,59 +10,13 @@
 import { execFile } from 'child_process'
 import { existsSync } from 'fs'
 import { join } from 'path'
+import { binExt, bundledDir } from './ffmpeg-path'
 
 export interface FfmpegStatus {
   available: boolean
   ffmpegPath: string | null
   ffprobePath: string | null
   reason?: string
-}
-
-// ---------------------------------------------------------------------------
-// Detect packaged mode safely across Electron / test / script environments
-// ---------------------------------------------------------------------------
-
-function isPackaged(): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { app } = require('electron')
-    return app?.isPackaged === true
-  } catch {
-    return false
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Platform helpers
-// ---------------------------------------------------------------------------
-
-// darwin 需要区分 x64 / arm64，与 ffmpeg-path.ts 的目录布局保持一致
-function platformDir(): string {
-  const p = process.platform
-  if (p === 'win32') return 'win32'
-  if (p === 'darwin') return process.arch === 'arm64' ? 'darwin/arm64' : 'darwin/x64'
-  return 'linux'
-}
-
-function binExt(): string {
-  return process.platform === 'win32' ? '.exe' : ''
-}
-
-// ---------------------------------------------------------------------------
-// Bundled directory resolver
-// ---------------------------------------------------------------------------
-
-function bundledDir(): string {
-  if (isPackaged()) {
-    // Packaged: binaries live inside the app's resources
-    return join(process.resourcesPath!, 'ffmpeg', platformDir())
-  }
-  // Dev mode: this file compiles to out/main/, resources is ../../resources/
-  return join(__dirname, '..', '..', 'resources', 'ffmpeg', platformDir())
-}
-
-export function getBundledDir(): string {
-  return bundledDir()
 }
 
 // ---------------------------------------------------------------------------
@@ -85,7 +39,7 @@ export function probeBinary(binPath: string): Promise<boolean> {
  * Check if FFmpeg is available (bundled or custom path).
  */
 export async function ensureFfmpeg(customFfmpegPath?: string | null): Promise<FfmpegStatus> {
-  const ext = binExt()
+  const ext = binExt(process.platform)
   const ffmpegName = `ffmpeg${ext}`
   const ffprobeName = `ffprobe${ext}`
 

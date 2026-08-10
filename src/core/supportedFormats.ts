@@ -18,7 +18,8 @@ export const ENCRYPTED_EXTS: string[] = [
   '.ncm', '.kwm', '.kgm', '.kgma',
   '.vpr', '.qmc0', '.qmc3', '.qmcflac',
   '.qmcogg', '.qmc1', '.qmc2', '.tkm',
-  '.kgg',
+  '.mflac', '.mflac0', '.mgg', '.bkc',
+  '.kgg', '.kgg.flac',
 ]
 
 /** 普通（未加密）音频格式 */

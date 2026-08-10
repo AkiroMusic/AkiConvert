@@ -10,18 +10,9 @@
 import { appendFile, readFile, unlink, writeFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import { join } from 'path'
+import type { HistoryRecord } from '../shared/types'
 
-export interface HistoryRecord {
-  ts: number
-  inputPath: string
-  inputName: string
-  targetFormat: string
-  status: 'success' | 'failed'
-  outputName: string | null
-  outputPath: string | null
-  durationMs: number | null
-  error: string | null
-}
+export type { HistoryRecord }
 
 export class HistoryStore {
   private readonly filePath: string

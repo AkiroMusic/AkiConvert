@@ -232,27 +232,6 @@ export function detectAudioFormat(data: Uint8Array): AudioFormat {
   return { ext: 'mp3', mime: 'audio/mpeg' };
 }
 
-import { type DecoderModule } from './types'
-
-export const ncmDecoder: DecoderModule = {
-  name: 'NCM Decoder',
-  extensions: ['.ncm'],
-  requiresKey: false,
-  decode: async (arrayBuffer, options) => {
-    const result = await parseNCM(arrayBuffer, options)
-    return {
-      audioData: result.audioData,
-      format: result.format,
-      metadata: result.metadata,
-      image: result.image,
-      imageMime: result.imageMime,
-      songName: result.songName,
-      artist: result.artist,
-      album: result.album,
-    }
-  },
-}
-
 export function base64ToUint8Array(base64: string): Uint8Array {
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);

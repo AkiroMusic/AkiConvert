@@ -9,18 +9,9 @@ import { isAbsolute } from 'path'
 import { SimpleStore } from '../simpleStore'
 import { probeBinary } from '../ffmpeg-check'
 import { OUTPUT_FORMATS } from '../../core/supportedFormats'
+import type { AppSettings, Preset } from '../../shared/types'
 
-export interface Preset {
-  id: string
-  name: string
-  outputFormat: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-}
+export type { Preset }
 
 const DEFAULT_PRESETS: Preset[] = [
   {
@@ -68,32 +59,6 @@ const DEFAULT_PRESETS: Preset[] = [
     bitDepth: '24'
   }
 ]
-
-type AppSettings = {
-  language: string
-  outputDir: string
-  filenameTemplate: string
-  theme: string
-  outputFormat: string
-  bitrate: string
-  vbrEnabled: boolean
-  vbrQuality: number
-  compressionLevel: number
-  sampleRate: string
-  bitDepth: string
-  qmcEkey: string
-  kggKeyImportPath: string
-  autoConcurrent: boolean
-  notificationsEnabled: boolean
-  selectedPreset: string
-  presets: Preset[]
-  concurrentLimit: number
-  duplicateAction: string
-  customFfmpegPath: string
-  embedCompanionLyrics: boolean
-  loudnormEnabled: boolean
-  loudnormTarget: number
-}
 
 // ---------------------------------------------------------------------------
 // 安全加固：settings:set / settings:import 键白名单 + 每键类型/值域校验。

@@ -143,10 +143,4 @@ function makeCipher(key: Uint8Array): Cipher {
   return key.length <= 300 ? makeMapCipher(key) : makeRc4Cipher(key)
 }
 
-export {
-  makeCipher,
-  MAP_OFFSET_BOUNDARY,
-  MAP_INDEX_OFFSET,
-  RC4_FIRST_SEGMENT_SIZE,
-  RC4_SEGMENT_SIZE,
-}
+export { makeCipher }

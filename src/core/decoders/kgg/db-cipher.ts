@@ -118,14 +118,4 @@ function decryptPage(page: Uint8Array, pageNumber: number, masterKey: Buffer): v
   }
 }
 
-export {
-  PAGE_SIZE,
-  MASTER_KEY,
-  pageKey,
-  pageIv,
-  isPlaintextHeader,
-  isEncryptedHeader,
-  decryptFirstPage,
-  decryptPage,
-  decryptBlocks,
-}
+export { MASTER_KEY, isPlaintextHeader, decryptFirstPage, decryptPage }

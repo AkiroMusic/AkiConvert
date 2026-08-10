@@ -76,6 +76,8 @@ export const FORMAT_METADATA: Record<string, FormatMetadata> = {
   ".qmc3":     { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
   ".qmcflac":  { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
   ".qmcogg":   { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
+  ".qmc1":     { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
+  ".qmc2":     { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
   ".tkm":      { platform: "QQ 音乐",     version: "v1", requiresKey: false, keySource: "none" },
   ".mflac":    { platform: "QQ 音乐",     version: "v2", requiresKey: true, keySource: "ekey" },
   ".mflac0":   { platform: "QQ 音乐",     version: "v2", requiresKey: true, keySource: "ekey" },

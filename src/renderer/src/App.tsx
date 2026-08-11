@@ -25,7 +25,7 @@ type ViewType = 'convert' | 'settings' | 'history'
 function App(): JSX.Element {
   const { t } = useTranslation()
   const [currentView, setCurrentView] = useState<ViewType>('convert')
-  const { settings, setSettings, setFfmpegAvailable } = useAppStore()
+  const { settings, applyPersistedSettings, setFfmpegAvailable } = useAppStore()
   const files = useAppStore((s) => s.files)
   const isConverting = useAppStore((s) => s.isConverting)
   const [summaryModal, setSummaryModal] = useState<{
@@ -40,7 +40,7 @@ function App(): JSX.Element {
   // ===== Load settings on mount =====
   useEffect(() => {
     window.akiConvert?.getSettings().then((s) => {
-      setSettings(s)
+      applyPersistedSettings(s)
       // Sync i18n language with stored setting
       if (s.language) {
         i18n.changeLanguage(s.language)

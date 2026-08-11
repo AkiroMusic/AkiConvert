@@ -48,6 +48,7 @@ interface AppState {
   setConverting: (converting: boolean) => void
   setOutputDir: (dir: string | null) => void
   setSettings: (settings: Partial<AppSettings>) => void
+  applyPersistedSettings: (settings: AppSettings) => void
   setCurrentPreview: (id: string | null) => void
   resetStats: () => void
   setLyricsPath: (id: string, lyricsPath?: string) => void
@@ -220,6 +221,14 @@ export const useAppStore = create<AppState>((set) => ({
   setSettings: (settings) =>
     set((state) => ({
       settings: { ...state.settings, ...settings }
+    })),
+
+  // Hydrate persisted settings on launch: merge them into state.settings and
+  // mirror outputDir into the runtime outputDir (empty string → null).
+  applyPersistedSettings: (settings) =>
+    set((state) => ({
+      settings: { ...state.settings, ...settings },
+      outputDir: settings.outputDir || null
     })),
 
   setCurrentPreview: (id) => set({ currentPreviewId: id }),

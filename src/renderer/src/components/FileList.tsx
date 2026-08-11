@@ -84,6 +84,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       dir = await window.akiConvert.selectFolder()
       if (!dir) return
       useAppStore.getState().setOutputDir(dir)
+      useAppStore.getState().setSettings({ outputDir: dir })
     }
 
     const gen = runGenRef.current

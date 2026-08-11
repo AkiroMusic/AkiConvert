@@ -12,6 +12,7 @@ import {
   ENCRYPTED_EXTS,
   PLAIN_AUDIO_EXTS,
   OUTPUT_FORMATS,
+  classifySourceExt,
   getAllSupportedExts,
   isEncryptedExt,
   isPlainAudioExt,
@@ -179,5 +180,30 @@ describe('isSupportedExt', () => {
   it('should return false for unknown extensions', () => {
     expect(isSupportedExt('.txt')).toBe(false)
     expect(isSupportedExt('')).toBe(false)
+  })
+})
+
+describe('classifySourceExt', () => {
+  it('should classify a multi-extension encrypted source (e.g. .kgg.flac) as encrypted', () => {
+    expect(classifySourceExt('song.kgg.flac')).toEqual({ ext: '.kgg.flac', encrypted: true })
+  })
+
+  it('should classify a plain audio source as not encrypted', () => {
+    expect(classifySourceExt('song.flac')).toEqual({ ext: '.flac', encrypted: false })
+  })
+
+  it('should be case-insensitive', () => {
+    expect(classifySourceExt('track.KGG.FLAC')).toEqual({ ext: '.kgg.flac', encrypted: true })
+  })
+
+  it('should return null for an unsupported extension', () => {
+    expect(classifySourceExt('unknown.xyz')).toBeNull()
+  })
+
+  it('should prefer the longest matching suffix over a shorter plain suffix', () => {
+    // 'song.kgg.flac' ends with both '.flac' and '.kgg.flac' — longest match must win
+    const result = classifySourceExt('song.kgg.flac')
+    expect(result?.ext).toBe('.kgg.flac')
+    expect(result?.encrypted).toBe(true)
   })
 })

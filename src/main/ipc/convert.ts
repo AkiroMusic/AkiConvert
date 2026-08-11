@@ -18,7 +18,7 @@ import { renderFilenameTemplate, deriveMetadataFromFilename } from "../../core/t
 import { run, runFfmpeg, FfmpegOptions, extractLyrics } from "../ffmpeg"
 import { HistoryStore } from "../history"
 import { settingsStore } from "./settings"
-import { isEncryptedExt, isPlainAudioExt, OUTPUT_FORMATS } from '../../core/supportedFormats'
+import { classifySourceExt, OUTPUT_FORMATS } from '../../core/supportedFormats'
 import { loadKeysMap } from '../kggKeys'
 import { memoryKeyProvider } from '../../core/decoders/kgg'
 
@@ -150,13 +150,13 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
         sendProgress(0.05)
 
-        const ext = extname(filePath).toLowerCase()
-        isEncrypted = isEncryptedExt(ext)
-        const isPlainAudio = isPlainAudioExt(ext)
-
-        if (!isEncrypted && !isPlainAudio) {
-          return { success: false, errorMessage: `Unsupported file format: ${ext}` }
+        const src = classifySourceExt(filePath)
+        if (!src) {
+          return { success: false, errorMessage: `Unsupported file format: ${extname(filePath).toLowerCase()}` }
         }
+        const ext = src.ext
+        isEncrypted = src.encrypted
+        const isPlainAudio = !src.encrypted
 
         const fileBuffer = await readFile(filePath)
         sendProgress(0.1)

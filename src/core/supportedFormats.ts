@@ -74,3 +74,23 @@ export function isPlainAudioExt(ext: string): boolean {
 export function isSupportedExt(ext: string): boolean {
   return isEncryptedExt(ext) || isPlainAudioExt(ext)
 }
+
+/**
+ * 将源文件路径归类为加密或普通音频格式，返回匹配的后缀与加密标记。
+ *
+ * 按后缀长度降序匹配（最长匹配优先），同长度时优先加密格式，这样
+ * 'song.kgg.flac' 会命中 '.kgg.flac' 而不是较短且位于普通列表的 '.flac'。
+ * 无任何匹配时返回 null。
+ */
+export function classifySourceExt(filePath: string): { ext: string; encrypted: boolean } | null {
+  const lower = filePath.toLowerCase()
+  const candidates = ENCRYPTED_EXTS.concat(PLAIN_AUDIO_EXTS)
+    .filter((ext, i, arr) => arr.indexOf(ext) === i)
+    .sort((a, b) => b.length - a.length || (ENCRYPTED_EXTS.includes(a) ? -1 : 1))
+  for (const ext of candidates) {
+    if (lower.endsWith(ext)) {
+      return { ext, encrypted: ENCRYPTED_EXTS.includes(ext) }
+    }
+  }
+  return null
+}

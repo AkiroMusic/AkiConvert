@@ -11,13 +11,15 @@ function LanguageSwitcher(): JSX.Element {
   const { i18n, t } = useTranslation()
   const setSettings = useAppStore((s) => s.setSettings)
 
-  const currentLang = i18n.language || 'zh-CN'
+  const currentLang = i18n.language || 'en-US'
 
   const toggleLanguage = useCallback(async () => {
     const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN'
     await i18n.changeLanguage(newLang)
-    setSettings({ language: newLang })
-    window.akiConvert?.setSettings({ language: newLang }).catch(() => {})
+    // Explicit choice: persist both the language and the languageSet flag
+    // so future launches honor it instead of re-running OS auto-detection.
+    setSettings({ language: newLang, languageSet: true })
+    window.akiConvert?.setSettings({ language: newLang, languageSet: true }).catch(() => {})
   }, [currentLang, i18n, setSettings])
 
   return (

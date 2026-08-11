@@ -118,6 +118,13 @@ describe('sanitizePatch — per-key validators', () => {
     expect(sanitizePatch({ loudnormTarget: -14 })).toEqual({ loudnormTarget: -14 })
   })
 
+  it('should accept only booleans for languageSet', () => {
+    expect(sanitizePatch({ languageSet: true })).toEqual({ languageSet: true })
+    expect(sanitizePatch({ languageSet: false })).toEqual({ languageSet: false })
+    expect(sanitizePatch({ languageSet: 'yes' })).toEqual({})
+    expect(sanitizePatch({ languageSet: 1 })).toEqual({})
+  })
+
   it('should reject invalid duplicateAction', () => {
     expect(sanitizePatch({ duplicateAction: 'delete-everything' })).toEqual({})
     expect(sanitizePatch({ duplicateAction: 'rename' })).toEqual({ duplicateAction: 'rename' })

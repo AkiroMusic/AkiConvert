@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
 import { useAppStore } from './store/useAppStore'
+import { resolveInitialLanguage } from './utils/language'
 import { getAllSupportedExts } from '../../core/supportedFormats'
 import TitleBar from './components/TitleBar'
 import Sidebar from './components/Sidebar'
@@ -41,9 +42,15 @@ function App(): JSX.Element {
   useEffect(() => {
     window.akiConvert?.getSettings().then((s) => {
       applyPersistedSettings(s)
-      // Sync i18n language with stored setting
-      if (s.language) {
-        i18n.changeLanguage(s.language)
+      // Sync i18n language with stored setting: an explicit user choice
+      // wins; on first run (languageSet === false) auto-detect from the
+      // OS language and persist the decision so later launches are stable.
+      const lang = resolveInitialLanguage(s.language, s.languageSet, navigator.language ?? '')
+      i18n.changeLanguage(lang)
+      if (!s.languageSet) {
+        const patch = { language: lang, languageSet: true }
+        window.akiConvert?.setSettings(patch).catch(() => {})
+        useAppStore.getState().setSettings(patch)
       }
     }).catch(() => {
       // Settings store may not be ready, use defaults

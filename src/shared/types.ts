@@ -23,6 +23,9 @@ export interface Preset {
 // 可满足 SimpleStore<T extends StoredData> 的约束（interface 无隐式索引签名）。
 export type AppSettings = {
   language: string
+  // true 表示用户显式选择了语言（首次运行时自动检测后也会置为 true）；
+  // false 表示从未选择过，启动时应按系统语言自动检测。
+  languageSet: boolean
   outputDir: string
   filenameTemplate: string
   theme: string

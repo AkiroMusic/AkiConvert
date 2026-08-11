@@ -106,6 +106,7 @@ export const useAppStore = create<AppState>((set) => ({
   stats: { total: 0, success: 0, fail: 0 },
   settings: {
     language: 'en-US',
+    languageSet: false,
     outputDir: '',
     filenameTemplate: '{artist} - {title}',
     theme: 'dark',

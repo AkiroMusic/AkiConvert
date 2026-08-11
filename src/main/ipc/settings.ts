@@ -71,6 +71,7 @@ const DEFAULT_PRESETS: Preset[] = [
 /** 允许通过 IPC 写入的设置键（customFfmpegPath 见下方单独处理）。 */
 const SETTABLE_KEYS = new Set<keyof AppSettings>([
   'language',
+  'languageSet',
   'theme',
   'outputDir',
   'filenameTemplate',
@@ -96,6 +97,7 @@ const SETTABLE_KEYS = new Set<keyof AppSettings>([
 
 const VALIDATORS: Partial<Record<keyof AppSettings, (v: unknown) => boolean>> = {
   language: (v) => v === 'zh-CN' || v === 'en-US',
+  languageSet: (v) => typeof v === 'boolean',
   theme: (v) => ['system', 'dark', 'light', 'sepia', 'forest', 'ocean', 'lavender'].includes(v as string),
   outputDir: (v) => typeof v === 'string' && v.length <= 4096,
   filenameTemplate: (v) => typeof v === 'string' && v.length <= 200,
@@ -157,6 +159,7 @@ const store = new SimpleStore<AppSettings>({
   validateKey: validateSettingsKey,
   defaults: {
     language: 'zh-CN',
+    languageSet: false,
     outputDir: '',
     filenameTemplate: '{artist} - {title}',
     theme: 'dark',
@@ -260,8 +263,8 @@ export function registerSettingsHandlers(): void {
       // 自定义 FFmpeg 路径不在白名单内（需经对话框选择），故忽略导入。
       const sanitized = sanitizePatch(imported)
       for (const [key, value] of Object.entries(sanitized)) {
-        if (key !== 'language') {
-          // Don't override language
+        if (key !== 'language' && key !== 'languageSet') {
+          // Don't override language / languageSet (locale stays local)
           store.set(key as keyof AppSettings, value)
         }
       }

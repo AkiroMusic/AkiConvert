@@ -17,6 +17,28 @@ const MAX_TOTAL_BYTES = 1024 * 1024 * 1024 // 总大小 ≤ 1 GiB
 const MAX_SINGLE_FILE_BYTES = 512 * 1024 * 1024 // 单文件 ≤ 512 MiB
 const MAX_FILE_COUNT = 500 // 文件数 ≤ 500
 
+/**
+ * 消毒 ZIP 条目名，防止路径穿越（zip-slip）与绝对路径/控制字符注入。
+ * JSZip 会按原样保存条目名，`../evil.txt` 在解压时可写出目标目录之外，
+ * `/abs/name.txt` 保留前导斜杠、NUL 等控制字符也可能造成危险。
+ *
+ * 规则：按 `/` 与 `\` 分段，丢弃空段与 `..` 段，去掉前导斜杠，
+ * 控制字符（[\u0000-\u001f\u007f]）替换为 `_`，再以 `/` 重新拼接；
+ * 结果为空或仅剩 `.` 时回退到 `file`。
+ */
+export function sanitizeZipEntryName(name: string): string {
+  const segments: string[] = []
+  for (const raw of name.replace(/[\u0000-\u001f\u007f]/g, '_').split(/[\\/]+/)) {
+    if (raw === '' || raw === '.') continue
+    if (raw === '..') {
+      segments.pop() // `..` 抵消前一段（pop 空栈无害，不会产生穿越）
+      continue
+    }
+    segments.push(raw)
+  }
+  return segments.length > 0 ? segments.join('/') : 'file'
+}
+
 export function registerZipHandlers(): void {
   ipcMain.handle(
     'convert:downloadAsZip',
@@ -67,7 +89,7 @@ export function registerZipHandlers(): void {
           const filePath = filePaths[i]
           const fileName = fileNames[i] || `file_${i}${extname(filePath)}`
           const data = await readFile(filePath)
-          zip.file(fileName, data)
+          zip.file(sanitizeZipEntryName(fileName), data)
         }
 
         const zipBuffer = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })

@@ -22,4 +22,16 @@ describe('basenameFromPath', () => {
   it('空串输入返回空串', () => {
     expect(basenameFromPath('')).toBe('')
   })
+
+  it('去除末尾分隔符后提取末段（Windows）', () => {
+    expect(basenameFromPath('C:\\foo\\bar\\')).toBe('bar')
+  })
+
+  it('去除末尾分隔符后提取末段（正斜杠）', () => {
+    expect(basenameFromPath('a/b/')).toBe('b')
+  })
+
+  it('全部为分隔符时返回空串', () => {
+    expect(basenameFromPath('\\\\')).toBe('')
+  })
 })

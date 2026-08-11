@@ -11,5 +11,5 @@
  * @example basenameFromPath('C:\\Users\\x\\song.flac') → 'song.flac'
  */
 export function basenameFromPath(p: string): string {
-  return p.split(/[\\/]/).pop() || p
+  return p.replace(/[\\/]+$/, '').split(/[\\/]/).pop() || ''
 }

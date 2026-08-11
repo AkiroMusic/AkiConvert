@@ -4,7 +4,7 @@
  */
 
 import { ipcMain, dialog } from 'electron'
-import { ENCRYPTED_EXTS, PLAIN_AUDIO_EXTS } from '../../core/supportedFormats'
+import { getAllSupportedExts } from '../../core/supportedFormats'
 
 export function registerDialogHandlers(): void {
   // Multi-format file selection (Phase 1 — no external key needed)
@@ -14,7 +14,7 @@ export function registerDialogHandlers(): void {
       filters: [
         {
           name: 'All Supported Audio Files',
-          extensions: ENCRYPTED_EXTS.map((e) => e.slice(1))
+          extensions: getAllSupportedExts().map((e) => e.slice(1))
         },
         { name: 'All Files', extensions: ['*'] }
       ]

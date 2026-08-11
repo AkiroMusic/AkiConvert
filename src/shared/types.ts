@@ -60,4 +60,17 @@ export interface HistoryRecord {
   outputPath: string | null
   durationMs: number | null
   error: string | null
+  // i18n 键：失败记录由主进程附带，渲染进程据此翻译错误文案（error 保留英文兜底）。
+  // 旧记录可能没有该字段，渲染进程需回退到 error 原文。
+  errorKey?: string
+}
+
+/**
+ * 转换失败结果的统一形状：errorKey 供渲染进程做 i18n 翻译，
+ * message 为英文兜底文案（渲染进程无法翻译时直接展示）。
+ */
+export type ConversionErrorResult = {
+  ok: false
+  errorKey: string
+  message: string
 }

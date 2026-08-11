@@ -165,7 +165,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
 
       for (const file of failed) {
         const result = resultsByPath.get(file.filePath)
-        setFileError(file.filePath, result?.errorMessage || t('error.convertFailed'))
+        // 主进程附带 errorKey 时优先 i18n 翻译；未知键回退到英文错误文案
+        setFileError(file.filePath, result?.errorKey ? t(result.errorKey, result.errorMessage ?? '') : (result?.errorMessage || t('error.convertFailed')))
         batchFailRef.current += 1
       }
 

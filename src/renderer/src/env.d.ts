@@ -49,6 +49,7 @@ interface AkiConvertAPI {
     encrypted?: boolean
     verified?: boolean
     errorMessage?: string
+    errorKey?: string
   }>
 
   onConvertProgress(

@@ -16,6 +16,7 @@ interface HistoryRecord {
   outputPath: string | null
   durationMs: number | null
   error: string | null
+  errorKey?: string
 }
 
 function formatDuration(ms: number | null): string {
@@ -255,7 +256,8 @@ function HistoryView(): JSX.Element {
                   paddingLeft: '20px'
                 }}
               >
-                {record.error}
+                {/* 有 errorKey 时翻译；旧记录/未知键回退到英文原文 */}
+                {t(record.errorKey ?? record.error, record.error)}
               </div>
             )}
             {record.status === 'success' && record.outputPath && (

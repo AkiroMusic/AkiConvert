@@ -103,6 +103,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
       encrypted?: boolean
       verified?: boolean
       errorMessage?: string
+      errorKey?: string
     }> => {
       const startTime = Date.now()
       const controller = new AbortController()
@@ -152,7 +153,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
         const src = classifySourceExt(filePath)
         if (!src) {
-          return { success: false, errorMessage: `Unsupported file format: ${extname(filePath).toLowerCase()}` }
+          return { success: false, errorKey: "error.invalidFormat", errorMessage: `Unsupported file format: ${extname(filePath).toLowerCase()}` }
         }
         const ext = src.ext
         isEncrypted = src.encrypted
@@ -235,7 +236,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         // （可被恶意 settings.json 注入），必须确认其落在合法格式集合内，
         // 防止 `../x`、`/tmp/x` 等含路径分隔符的字符串越界写出。
         if (!ALLOWED_OUTPUT_FORMATS.has(effectiveFormat)) {
-          return { success: false, errorMessage: `Unsupported output format: ${outputFormat}` }
+          return { success: false, errorKey: "error.invalidFormat", errorMessage: `Unsupported output format: ${outputFormat}` }
         }
 
         // --- Generate output filename ---
@@ -256,7 +257,7 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         const resolvedOutputPath = resolve(outputPath)
         const rel = relative(resolvedOutputDir, resolvedOutputPath)
         if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) {
-          return { success: false, errorMessage: "Output path escapes the output directory" }
+          return { success: false, errorKey: "error.outputEscape", errorMessage: "Output path escapes the output directory" }
         }
 
         const outputDirPath = dirname(outputPath)
@@ -277,9 +278,10 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
             outputName: null,
             outputPath: null,
             durationMs: Date.now() - startTime,
-            error: "File already exists"
+            error: "File already exists",
+            errorKey: "error.fileExists"
           })
-          return { success: false, errorMessage: "File already exists" }
+          return { success: false, errorKey: "error.fileExists", errorMessage: "File already exists" }
         } else if (duplicateAction === "rename") {
           let counter = 1
           while (existsSync(outputPath)) {
@@ -454,6 +456,15 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
       } catch (error) {
         let message = error instanceof Error ? error.message : "Unknown error"
 
+        // 为可识别的失败场景附加 i18n 键：渲染进程用 errorKey 做翻译，
+        // message 始终保留英文兜底文案（含原始错误详情）。
+        let errorKey: string | undefined
+        if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {
+          errorKey = "error.sourceMissing"
+        } else if (isEncrypted) {
+          errorKey = "error.corruptOrKey"
+        }
+
         // For encrypted formats that produced an invalid audio header, the
         // failure is almost always a corrupt/truncated source file or a
         // wrong decryption key — append a human-readable hint to the raw
@@ -472,12 +483,14 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
           outputName: null,
           outputPath: null,
           durationMs: Date.now() - startTime,
-          error: message
+          error: message,
+          errorKey
         })
 
         return {
           success: false,
           verified: false,
+          errorKey,
           errorMessage: message
         }
       } finally {

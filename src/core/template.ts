@@ -9,8 +9,9 @@
  */
 
 export function sanitizeFileName(s: string): string {
-  // 非法字符替换为 `_`；结尾的 `.` 和空格是 Windows 禁止的，一并去掉
-  return s.replace(/[<>:"/\\|?*]/g, '_').replace(/[. ]+$/, '')
+  // 非法字符替换为 `_`（含 Windows 控制字符 U+0000–U+001F、U+007F）；
+  // 结尾的 `.` 和空格是 Windows 禁止的，一并去掉
+  return s.replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, '_').replace(/[. ]+$/, '')
 }
 
 /**

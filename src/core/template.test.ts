@@ -34,6 +34,16 @@ describe('sanitizeFileName', () => {
   it('should trim trailing dot and spaces', () => {
     expect(sanitizeFileName('My Song. ')).toBe('My Song')
   })
+
+  it('should replace Windows control chars with underscores', () => {
+    expect(sanitizeFileName('a\u0000b')).toBe('a_b')
+    expect(sanitizeFileName('x\u001fy')).toBe('x_y')
+    expect(sanitizeFileName('\u007f')).toBe('_')
+  })
+
+  it('should trim trailing dot and spaces after control-char replacement', () => {
+    expect(sanitizeFileName('a\u0000. ')).toBe('a_')
+  })
 })
 
 describe('renderFilenameTemplate', () => {

@@ -37,7 +37,7 @@ const QMC1_STATIC_BOX = new Uint8Array([
   0x1C, 0x71, 0xDB, 0x00, 0xBC, 0xFD, 0x0C, 0x6C, 0xA5, 0x47, 0xF7, 0xF6, 0x00, 0x79, 0x4A, 0x11,
 ])
 
-const V1_MASK = new Uint8Array(32768)
+export const V1_MASK = new Uint8Array(32768)
 for (let i = 0; i < 32768; i++) {
   V1_MASK[i] = QMC1_STATIC_BOX[(i * i + 27) & 0xff]
 }
@@ -352,7 +352,7 @@ function applyMask(buf: Uint8Array, mask: Uint8Array): void {
   const len = buf.length
   const limit1 = Math.min(len, 32768)
   for (let i = 0; i < limit1; i++) buf[i] ^= mask[i]
-  for (let i = 32768; i < len; i++) buf[i] ^= mask[i % 32767]
+  for (let i = 32768; i < len; i++) buf[i] ^= mask[i % 32768]
 }
 
 function decryptV1Buffer(qmcBuf: Uint8Array): Uint8Array {

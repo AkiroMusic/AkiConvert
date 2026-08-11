@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
 import { useAppStore } from './store/useAppStore'
 import { resolveInitialLanguage } from './utils/language'
+import { basenameFromPath } from './utils/path'
 import { getAllSupportedExts } from '../../core/supportedFormats'
 import TitleBar from './components/TitleBar'
 import Sidebar from './components/Sidebar'
@@ -154,8 +155,7 @@ function App(): JSX.Element {
       }
 
       const entries = validPaths.map((path) => {
-        const parts = path.replace(/\\/g, '/').split('/')
-        const fileName = parts[parts.length - 1]
+        const fileName = basenameFromPath(path)
         return {
           id: crypto.randomUUID(),
           filePath: path,
@@ -182,8 +182,7 @@ function App(): JSX.Element {
         window.akiConvert.selectFiles().then((paths: string[]) => {
           if (paths.length > 0) {
             const entries = paths.map((path: string) => {
-              const parts = path.replace(/\\/g, '/').split('/')
-              const fileName = parts[parts.length - 1]
+              const fileName = basenameFromPath(path)
               return {
                 id: crypto.randomUUID(),
                 filePath: path,

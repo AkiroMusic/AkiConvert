@@ -6,6 +6,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore, FileEntry } from '../store/useAppStore'
+import { basenameFromPath } from '../utils/path'
 import { getAllSupportedExts } from '../../../core/supportedFormats'
 
 /**
@@ -68,8 +69,7 @@ function DropZone(): JSX.Element {
   const handleFilesAdded = useCallback(
     (paths: string[]) => {
       const entries: FileEntry[] = paths.map((path) => {
-        const parts = path.replace(/\\/g, '/').split('/')
-        const fileName = parts[parts.length - 1]
+        const fileName = basenameFromPath(path)
         return {
           id: crypto.randomUUID(),
           filePath: path,
@@ -92,8 +92,7 @@ function DropZone(): JSX.Element {
       const vbrQuality = settings.vbrQuality ?? 5
 
       const entries: FileEntry[] = paths.map(({ path, size }) => {
-        const parts = path.replace(/\\/g, '/').split('/')
-        const fileName = parts[parts.length - 1]
+        const fileName = basenameFromPath(path)
         return {
           id: crypto.randomUUID(),
           filePath: path,

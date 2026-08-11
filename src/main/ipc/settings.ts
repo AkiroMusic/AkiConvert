@@ -135,6 +135,18 @@ const VALIDATORS: Partial<Record<keyof AppSettings, (v: unknown) => boolean>> = 
   kggKeyImportPath: (v) => typeof v === 'string' && v.length <= 4096,
 }
 
+/**
+ * 加载时的逐键校验（L7）：白名单内的键按各自校验器验证，非法值回退 defaults；
+ * customFfmpegPath 只能经对话框探活后写入，放行。其余任何键 —— 含
+ * __proto__/constructor/prototype 及任意未知键 —— 一律拒绝，防止手工编辑的
+ * settings.json 注入任意属性或污染对象原型。
+ */
+export function validateSettingsKey(key: string, value: unknown): boolean {
+  const validate = VALIDATORS[key as keyof AppSettings]
+  if (validate) return validate(value)
+  return key === 'customFfmpegPath' || SETTABLE_KEYS.has(key as keyof AppSettings)
+}
+
 const store = new SimpleStore<AppSettings>({
   name: 'settings',
   // L7：settings.json schema 加载校验。load 时逐键跑 VALIDATORS，
@@ -142,11 +154,7 @@ const store = new SimpleStore<AppSettings>({
   // 防止损坏的配置文件把运行时拖垮。schemaVersion=1 为当前版本，
   // 未来字段变更时递增版本并提供 migrate 迁移。
   schemaVersion: 1,
-  validateKey: (key, value): boolean => {
-    const validate = VALIDATORS[key as keyof AppSettings]
-    // 无校验器的键（customFfmpegPath，经对话框探活后才写入）直接放行
-    return validate ? validate(value) : true
-  },
+  validateKey: validateSettingsKey,
   defaults: {
     language: 'zh-CN',
     outputDir: '',

@@ -80,6 +80,10 @@ export class SimpleStore<T extends StoredData> {
         const result: Record<string, unknown> = { ...this.options.defaults }
         for (const [key, value] of Object.entries(migrated)) {
           if (value === undefined) continue
+          // 拒绝原型键：手工编辑的 JSON 可用 __proto__ 污染对象原型、
+          // 用 constructor/prototype 注入任意自有属性（原型链污染加固，
+          // 独立于 validateKey —— 即使校验器放行也不允许写入）。
+          if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue
           if (this.options.validateKey && !this.options.validateKey(key, value)) continue
           result[key] = value
         }

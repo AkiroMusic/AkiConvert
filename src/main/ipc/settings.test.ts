@@ -21,6 +21,7 @@ import type { Preset } from './settings'
 
 let tempDir = ''
 let sanitizePatch: (patch: Record<string, unknown>) => Partial<Record<string, unknown>>
+let validateSettingsKey: ((key: string, value: unknown) => boolean) | undefined
 let settingsStore: {
   store: Record<string, unknown>
 }
@@ -42,6 +43,7 @@ beforeAll(async () => {
   tempDir = mkdtempSync(join(tmpdir(), 'settings-test-'))
   const mod = await import('./settings')
   sanitizePatch = mod.sanitizePatch
+  validateSettingsKey = mod.validateSettingsKey
   settingsStore = mod.settingsStore as typeof settingsStore
   const simpleStore = await import('../simpleStore')
   SimpleStoreCtor = simpleStore.SimpleStore as typeof SimpleStoreCtor
@@ -258,5 +260,93 @@ describe('SimpleStore — schema load validation (L7)', () => {
       outputFormat: 'source',
       embedCompanionLyrics: true
     })
+  })
+
+  it('should reject magic/prototype keys and unknown keys when loading settings.json', () => {
+    // 攻击面：手工编辑的 settings.json 携带 __proto__/constructor/prototype
+    // 及任意未知键。__proto__ 会污染 store 数据对象原型，constructor 会成为
+    // 自有键并被导出，未知键会原样进入运行时 —— 加载路径必须全部丢弃。
+    writeFileSync(
+      join(tempDir, 'settings.json'),
+      JSON.stringify({
+        _version: 1,
+        theme: 'dark',
+        language: 'en-US',
+        // 计算属性名：对象字面量里 __proto__ 会设置原型而非建 own key，
+        // 而 JSON.parse 会把它还原成真正的 own key —— 正是攻击载荷。
+        ['__proto__']: { polluted: true },
+        constructor: { prototype: { evil: true } },
+        prototype: { polluted: true },
+        evil: true,
+        exec: '/bin/sh'
+      }),
+      'utf-8'
+    )
+
+    const store = new SimpleStoreCtor({
+      name: 'settings',
+      schemaVersion: 1,
+      // 与 settings.ts 真实的加载校验器保持一致（收紧后：白名单外键拒绝）
+      validateKey: validateSettingsKey,
+      defaults: {
+        theme: 'dark',
+        concurrentLimit: 3,
+        language: 'zh-CN',
+        outputFormat: 'source',
+        customFfmpegPath: ''
+      }
+    })
+
+    // TS private 仅编译期生效，运行时 data 可访问：直接验证内部数据对象
+    const data = (store as unknown as { data: Record<string, unknown> }).data
+    // 原型未被污染（__proto__ 载荷不生效）
+    expect(Object.getPrototypeOf(data)).toBe(Object.prototype)
+    expect('polluted' in data).toBe(false)
+    // 无魔术键 own key 残留
+    expect(Object.prototype.hasOwnProperty.call(data, '__proto__')).toBe(false)
+    expect(Object.prototype.hasOwnProperty.call(data, 'constructor')).toBe(false)
+    expect(Object.prototype.hasOwnProperty.call(data, 'prototype')).toBe(false)
+    // 未知键被丢弃
+    expect(Object.prototype.hasOwnProperty.call(data, 'evil')).toBe(false)
+    expect(Object.prototype.hasOwnProperty.call(data, 'exec')).toBe(false)
+    // 公开视图同样无残留
+    expect(Object.prototype.hasOwnProperty.call(store.store, 'constructor')).toBe(false)
+    expect(Object.prototype.hasOwnProperty.call(store.store, 'evil')).toBe(false)
+    // 合法键仍正常加载
+    expect(store.store.theme).toBe('dark')
+    expect(store.store.language).toBe('en-US')
+    expect(store.store.concurrentLimit).toBe(3)
+  })
+
+  it('should still load a settings.json containing only valid keys', () => {
+    writeFileSync(
+      join(tempDir, 'settings.json'),
+      JSON.stringify({
+        _version: 1,
+        theme: 'light',
+        language: 'en-US',
+        outputFormat: 'flac',
+        concurrentLimit: 5
+      }),
+      'utf-8'
+    )
+
+    const store = new SimpleStoreCtor({
+      name: 'settings',
+      schemaVersion: 1,
+      validateKey: validateSettingsKey,
+      defaults: {
+        theme: 'dark',
+        concurrentLimit: 3,
+        language: 'zh-CN',
+        outputFormat: 'source',
+        customFfmpegPath: ''
+      }
+    })
+
+    expect(store.store.theme).toBe('light')
+    expect(store.store.language).toBe('en-US')
+    expect(store.store.outputFormat).toBe('flac')
+    expect(store.store.concurrentLimit).toBe(5)
   })
 })

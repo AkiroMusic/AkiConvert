@@ -27,7 +27,9 @@ type ViewType = 'convert' | 'settings' | 'history'
 function App(): JSX.Element {
   const { t } = useTranslation()
   const [currentView, setCurrentView] = useState<ViewType>('convert')
-  const { settings, applyPersistedSettings, setFfmpegAvailable } = useAppStore()
+  const settings = useAppStore((s) => s.settings)
+  const applyPersistedSettings = useAppStore((s) => s.applyPersistedSettings)
+  const setFfmpegAvailable = useAppStore((s) => s.setFfmpegAvailable)
   const files = useAppStore((s) => s.files)
   const isConverting = useAppStore((s) => s.isConverting)
   const [summaryModal, setSummaryModal] = useState<{

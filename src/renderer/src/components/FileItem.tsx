@@ -3,7 +3,7 @@
  * Copyright (c) 2026 Akiro. All rights reserved.
  */
 
-import { Fragment, useCallback, useState } from 'react'
+import { Fragment, memo, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore, FileEntry } from '../store/useAppStore'
 import UnlockAnimation from './UnlockAnimation'
@@ -21,7 +21,7 @@ function formatFileSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
-function FileItem({ file, index }: FileItemProps): JSX.Element {
+const FileItem = memo(function FileItem({ file, index }: FileItemProps): JSX.Element {
   const { t } = useTranslation()
   const removeFile = useAppStore((s) => s.removeFile)
   const setCurrentPreview = useAppStore((s) => s.setCurrentPreview)
@@ -519,6 +519,6 @@ function FileItem({ file, index }: FileItemProps): JSX.Element {
       )}
     </>
   )
-}
+})
 
 export default FileItem

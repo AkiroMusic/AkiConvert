@@ -34,5 +34,11 @@ release/
 .env
 .env.local
 
+# Temp
+tmp/
+temp/
+*.tmp
+*.bak
+
 # Bundled FFmpeg binaries (downloaded by scripts/download-ffmpeg.mjs)
 resources/ffmpeg/

@@ -23,7 +23,7 @@
     "build:linux": "electron-vite build && electron-builder --linux",
     "download:ffmpeg": "node scripts/download-ffmpeg.mjs",
     "download:ffmpeg:all": "node scripts/download-ffmpeg.mjs --all",
-    "postinstall": "node scripts/download-ffmpeg.mjs"
+    "postinstall": "node scripts/download-ffmpeg.mjs && node node_modules/electron/install.js"
   },
   "build": {
     "appId": "com.akiro.akiconvert",
@@ -267,13 +267,13 @@
     ]
   },
   "dependencies": {
-    "i18next": "^24.2.2",
+    "i18next": "^24.2.3",
     "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-i18next": "^15.4.1",
-    "sql.js": "^1.11.0",
-    "zustand": "^5.0.3"
+    "react-i18next": "^15.7.4",
+    "sql.js": "^1.14.1",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@electron-toolkit/utils": "^4.0.0",
@@ -286,8 +286,8 @@
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.3",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vitest": "^4.1.10"
   }

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { resolveConcurrency } from '../utils/concurrency'
+import { runConversionBatches } from '../utils/conversion'
 import { basenameFromPath } from '../utils/path'
 import FileItem from './FileItem'
 
@@ -45,6 +46,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   const [avgDurationMs, setAvgDurationMs] = useState(0)
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const pausedRef = useRef(false)
+  // Generation token: bumped on pause so stale convertAll runs can detect they were superseded
+  const runGenRef = useRef(0)
   const batchSuccessRef = useRef(0)
   const batchFailRef = useRef(0)
   const batchStartTimeRef = useRef(0)
@@ -83,6 +86,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       useAppStore.getState().setOutputDir(dir)
     }
 
+    const gen = runGenRef.current
     // Reset batch counters
     batchSuccessRef.current = 0
     batchFailRef.current = 0
@@ -97,80 +101,91 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       }
     })
 
-    const pendingFiles = files.filter((f) => f.status === 'pending' || f.status === 'converting')
-    const settings = useAppStore.getState().settings
-    const limit = resolveConcurrency({ autoConcurrent: settings.autoConcurrent, concurrentLimit: settings.concurrentLimit })
+    try {
+      const pendingFiles = files.filter((f) => f.status === 'pending' || f.status === 'converting')
+      const settings = useAppStore.getState().settings
+      const limit = resolveConcurrency({ autoConcurrent: settings.autoConcurrent, concurrentLimit: settings.concurrentLimit })
+      // Full IPC results captured here so setFileSuccess can carry format/metadata payloads
+      const resultsByPath = new Map<string, Awaited<ReturnType<typeof window.akiConvert.convertFile>>>()
 
-    for (let i = 0; i < pendingFiles.length; i += limit) {
-      // Check for pause — if paused, stop processing
-      if (pausedRef.current) {
-        break
-      }
-
-      const batch = pendingFiles.slice(i, i + limit)
-      // Record start times for ETA estimate
-      batch.forEach((f) => conversionStartTimes.current.set(f.filePath, Date.now()))
-      const results = await Promise.all(
-        batch.map((file) => {
+      const { success, failed, interrupted } = await runConversionBatches({
+        files: pendingFiles,
+        limit,
+        convert: async (file) => {
+          // Mark the file converting so isStale only fires after pause/cancel reset it to pending
+          updateFileProgress(file.filePath, 0)
+          conversionStartTimes.current.set(file.filePath, Date.now())
           const settings = useAppStore.getState().settings
-          return window.akiConvert
-            .convertFile({
-              filePath: file.filePath,
-              outputDir: dir || '',
-              filenameTemplate: settings.filenameTemplate,
-              outputFormat: settings.outputFormat,
-              duplicateAction: settings.duplicateAction,
-              bitrate: settings.bitrate,
-              vbrEnabled: settings.vbrEnabled,
-              vbrQuality: settings.vbrQuality,
-              compressionLevel: settings.compressionLevel,
-              sampleRate: settings.sampleRate,
-              bitDepth: settings.bitDepth,
-              lyricsPath: file.lyricsPath
-            })
-            .then((result) => ({ file, result }))
-        })
-      )
-
-      for (const { file, result } of results) {
-        if (result.success) {
-          setFileSuccess(file.filePath, {
-            format: result.format,
-            songName: result.songName,
-            artist: result.artist,
-            album: result.album,
-            coverImageBase64: result.coverImageBase64,
-            outputPath: result.outputPath
+          const result = await window.akiConvert.convertFile({
+            filePath: file.filePath,
+            outputDir: dir || '',
+            filenameTemplate: settings.filenameTemplate,
+            outputFormat: settings.outputFormat,
+            duplicateAction: settings.duplicateAction,
+            bitrate: settings.bitrate,
+            vbrEnabled: settings.vbrEnabled,
+            vbrQuality: settings.vbrQuality,
+            compressionLevel: settings.compressionLevel,
+            sampleRate: settings.sampleRate,
+            bitDepth: settings.bitDepth,
+            lyricsPath: file.lyricsPath
           })
-          batchSuccessRef.current += 1
-          // Track duration for ETA estimate
-          const convStart = conversionStartTimes.current.get(file.filePath)
-          if (convStart) {
-            const convDuration = Date.now() - convStart
-            totalDurationMs.current += convDuration
-            completedCount.current += 1
-            setAvgDurationMs(Math.round(totalDurationMs.current / completedCount.current))
-          }
-        } else {
-          setFileError(file.filePath, result.errorMessage || t('error.convertFailed'))
-          batchFailRef.current += 1
+          resultsByPath.set(file.filePath, result)
+          return result
+        },
+        shouldAbort: () => pausedRef.current || runGenRef.current !== gen,
+        // A file is stale when its status was reset (pause/cancel) while its conversion was in flight
+        isStale: (file) => {
+          const current = useAppStore.getState().files.find((f) => f.filePath === file.filePath)
+          return current === undefined || current.status !== 'converting'
+        }
+      })
+
+      for (const file of success) {
+        const result = resultsByPath.get(file.filePath)
+        setFileSuccess(file.filePath, {
+          format: result?.format,
+          songName: result?.songName,
+          artist: result?.artist,
+          album: result?.album,
+          coverImageBase64: result?.coverImageBase64,
+          outputPath: result?.outputPath
+        })
+        batchSuccessRef.current += 1
+        // Track duration for ETA estimate
+        const convStart = conversionStartTimes.current.get(file.filePath)
+        if (convStart) {
+          const convDuration = Date.now() - convStart
+          totalDurationMs.current += convDuration
+          completedCount.current += 1
+          setAvgDurationMs(Math.round(totalDurationMs.current / completedCount.current))
         }
       }
-    }
 
-    unsub()
-    setConverting(false)
+      for (const file of failed) {
+        const result = resultsByPath.get(file.filePath)
+        setFileError(file.filePath, result?.errorMessage || t('error.convertFailed'))
+        batchFailRef.current += 1
+      }
 
-    // Fire completion callback if we weren't paused
-    if (!pausedRef.current) {
-      const totalBatch = batchSuccessRef.current + batchFailRef.current
-      if (totalBatch > 0 && onConversionComplete) {
-        onConversionComplete(
-          batchSuccessRef.current,
-          batchFailRef.current,
-          totalBatch,
-          Date.now() - batchStartTimeRef.current
-        )
+      // Fire completion callback if this run was neither paused nor superseded by a newer run
+      if (!interrupted && !pausedRef.current && gen === runGenRef.current) {
+        const totalBatch = batchSuccessRef.current + batchFailRef.current
+        if (totalBatch > 0 && onConversionComplete) {
+          onConversionComplete(
+            batchSuccessRef.current,
+            batchFailRef.current,
+            totalBatch,
+            Date.now() - batchStartTimeRef.current
+          )
+        }
+      }
+    } finally {
+      // Only the latest run may clean up shared converting state; superseded runs must not
+      // clobber the resumed run's isConverting flag
+      if (gen === runGenRef.current) {
+        unsub()
+        setConverting(false)
       }
     }
   }, [files, isConverting, outputDir, setConverting, setFileSuccess, setFileError, updateFileProgress, t, onConversionComplete])
@@ -189,6 +204,8 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
 
   const handlePause = useCallback(() => {
     pausedRef.current = true
+    // Invalidate any in-flight convertAll run so it cannot clobber the resumed run's state
+    runGenRef.current += 1
     setPaused(true)
     window.akiConvert.cancelConversions().catch(() => {})
     // 将卡在 converting 状态的文件还原为 pending，便于恢复时重试

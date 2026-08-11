@@ -39,4 +39,16 @@ describe('resolveConcurrency', () => {
   it('autoConcurrent=false 且 concurrentLimit=0 时回退 3', () => {
     expect(resolveConcurrency({ autoConcurrent: false, concurrentLimit: 0 })).toBe(3)
   })
+
+  it('autoConcurrent=false 且 concurrentLimit=99 时钳制到 10', () => {
+    expect(resolveConcurrency({ autoConcurrent: false, concurrentLimit: 99 })).toBe(10)
+  })
+
+  it('autoConcurrent=false 且 concurrentLimit=-5 时钳制到 1', () => {
+    expect(resolveConcurrency({ autoConcurrent: false, concurrentLimit: -5 })).toBe(1)
+  })
+
+  it('autoConcurrent=false 且 concurrentLimit=7 时返回 7', () => {
+    expect(resolveConcurrency({ autoConcurrent: false, concurrentLimit: 7 })).toBe(7)
+  })
 })

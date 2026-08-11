@@ -25,5 +25,5 @@ export function resolveConcurrency(settings: ConcurrencySettings, hc?: number): 
       4
     return Math.max(1, Math.min(10, hardware))
   }
-  return settings.concurrentLimit || 3
+  return Math.max(1, Math.min(10, settings.concurrentLimit || 3))
 }

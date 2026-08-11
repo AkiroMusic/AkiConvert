@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { FileEntry } from '../store/useAppStore'
-import { formatTime, formatVolume } from '../utils/player'
+import { formatTime, formatVolume, toFileUrl } from '../utils/player'
 
 function PlayerBar(): JSX.Element {
   const { t } = useTranslation()
@@ -18,6 +18,7 @@ function PlayerBar(): JSX.Element {
   const setVolume = useAppStore((s) => s.setVolume)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const playGenRef = useRef(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -69,23 +70,39 @@ function PlayerBar(): JSX.Element {
 
     // 使用 file:// 协议时必须对路径做 URL 编码（空格/中文/特殊字符），
     // 否则 Chromium 可能无法解析含特殊字符的本地路径。
-    const audio = new Audio('file:///' + encodeURI(currentFile.outputPath.replace(/\\/g, '/')))
+    const audio = new Audio(toFileUrl(currentFile.outputPath))
+    playGenRef.current += 1
+    const gen = playGenRef.current
     audio.volume = volume
     audioRef.current = audio
 
     audio.addEventListener('loadedmetadata', () => {
-      setDuration(audio.duration)
+      if (gen === playGenRef.current) {
+        setDuration(audio.duration)
+      }
     })
 
     audio.addEventListener('timeupdate', () => {
-      setCurrentTime(audio.currentTime)
+      if (gen === playGenRef.current) {
+        setCurrentTime(audio.currentTime)
+      }
     })
 
     audio.addEventListener('ended', () => {
-      playNext()
+      if (gen === playGenRef.current) {
+        playNext()
+      }
     })
 
-    audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
+    audio.play().then(() => {
+      if (gen === playGenRef.current) {
+        setIsPlaying(true)
+      }
+    }).catch(() => {
+      if (gen === playGenRef.current) {
+        setIsPlaying(false)
+      }
+    })
 
     return () => {
       audio.pause()

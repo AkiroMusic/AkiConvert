@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { formatTime, formatVolume } from './player'
+import { formatTime, formatVolume, toFileUrl } from './player'
 
 describe('formatTime', () => {
   it('formats 0 seconds as "0:00"', () => {
@@ -43,5 +43,23 @@ describe('formatVolume', () => {
 
   it('formats 0.345 as "35%"', () => {
     expect(formatVolume(0.345)).toBe('35%')
+  })
+})
+
+describe('toFileUrl', () => {
+  it('encodes # and ? which encodeURI leaves unsafe', () => {
+    expect(toFileUrl('C:\\Music\\song#1?.flac')).toBe('file:///C:/Music/song%231%3F.flac')
+  })
+
+  it('preserves the drive colon and encodes unicode and spaces', () => {
+    expect(toFileUrl('D:/音乐/我的 歌.mp3')).toBe(
+      'file:///D:/%E9%9F%B3%E4%B9%90/%E6%88%91%E7%9A%84%20%E6%AD%8C.mp3'
+    )
+  })
+
+  it('normalizes backslashes to forward slashes', () => {
+    expect(toFileUrl('C:\\Users\\me\\Music\\a b\\c#d.flac')).toBe(
+      'file:///C:/Users/me/Music/a%20b/c%23d.flac'
+    )
   })
 })

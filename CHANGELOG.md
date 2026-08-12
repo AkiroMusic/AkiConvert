@@ -9,7 +9,30 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
-## [2.1.0] - 2026-08-12
+## [2.2.0] - 2026-08-12
+
+### Changed
+- Output directory selection is deferred to convert time: importing or
+  dropping files no longer prompts for a save location; the folder picker
+  appears once when starting a conversion without a chosen directory.
+- When "Auto" concurrency is enabled, the manual max-concurrency slider is
+  disabled and greyed out (previously adjustable despite being overridden).
+
+### Fixed
+- `ncmDecrypt` `readUint32LE` deduplicated into the shared decoder utils
+  (single source of truth; re-exported for compatibility).
+- Documented why `ncmDecrypt.detectAudioFormat` intentionally stays local
+  (returns an `AudioFormat` object with MIME vs. the utils string variant).
+- Dependency upgrades: i18next `^24 → ^26.3.6`, react-i18next `^15 → ^17.0.11`
+  (app uses none of the removed v26 APIs; runtime-verified).
+
+### Quality
+- 285 tests passing across 21 files; typecheck + build clean.
+- CI runs on every push/PR.
+
+---
+
+## [2.0.0] - 2026-08-08
 
 ### Added
 - **KGG decryption end-to-end** — decrypt Kugou `.kgg` (V5) files, import key
@@ -75,10 +98,12 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [2.0.0] - 2026-08-08
 
-Project renamed from **Format Converter** to **AkiConvert**; part of the
-**Aki series** of software.
+Major milestone release: full KGG support groundwork, toolchain upgrades, and
+a comprehensive feature set including multi-format decryption, batch
+conversion, metadata preservation, audio preview, and bilingual UI.
 
-[Unreleased]: https://github.com/AkiroMusic/AkiConvert/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/AkiroMusic/AkiConvert/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/AkiroMusic/AkiConvert/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/AkiroMusic/AkiConvert/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/AkiroMusic/AkiConvert/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/AkiroMusic/AkiConvert/releases/tag/v2.0.0

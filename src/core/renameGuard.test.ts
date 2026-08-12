@@ -31,10 +31,10 @@ function collectFiles(dir: string): string[] {
 }
 
 describe('AkiConvert rename guard', () => {
-  it('package.json 声明 akiconvert / 2.1.0 / AkiConvert 品牌配置', () => {
+  it('package.json 声明 akiconvert / 2.2.0 / AkiConvert 品牌配置', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
     expect(pkg.name).toBe('akiconvert')
-    expect(pkg.version).toBe('2.1.0')
+    expect(pkg.version).toBe('2.2.0')
     expect(pkg.build.productName).toBe('AkiConvert')
     expect(pkg.build.appId).toBe('com.akiro.akiconvert')
     expect(pkg.build.nsis.shortcutName).toBe('AkiConvert')

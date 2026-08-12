@@ -8,8 +8,6 @@ A cross-platform desktop audio format converter built with Electron. Decrypts pr
 
 > **Developer**: [Akiro](https://akiromusic.com) (AkiroMusic) · Contact: [akiromusic@qq.com](mailto:akiromusic@qq.com)
 
-> **History**: This project was originally named **Format Converter**. The formal version has been renamed to **AkiConvert** starting from v2.0.0. It is part of the **Aki series** of software.
-
 > **Changelog**: See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ---
@@ -144,6 +142,8 @@ src/
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
+Copyright © 2026 [Akiro](https://akiromusic.com) (AkiroMusic). All rights reserved.
+
 ---
 
 # AkiConvert（音频格式转换工具）
@@ -155,8 +155,6 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 一款基于 Electron 构建的跨平台桌面音频格式转换工具。解密专有音乐格式（NCM、KWM、KGM、QMC、KGG），并在标准音频格式之间进行转换——**所有处理完全在本地离线完成**。
 
 > **开发者**：[Akiro](https://akiromusic.com)（AkiroMusic）· 联系：[akiromusic@qq.com](mailto:akiromusic@qq.com)
-
-> **历史说明**：本项目原名为 **Format Converter**，自 v2.0.0 起正式更名为 **AkiConvert**，属于 **Aki 系列**软件之一。
 
 > **更新日志**：完整版本历史见 [CHANGELOG.md](CHANGELOG.md)。
 
@@ -291,3 +289,5 @@ src/
 ## 许可证
 
 本项目基于 [GNU 通用公共许可证 v3.0](LICENSE) 授权发布。
+
+版权所有 © 2026 [Akiro](https://akiromusic.com)（AkiroMusic）。保留所有权利。

@@ -64,13 +64,3 @@ export interface HistoryRecord {
   // 旧记录可能没有该字段，渲染进程需回退到 error 原文。
   errorKey?: string
 }
-
-/**
- * 转换失败结果的统一形状：errorKey 供渲染进程做 i18n 翻译，
- * message 为英文兜底文案（渲染进程无法翻译时直接展示）。
- */
-export type ConversionErrorResult = {
-  ok: false
-  errorKey: string
-  message: string
-}

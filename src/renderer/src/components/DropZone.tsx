@@ -163,6 +163,7 @@ function DropZone(): JSX.Element {
             if (dir) {
               setOutputDir(dir)
               useAppStore.getState().setSettings({ outputDir: dir })
+              window.akiConvert.setSettings({ outputDir: dir }).catch(() => {})
               handleFilesAddedWithEstimate(dropped)
             }
           })
@@ -179,6 +180,7 @@ function DropZone(): JSX.Element {
     if (dir) {
       setOutputDir(dir)
       useAppStore.getState().setSettings({ outputDir: dir })
+      window.akiConvert.setSettings({ outputDir: dir }).catch(() => {})
     }
   }, [setOutputDir])
 

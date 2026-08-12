@@ -85,6 +85,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
       if (!dir) return
       useAppStore.getState().setOutputDir(dir)
       useAppStore.getState().setSettings({ outputDir: dir })
+      window.akiConvert.setSettings({ outputDir: dir }).catch(() => {})
     }
 
     const gen = runGenRef.current
@@ -183,10 +184,11 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         }
       }
     } finally {
+      // Always detach THIS run's IPC progress listener, even when superseded by pause/resume
+      unsub()
       // Only the latest run may clean up shared converting state; superseded runs must not
       // clobber the resumed run's isConverting flag
       if (gen === runGenRef.current) {
-        unsub()
         setConverting(false)
       }
     }

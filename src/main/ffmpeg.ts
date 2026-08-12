@@ -89,6 +89,9 @@ export async function runFfmpeg(
     let stderr = ''
     let lastUpdate = 0
     let lastPct = -1
+    // stderr 缓冲上限：长音频转换会持续输出进度行，若全部累积可能
+    // 无界增长。错误/摘要信息总在尾部，只保留末尾 64 KiB 足够。
+    const MAX_STDERR = 64 * 1024
 
     // --- abort handling ---
     const onAbort = (): void => {
@@ -111,7 +114,7 @@ export async function runFfmpeg(
     // --- stderr parsing & progress ---
     proc.stderr.on('data', (chunk: Buffer) => {
       const s = chunk.toString()
-      stderr += s
+      stderr = (stderr + s).slice(-MAX_STDERR)
 
       const { onProgress, totalDurationSec, signal } = opts
       if (onProgress && totalDurationSec && totalDurationSec > 0 && !signal?.aborted) {

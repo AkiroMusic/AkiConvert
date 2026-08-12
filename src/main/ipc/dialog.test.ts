@@ -13,11 +13,17 @@
  * 与 settings.test.ts 的既有模式保持一致。
  */
 
-import { describe, it, expect, vi, beforeAll } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
+import { mkdtempSync, rmSync } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
+
+const tempDir = mkdtempSync(join(tmpdir(), 'dialog-test-'))
 
 vi.mock('electron', () => ({
   ipcMain: { handle: vi.fn() },
-  dialog: { showOpenDialog: vi.fn(), showSaveDialog: vi.fn() }
+  dialog: { showOpenDialog: vi.fn(), showSaveDialog: vi.fn() },
+  app: { getPath: vi.fn(() => tempDir) }
 }))
 
 import { ipcMain, dialog } from 'electron'
@@ -26,6 +32,10 @@ describe('dialog:selectFiles — file-open filter', () => {
   beforeAll(async () => {
     const mod = await import('./dialog')
     mod.registerDialogHandlers()
+  })
+
+  afterAll(() => {
+    rmSync(tempDir, { recursive: true, force: true })
   })
 
   it('should include plain audio formats (mp3, flac) in the "All Supported Audio Files" filter', async () => {

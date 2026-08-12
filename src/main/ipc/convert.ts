@@ -9,14 +9,14 @@ import { ipcMain, BrowserWindow, app } from "electron"
 import { readFile, writeFile, rm } from "fs/promises"
 import { join, dirname, extname, basename, resolve, relative, isAbsolute, sep } from "path"
 import { existsSync, mkdirSync, mkdtempSync, statSync } from "fs"
-import { createHash, randomUUID } from "crypto"
+import { randomUUID } from "crypto"
 import { tmpdir } from "os"
 import * as ncm from "../../core/ncmDecrypt"
 import * as decoders from "../../core/decoders"
 import { writeID3Tags } from "../../core/id3Writer"
 import { renderFilenameTemplate, deriveMetadataFromFilename } from "../../core/template"
 import { run, runFfmpeg, FfmpegOptions, extractLyrics } from "../ffmpeg"
-import { HistoryStore } from "../history"
+import { historyStore } from "./history"
 import { settingsStore } from "./settings"
 import { classifySourceExt, OUTPUT_FORMATS } from '../../core/supportedFormats'
 import { loadKeysMap } from '../kggKeys'
@@ -34,7 +34,6 @@ interface PendingConversion {
 // 以转换任务 ID（uuid）为 key：同一路径并发/重复转换时各自持有独立的
 // AbortController，取消一个不会误杀另一个（L1）。
 const pendingConversions = new Map<string, PendingConversion>()
-const historyStore = new HistoryStore(app.getPath("userData"))
 
 // 输出格式白名单：与 ffmpeg.ts 的 FfmpegOptions["format"] 保持一致，
 // 并收敛到 supportedFormats.ts 的 OUTPUT_FORMATS（单一事实源）。
@@ -224,8 +223,6 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
 
         // Verify decrypted audio header integrity
         decryptionVerified = verifyAudioHeader(audio, sourceFormat)
-        // Compute integrity hash of decrypted audio data
-        const audioHash = createHash('md5').update(Buffer.from(audio)).digest('hex')
 
         sendProgress(0.6)
 

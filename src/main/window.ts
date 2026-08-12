@@ -22,7 +22,10 @@ export function createWindow(): BrowserWindow {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      // 安全加固：preload 仅使用 contextBridge/ipcRenderer/webUtils，
+      // 全部属于 sandbox 白名单 API，开启 sandbox 不破坏现有功能，
+      // 同时限制渲染进程逃逸面（Electron 安全最佳实践）。
+      sandbox: true
     }
   })
 

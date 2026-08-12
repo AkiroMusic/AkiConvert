@@ -9,8 +9,12 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import { execSync } from 'child_process'
+import { execFile } from 'child_process'
+import { promisify } from 'util'
 import * as dbCipher from '../core/decoders/kgg/db-cipher'
+
+// 异步 execFile：替代 execSync 以避免阻塞主进程事件循环（L3）。
+const execFileAsync = promisify(execFile)
 
 // ---------------------------------------------------------------------------
 // Types
@@ -175,7 +179,7 @@ export async function autoScanKeys(
   const initialSize = currentMap.size
 
   // Build list of paths to scan
-  const pathsToScan: string[] = opts?.mockPaths ?? buildScanPaths(platform, env)
+  const pathsToScan: string[] = opts?.mockPaths ?? (await buildScanPaths(platform, env))
 
   for (const dbPath of pathsToScan) {
     if (existsSync(dbPath)) {
@@ -205,11 +209,13 @@ export async function autoScanKeys(
 
 /**
  * Builds a list of known KuGou KGMusicV3.db paths for the current platform.
+ * 异步：Windows 全盘枚举需调用 PowerShell，改用异步 execFile 避免
+ * execSync 阻塞主进程事件循环（L3：主进程响应性）。
  */
-function buildScanPaths(
+async function buildScanPaths(
   platform: NodeJS.Platform,
   env: Record<string, string | undefined>,
-): string[] {
+): Promise<string[]> {
   const paths: string[] = []
 
   if (platform === 'win32') {
@@ -228,7 +234,7 @@ function buildScanPaths(
     }
 
     // Aggressive fallback: check all local drives via CIM
-    paths.push(...scanWindowsDrives())
+    paths.push(...(await scanWindowsDrives()))
   } else if (platform === 'darwin') {
     const home = env.HOME || ''
     if (home) {
@@ -254,18 +260,27 @@ function buildScanPaths(
 /**
  * Uses PowerShell CIM to enumerate local fixed drives and builds
  * KuGou DB paths for each. (CIM replaces the removed wmic tool.)
+ * 异步实现：execFile 非阻塞；5 秒超时兜底，PowerShell 缺失/被禁用时静默返回空。
  */
-function scanWindowsDrives(): string[] {
+async function scanWindowsDrives(): Promise<string[]> {
   const paths: string[] = []
   try {
-    const output = execSync(
-      'powershell -NoProfile -NonInteractive -Command "Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 } | Select-Object -ExpandProperty DeviceID"',
+    const { stdout } = await execFileAsync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        'Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 } | Select-Object -ExpandProperty DeviceID',
+      ],
       {
         encoding: 'utf-8',
         windowsHide: true,
+        timeout: 5000,
+        maxBuffer: 64 * 1024,
       },
     )
-    const drives = output
+    const drives = stdout
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter((l) => /^[A-Z]:$/.test(l))

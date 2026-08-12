@@ -78,12 +78,22 @@ export class HistoryStore {
 
   /**
    * Clear all history by deleting the file.
+   * 与 append 共享同一条 writeChain：保证 clear 不会与在途的 append
+   * 交错（否则可能 clear 删文件后 append 又把记录写回，或 trim 读到
+   * 半截数据），串行执行后 clear 语义确定。
    */
   async clear(): Promise<void> {
     try {
-      if (existsSync(this.filePath)) {
-        await unlink(this.filePath)
-      }
+      this.writeChain = this.writeChain
+        .then(async () => {
+          if (existsSync(this.filePath)) {
+            await unlink(this.filePath)
+          }
+        })
+        .catch((err) => {
+          console.error('HistoryStore.clear failed:', err)
+        })
+      return this.writeChain
     } catch (err) {
       console.error('HistoryStore.clear failed:', err)
     }

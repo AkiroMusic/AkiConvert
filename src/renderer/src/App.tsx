@@ -27,7 +27,7 @@ type ViewType = 'convert' | 'settings' | 'history'
 function App(): JSX.Element {
   const { t } = useTranslation()
   const [currentView, setCurrentView] = useState<ViewType>('convert')
-  const settings = useAppStore((s) => s.settings)
+  const settingsTheme = useAppStore((s) => s.settings.theme)
   const applyPersistedSettings = useAppStore((s) => s.applyPersistedSettings)
   const setFfmpegAvailable = useAppStore((s) => s.setFfmpegAvailable)
   const files = useAppStore((s) => s.files)
@@ -90,7 +90,7 @@ function App(): JSX.Element {
   // Apply theme on settings change (in-app + system taskbar icon)
   useEffect(() => {
     const apply = async (): Promise<void> => {
-      let theme = settings.theme
+      let theme = settingsTheme
       if (theme === 'system') {
         theme = await resolveSystemTheme()
       }
@@ -98,11 +98,11 @@ function App(): JSX.Element {
       window.akiConvert?.setAppIcon(theme)
     }
     apply()
-  }, [settings.theme, resolveSystemTheme])
+  }, [settingsTheme, resolveSystemTheme])
 
   // Listen for OS theme changes
   useEffect(() => {
-    if (settings.theme !== 'system') return
+    if (settingsTheme !== 'system') return
 
     const unsub = window.akiConvert?.onSystemThemeChanged((systemTheme) => {
       document.documentElement.dataset.theme = systemTheme
@@ -111,7 +111,7 @@ function App(): JSX.Element {
     // Also listen via CSS media query as fallback
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const handler = (): void => {
-      if (settings.theme === 'system') {
+      if (settingsTheme === 'system') {
         const t = mq.matches ? 'dark' : 'light'
         document.documentElement.dataset.theme = t
         window.akiConvert?.setAppIcon(t)
@@ -122,7 +122,7 @@ function App(): JSX.Element {
       unsub?.()
       mq.removeEventListener('change', handler)
     }
-  }, [settings.theme])
+  }, [settingsTheme])
 
   // ===== Window title update (conversion progress) =====
   useEffect(() => {

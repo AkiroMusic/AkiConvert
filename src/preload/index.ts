@@ -41,6 +41,7 @@ const akiConvertAPI = {
     coverImageBase64?: string
     encrypted?: boolean
     verified?: boolean
+    errorKey?: string
     errorMessage?: string
   }> => ipcRenderer.invoke('convert:file', payload),
 

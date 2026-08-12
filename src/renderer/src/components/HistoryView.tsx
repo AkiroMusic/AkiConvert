@@ -256,8 +256,8 @@ function HistoryView(): JSX.Element {
                   paddingLeft: '20px'
                 }}
               >
-                {/* 有 errorKey 时翻译；旧记录/未知键回退到英文原文 */}
-                {t(record.errorKey ?? record.error, record.error)}
+                {/* 有 errorKey 时走 i18n 翻译（未知键回退英文原文）；无 errorKey 的旧记录直接显示原文 */}
+                {record.errorKey ? t(record.errorKey, record.error) : record.error}
               </div>
             )}
             {record.status === 'success' && record.outputPath && (

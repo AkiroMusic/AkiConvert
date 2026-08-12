@@ -10,6 +10,10 @@
 // changes.
 // ============================================================
 
+// 复用解码器共享工具（单一事实源），re-export 保持既有调用方/测试兼容。
+import { readUint32LE } from './decoders/utils'
+export { readUint32LE }
+
 // ---- Constants (byte-identical copies from original) ----
 
 const coreKey = new Uint8Array([0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57]);
@@ -190,10 +194,6 @@ export function removePKCS7Padding(data: Uint8Array): Uint8Array {
   return data;
 }
 
-export function readUint32LE(data: Uint8Array, offset: number): number {
-  return (data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)) >>> 0;
-}
-
 export class CR4 {
   box: Uint8Array;
 
@@ -220,6 +220,10 @@ export class CR4 {
   }
 }
 
+// detectAudioFormat：与 decoders/utils.ts 的 detectAudioFormat 同名但签名不同——
+// 本版返回 AudioFormat 对象（ext + mime，含 m4a 品牌细分），utils 版仅返回 string。
+// 两者服务于不同消费方（ParseNCMResult.format 需要 mime），刻意保留而非合并，
+// 避免跨模块类型重构；测试覆盖了本版的完整返回对象。
 export function detectAudioFormat(data: Uint8Array): AudioFormat {
   if (data[0] === 0x49 && data[1] === 0x44 && data[2] === 0x33) return { ext: 'mp3', mime: 'audio/mpeg' };
   if (data[0] === 0xff && (data[1] & 0xe0) === 0xe0) return { ext: 'mp3', mime: 'audio/mpeg' };

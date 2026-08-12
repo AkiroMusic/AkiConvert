@@ -998,7 +998,7 @@ function SettingsPanel(): JSX.Element {
 
       {/* Max Concurrent Conversions + Auto */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
-        <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
+        <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: settings.autoConcurrent ? 'var(--text-tertiary)' : 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
           {t('settings.concurrentLimit')}: <strong>{settings.concurrentLimit}</strong>
           <InfoTooltip text={t('tooltip.concurrentLimit')} />
         </label>
@@ -1008,6 +1008,7 @@ function SettingsPanel(): JSX.Element {
           max={10}
           step={1}
           value={settings.concurrentLimit}
+          disabled={settings.autoConcurrent}
           onChange={(e) => {
             const val = Number(e.target.value)
             setConcurrentLimit(val)
@@ -1017,7 +1018,8 @@ function SettingsPanel(): JSX.Element {
             width: '100%',
             accentColor: 'var(--accent)',
             height: '6px',
-            cursor: 'pointer',
+            cursor: settings.autoConcurrent ? 'not-allowed' : 'pointer',
+            opacity: settings.autoConcurrent ? 0.4 : 1,
             marginBottom: 'var(--space-3)'
           }}
         />

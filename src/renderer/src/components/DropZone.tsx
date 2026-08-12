@@ -157,22 +157,12 @@ function DropZone(): JSX.Element {
       }
 
       if (dropped.length > 0) {
-        // Ensure output directory is selected
-        if (!outputDir) {
-          window.akiConvert.selectFolder().then((dir) => {
-            if (dir) {
-              setOutputDir(dir)
-              useAppStore.getState().setSettings({ outputDir: dir })
-              window.akiConvert.setSettings({ outputDir: dir }).catch(() => {})
-              handleFilesAddedWithEstimate(dropped)
-            }
-          })
-        } else {
-          handleFilesAddedWithEstimate(dropped)
-        }
+        // 导入阶段不再弹出保存目录选择：输出目录的确认推迟到
+        // 点击“转换”时进行（FileList.convertAll 在未设置目录时弹出）。
+        handleFilesAddedWithEstimate(dropped)
       }
     },
-    [handleFilesAddedWithEstimate, isConverting, outputDir, setOutputDir]
+    [handleFilesAddedWithEstimate, isConverting]
   )
 
   const handleSelectOutputDir = useCallback(async () => {

@@ -2,12 +2,15 @@
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
+[![CI](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml/badge.svg)](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml)
 
 A cross-platform desktop audio format converter built with Electron. Decrypts proprietary music formats (NCM, KWM, KGM, QMC, KGG) and converts between standard audio formats — all processing is done **entirely offline** on your local machine.
 
 > **Developer**: [Akiro](https://akiromusic.com) (AkiroMusic) · Contact: [akiromusic@qq.com](mailto:akiromusic@qq.com)
 
 > **History**: This project was originally named **Format Converter**. The formal version has been renamed to **AkiConvert** starting from v2.0.0. It is part of the **Aki series** of software.
+
+> **Changelog**: See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ---
 
@@ -147,12 +150,15 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
+[![CI](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml/badge.svg)](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml)
 
 一款基于 Electron 构建的跨平台桌面音频格式转换工具。解密专有音乐格式（NCM、KWM、KGM、QMC、KGG），并在标准音频格式之间进行转换——**所有处理完全在本地离线完成**。
 
 > **开发者**：[Akiro](https://akiromusic.com)（AkiroMusic）· 联系：[akiromusic@qq.com](mailto:akiromusic@qq.com)
 
 > **历史说明**：本项目原名为 **Format Converter**，自 v2.0.0 起正式更名为 **AkiConvert**，属于 **Aki 系列**软件之一。
+
+> **更新日志**：完整版本历史见 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 

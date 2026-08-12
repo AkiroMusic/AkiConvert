@@ -26,6 +26,10 @@ release/
 *.dmg
 *.blockmap
 *.yml
+# GitHub Actions workflows 需纳入版本控制（* .yml 仅针对 release 产物元数据）
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
 
 # Electron
 *.asar

@@ -1,6 +1,6 @@
 # AkiConvert
 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/AkiroMusic/AkiConvert?label=License)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
 [![CI](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml/badge.svg)](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml)
 
@@ -148,7 +148,7 @@ Copyright © 2026 [Akiro](https://akiromusic.com) (AkiroMusic). All rights reser
 
 # AkiConvert（音频格式转换工具）
 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/AkiroMusic/AkiConvert?label=License)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiConvert)](https://github.com/AkiroMusic/AkiConvert/releases)
 [![CI](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml/badge.svg)](https://github.com/AkiroMusic/AkiConvert/actions/workflows/ci.yml)
 

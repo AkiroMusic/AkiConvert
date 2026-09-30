@@ -282,7 +282,7 @@
     "@types/sql.js": "^1.4.9",
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
-    "electron": "^43.3.0",
+    "electron": "^43.7.6",
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "postcss": "^8.4.49",

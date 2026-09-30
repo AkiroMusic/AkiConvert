@@ -41,11 +41,12 @@ export function buffersEqual(a: Uint8Array, b: Uint8Array): boolean {
 }
 
 /**
- * Detect audio format by sniffing the header bytes.
- * Returns extension string like "mp3", "flac", "ogg", "wav", "m4a".
+ * Sniff the audio container format from the header bytes.
+ * Returns an extension string like "mp3", "flac", "ogg", "wav", "m4a",
+ * or null when no known signature matches.
  */
-export function detectAudioFormat(data: Uint8Array): string {
-  if (data.length < 4) return 'mp3'
+export function sniffAudioExt(data: Uint8Array): string | null {
+  if (data.length < 4) return null
   // ID3 (MP3 with metadata)
   if (data[0] === 0x49 && data[1] === 0x44 && data[2] === 0x33) return 'mp3'
   // fLaC
@@ -58,5 +59,13 @@ export function detectAudioFormat(data: Uint8Array): string {
   if (data[0] === 0xff && (data[1] & 0xe0) === 0xe0) return 'mp3'
   // ftyp at offset 4 (M4A/MP4)
   if (data.length >= 8 && data[4] === 0x66 && data[5] === 0x74 && data[6] === 0x79 && data[7] === 0x70) return 'm4a'
-  return 'mp3'
+  return null
+}
+
+/**
+ * Detect audio format by sniffing the header bytes.
+ * Returns extension string like "mp3", "flac", "ogg", "wav", "m4a".
+ */
+export function detectAudioFormat(data: Uint8Array): string {
+  return sniffAudioExt(data) ?? 'mp3'
 }

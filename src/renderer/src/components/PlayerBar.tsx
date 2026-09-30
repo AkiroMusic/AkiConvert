@@ -188,7 +188,7 @@ function PlayerBar(): JSX.Element {
 
   return (
     <div
-      className="glass-surface"
+      className="material-frosted"
       style={{
         padding: 'var(--space-3) var(--space-6)',
         flexShrink: 0
@@ -199,18 +199,41 @@ function PlayerBar(): JSX.Element {
         style={{ width: '100%', maxWidth: '960px', margin: '0 auto', gap: 'var(--space-2)' }}
       >
         {/* Cover */}
-        <img
-          src={coverSrc || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="%235B606E"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>'}
-          alt={currentFile.songName || ''}
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: 'var(--radius-sm)',
-            objectFit: 'cover',
-            backgroundColor: 'var(--surface-2)',
-            flexShrink: 0
-          }}
-        />
+        {coverSrc ? (
+          <img
+            src={coverSrc}
+            alt={currentFile.songName || ''}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: 'var(--radius-sm)',
+              objectFit: 'cover',
+              backgroundColor: 'var(--surface-2)',
+              flexShrink: 0
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--surface-2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-tertiary)',
+              flexShrink: 0
+            }}
+            aria-hidden
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+          </div>
+        )}
 
         {/* Info + Progress */}
         <div className="flex-1" style={{ minWidth: 0 }}>
@@ -242,20 +265,21 @@ function PlayerBar(): JSX.Element {
               onClick={handleSeek}
               style={{
                 flex: 1,
-                height: '4px',
-                backgroundColor: 'var(--border)',
-                borderRadius: 'var(--radius-sm)',
+                height: '6px',
+                backgroundColor: 'color-mix(in srgb, var(--text-primary) 8%, transparent)',
+                borderRadius: 'var(--radius-full)',
                 cursor: 'pointer',
-                position: 'relative'
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <div
                 style={{
                   width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
                   height: '100%',
-                  backgroundColor: 'var(--accent)',
-                  borderRadius: 'var(--radius-sm)',
-                  transition: 'width var(--duration-hover) var(--ease-default)'
+                  background: 'linear-gradient(90deg, var(--grad-a), var(--grad-b))',
+                  borderRadius: 'var(--radius-full)',
+                  transition: 'width var(--duration-spring) var(--ease-spring)'
                 }}
               />
             </div>
@@ -298,9 +322,10 @@ function PlayerBar(): JSX.Element {
           </svg>
         </button>
 
-        {/* Play/Pause button */}
+        {/* Play/Pause button — 播放中随曲目呼吸（§13.5，无 BPM 数据时按 1s 默认） */}
         <button
           onClick={togglePlay}
+          className={isPlaying ? 'pulse' : undefined}
           style={{
             width: '40px',
             height: '40px',
@@ -313,6 +338,7 @@ function PlayerBar(): JSX.Element {
             backgroundColor: 'var(--accent)',
             color: 'var(--bg-base)',
             flexShrink: 0,
+            boxShadow: 'var(--shadow-accent)',
             transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
           }}
           onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {

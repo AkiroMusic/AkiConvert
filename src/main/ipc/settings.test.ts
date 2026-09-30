@@ -182,7 +182,7 @@ describe('SimpleStore — schema load validation (L7)', () => {
       name: 'settings',
       schemaVersion: 1,
       validateKey: (key, value): boolean => {
-        if (key === 'theme') return ['system', 'dark', 'light', 'sepia', 'forest', 'ocean', 'lavender'].includes(value as string)
+        if (key === 'theme') return ['system', 'dark', 'amber', 'mint', 'pearl'].includes(value as string)
         if (key === 'concurrentLimit') return Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 10
         return true
       },
@@ -330,7 +330,7 @@ describe('SimpleStore — schema load validation (L7)', () => {
       join(tempDir, 'settings.json'),
       JSON.stringify({
         _version: 1,
-        theme: 'light',
+        theme: 'mint',
         language: 'en-US',
         outputFormat: 'flac',
         concurrentLimit: 5
@@ -351,7 +351,7 @@ describe('SimpleStore — schema load validation (L7)', () => {
       }
     })
 
-    expect(store.store.theme).toBe('light')
+    expect(store.store.theme).toBe('mint')
     expect(store.store.language).toBe('en-US')
     expect(store.store.outputFormat).toBe('flac')
     expect(store.store.concurrentLimit).toBe(5)

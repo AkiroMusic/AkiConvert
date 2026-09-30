@@ -129,7 +129,7 @@ function SettingsPanel(): JSX.Element {
   const [kggScanning, setKggScanning] = useState(false)
 
   useEffect(() => {
-    window.akiConvert.getKggKeyCount().then(setKggKeyCount).catch(() => {})
+    window.akiConvert?.getKggKeyCount().then(setKggKeyCount).catch(() => {})
   }, [])
 
   const handleImportKgg = useCallback(async () => {
@@ -289,40 +289,16 @@ function SettingsPanel(): JSX.Element {
         {t('settings.title')}
       </h2>
 
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.generalSection')}</h3>
 
       {/* Settings Import / Export */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
-          <button
-            onClick={handleExportSettings}
-            style={{
-              padding: 'var(--space-2) var(--space-4)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-2)',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontFamily: 'var(--font-sans)'
-            }}
-          >
+          <button onClick={handleExportSettings} className="btn-neutral">
             {t('settings.exportSettings')}
           </button>
-          <button
-            onClick={handleImportSettings}
-            style={{
-              padding: 'var(--space-2) var(--space-4)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-2)',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontFamily: 'var(--font-sans)'
-            }}
-          >
+          <button onClick={handleImportSettings} className="btn-neutral">
             {t('settings.importSettings')}
           </button>
         </div>
@@ -342,27 +318,17 @@ function SettingsPanel(): JSX.Element {
           {[
             { value: 'system', label: t('theme.system') },
             { value: 'dark', label: t('theme.dark') },
-            { value: 'light', label: t('theme.light') },
-            { value: 'sepia', label: t('theme.sepia') },
-            { value: 'forest', label: t('theme.forest') },
-            { value: 'ocean', label: t('theme.ocean') },
-            { value: 'lavender', label: t('theme.lavender') }
+            { value: 'amber', label: t('theme.amber') },
+            { value: 'mint', label: t('theme.mint') },
+            { value: 'pearl', label: t('theme.pearl') }
           ].map((opt) => {
             const isActive = settings.theme === opt.value
             return (
               <button
                 key={opt.value}
                 onClick={() => handleThemeChange(opt.value)}
-                style={{
-                  padding: 'var(--space-1) 10px',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-sans)'
-                }}
+                className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                style={{ fontSize: '12px' }}
               >
                 {opt.label}
               </button>
@@ -395,7 +361,7 @@ function SettingsPanel(): JSX.Element {
       {/* FFmpeg Status & Path Selection */}
       </div>
 
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.ffmpeg')}</h3>
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <div
@@ -455,16 +421,8 @@ function SettingsPanel(): JSX.Element {
             <button
               onClick={handleSelectFfmpeg}
               title={t('ffmpeg.selectBinaryTitle')}
-              style={{
-                padding: 'var(--space-1) var(--space-3)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--surface-2)',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontFamily: 'var(--font-sans)'
-              }}
+              className="btn-neutral"
+              style={{ padding: 'var(--space-1) var(--space-3)', fontSize: '12px' }}
             >
               {t('ffmpeg.selectBinary')}
             </button>
@@ -475,34 +433,25 @@ function SettingsPanel(): JSX.Element {
       {/* Conversion Presets */}
       </div>
 
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.presets')}</h3>
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-2)' }}>
-          {presets?.map((p) => {
-            const isActive = selectedPreset === p.id
-            const disabled = !ffmpegAvailable && p.outputFormat !== 'source'
-            return (
-              <button
-                key={p.id}
-                disabled={disabled}
-                onClick={() => handleSelectPreset(p.id)}
-                style={{
-                  padding: 'var(--space-1) 10px',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                  color: disabled ? 'var(--text-tertiary)' : isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: disabled ? 'not-allowed' : 'pointer',
-                  opacity: disabled ? 0.4 : 1,
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-sans)'
-                }}
-              >
-                {p.name}
-              </button>
-            )
-          })}
+            {presets?.map((p) => {
+              const isActive = selectedPreset === p.id
+              const disabled = !ffmpegAvailable && p.outputFormat !== 'source'
+              return (
+                <button
+                  key={p.id}
+                  disabled={disabled}
+                  onClick={() => handleSelectPreset(p.id)}
+                  className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                  style={{ fontSize: '12px' }}
+                >
+                  {p.name}
+                </button>
+              )
+            })}
         </div>
         {/* Save current settings as preset */}
         {ffmpegAvailable && (
@@ -512,31 +461,14 @@ function SettingsPanel(): JSX.Element {
               value={presetNameInput}
               onChange={(e) => setPresetNameInput(e.target.value)}
               placeholder={t('preset.saveAsName')}
-              style={{
-                flex: 1,
-                padding: 'var(--space-2) 10px',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--surface-1)',
-                border: '1px solid var(--border)',
-                color: 'var(--text-primary)',
-                fontSize: '12px',
-                fontFamily: 'var(--font-sans)',
-                outline: 'none'
-              }}
+              className="field-input"
+              style={{ flex: 1, fontSize: '12px' }}
             />
             <button
               onClick={handleSavePreset}
               disabled={!presetNameInput.trim()}
-              style={{
-                padding: 'var(--space-2) var(--space-3)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--surface-2)',
-                color: presetNameInput.trim() ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                cursor: presetNameInput.trim() ? 'pointer' : 'not-allowed',
-                fontSize: '12px',
-                fontFamily: 'var(--font-sans)'
-              }}
+              className="btn-neutral"
+              style={{ fontSize: '12px', color: presetNameInput.trim() ? undefined : 'var(--text-tertiary)' }}
             >
               {t('preset.saveAs')}
             </button>
@@ -546,7 +478,7 @@ function SettingsPanel(): JSX.Element {
 
       </div>
 
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.outputSection')}</h3>
 
       {/* Output Directory */}
@@ -556,34 +488,18 @@ function SettingsPanel(): JSX.Element {
         </label>
         <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
           <div
+            className="field-input"
             style={{
               flex: 1,
-              padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-1)',
-              border: '1px solid var(--border)',
-              color: settings.outputDir ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              fontSize: '13px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              color: settings.outputDir ? undefined : 'var(--text-tertiary)'
             }}
           >
             {settings.outputDir || t('settings.placeholder')}
           </div>
-          <button
-            onClick={handleBrowseOutputDir}
-            style={{
-              padding: 'var(--space-2) var(--space-4)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-2)',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontFamily: 'var(--font-sans)'
-            }}
-          >
+          <button onClick={handleBrowseOutputDir} className="btn-neutral">
             {t('actions.browse')}
           </button>
         </div>
@@ -598,38 +514,23 @@ function SettingsPanel(): JSX.Element {
           type="text"
           value={settings.filenameTemplate}
           onChange={(e) => handleTemplateChange(e.target.value)}
-          style={{
-            width: '100%',
-            padding: 'var(--space-2) var(--space-3)',
-            borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'var(--surface-1)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-primary)',
-            fontSize: '13px',
-            fontFamily: 'var(--font-mono)',
-            outline: 'none',
-            marginBottom: 'var(--space-2)'
-          }}
+          className="field-input"
+          style={{ width: '100%', fontFamily: 'var(--font-mono)', marginBottom: 'var(--space-2)' }}
         />
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-          {templatePresets.map((preset) => (
-            <button
-              key={preset.value}
-              onClick={() => handleTemplateChange(preset.value)}
-              style={{
-                padding: 'var(--space-1) 10px',
-                border: `1px solid ${settings.filenameTemplate === preset.value ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: settings.filenameTemplate === preset.value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                color: settings.filenameTemplate === preset.value ? 'var(--accent)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontFamily: 'var(--font-mono)'
-              }}
-            >
-              {preset.label}
-            </button>
-          ))}
+          {templatePresets.map((preset) => {
+            const isActive = settings.filenameTemplate === preset.value
+            return (
+              <button
+                key={preset.value}
+                onClick={() => handleTemplateChange(preset.value)}
+                className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
+              >
+                {preset.label}
+              </button>
+            )
+          })}
         </div>
         <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: 'var(--space-2)' }}>
           {t('settings.filenameHint')}
@@ -664,17 +565,8 @@ function SettingsPanel(): JSX.Element {
                   setOutputFormat(opt.value)
                   window.akiConvert.setSettings({ outputFormat: opt.value })
                 }}
-                style={{
-                  padding: 'var(--space-1) 10px',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                  color: disabled ? 'var(--text-tertiary)' : isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: disabled ? 'not-allowed' : 'pointer',
-                  opacity: disabled ? 0.4 : 1,
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-sans)'
-                }}
+                className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                style={{ fontSize: '12px' }}
               >
                 {opt.label}
               </button>
@@ -689,7 +581,7 @@ function SettingsPanel(): JSX.Element {
               marginTop: 'var(--space-3)',
               padding: '12px',
               borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-1)',
+              backgroundColor: 'var(--surface-2)',
               border: '1px solid var(--border)',
               fontSize: '13px',
               lineHeight: 1.5,
@@ -740,41 +632,33 @@ function SettingsPanel(): JSX.Element {
       </div>
 
       {/* Quality Settings */}
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.qualitySection')}</h3>
 
         {/* Bitrate (lossy only) */}
         {isLossy && (
-          <div style={{ marginBottom: 'var(--space-5)' }}>
+          <div style={{ marginBottom: 'var(--space-6)' }}>
             <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
               {t('settings.bitrate')}
               <InfoTooltip text={t('tooltip.bitrate')} />
             </label>
             <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-              {['128k', '192k', '256k', '320k'].map((rate) => {
-                const isActive = settings.bitrate === rate
-                return (
-                  <button
-                    key={rate}
-                    onClick={() => {
-                      setBitrate(rate)
-                      window.akiConvert.setSettings({ bitrate: rate })
-                    }}
-                    style={{
-                      padding: 'var(--space-1) 10px',
-                      border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                      color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-mono)'
-                    }}
-                  >
-                    {rate}
-                  </button>
-                )
-              })}
+            {['128k', '192k', '256k', '320k'].map((rate) => {
+              const isActive = settings.bitrate === rate
+              return (
+                <button
+                  key={rate}
+                  onClick={() => {
+                    setBitrate(rate)
+                    window.akiConvert.setSettings({ bitrate: rate })
+                  }}
+                  className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                  style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
+                >
+                  {rate}
+                </button>
+              )
+            })}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: 'var(--space-2)' }}>
               {t('settings.bitrateHint')}
@@ -784,7 +668,7 @@ function SettingsPanel(): JSX.Element {
 
         {/* VBR (lossy only) */}
         {isLossy && (
-          <div style={{ marginBottom: 'var(--space-5)' }}>
+          <div style={{ marginBottom: 'var(--space-6)' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', cursor: 'pointer' }}>
               <input
                 type="checkbox"
@@ -831,7 +715,7 @@ function SettingsPanel(): JSX.Element {
 
         {/* Compression Level (FLAC only) */}
         {settings.outputFormat === 'flac' && (
-          <div style={{ marginBottom: 'var(--space-5)' }}>
+          <div style={{ marginBottom: 'var(--space-6)' }}>
             <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
               {t('settings.compressionLevel')}: <strong>{settings.compressionLevel}</strong>
               <InfoTooltip text={t('tooltip.compression')} />
@@ -861,7 +745,7 @@ function SettingsPanel(): JSX.Element {
         )}
 
         {/* Sample Rate */}
-        <div style={{ marginBottom: 'var(--space-5)' }}>
+        <div style={{ marginBottom: 'var(--space-6)' }}>
           <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             {t('settings.sampleRate')}
             <InfoTooltip text={t('tooltip.sampleRate')} />
@@ -876,16 +760,8 @@ function SettingsPanel(): JSX.Element {
                     setSampleRate(rate)
                     window.akiConvert.setSettings({ sampleRate: rate })
                   }}
-                  style={{
-                    padding: 'var(--space-1) 10px',
-                    border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontFamily: 'var(--font-mono)'
-                  }}
+                  className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                  style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
                 >
                   {rate}
                 </button>
@@ -896,7 +772,7 @@ function SettingsPanel(): JSX.Element {
 
         {/* Bit Depth (PCM-based only) */}
         {isPcm && (
-          <div style={{ marginBottom: 'var(--space-5)' }}>
+          <div style={{ marginBottom: 'var(--space-6)' }}>
             <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
               {t('settings.bitDepth')}
               <InfoTooltip text={t('tooltip.bitDepth')} />
@@ -911,16 +787,8 @@ function SettingsPanel(): JSX.Element {
                       setBitDepth(depth)
                       window.akiConvert.setSettings({ bitDepth: depth })
                     }}
-                    style={{
-                      padding: 'var(--space-1) 10px',
-                      border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                      color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-mono)'
-                    }}
+                    className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                    style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
                   >
                     {depth}
                   </button>
@@ -948,9 +816,9 @@ function SettingsPanel(): JSX.Element {
       </div>
 
       {/* Loudness Normalization */}
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('loudness.title')}</h3>
-        <div style={{ marginBottom: 'var(--space-5)' }}>
+        <div style={{ marginBottom: 'var(--space-6)' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <input
               type="checkbox"
@@ -993,7 +861,7 @@ function SettingsPanel(): JSX.Element {
         </div>
       </div>
 
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>{t('settings.processingSection')}</h3>
 
       {/* Max Concurrent Conversions + Auto */}
@@ -1060,16 +928,8 @@ function SettingsPanel(): JSX.Element {
                   setDuplicateAction(opt.value)
                   window.akiConvert.setSettings({ duplicateAction: opt.value })
                 }}
-                style={{
-                  padding: 'var(--space-1) 10px',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-sans)'
-                }}
+                className={isActive ? 'seg-btn is-active' : 'seg-btn'}
+                style={{ fontSize: '12px' }}
               >
                 {opt.label}
               </button>
@@ -1080,14 +940,14 @@ function SettingsPanel(): JSX.Element {
       </div>
 
       {/* Key Management */}
-      <div className="double-bezel spring-in" style={groupCardStyle}>
+      <div className="double-bezel material-liquid spring-in" style={groupCardStyle}>
         <h3 style={sectionTitleStyle}>
           {t('settings.keyManagement')}
           <InfoTooltip text={t('tooltip.keyManagement')} />
         </h3>
 
         {/* QMCv2 Ekey */}
-        <div style={{ marginBottom: 'var(--space-5)' }}>
+        <div style={{ marginBottom: 'var(--space-6)' }}>
           <label style={{ display: 'block', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             {t('settings.qmcEkey')}
           </label>
@@ -1099,22 +959,13 @@ function SettingsPanel(): JSX.Element {
               window.akiConvert.setSettings({ qmcEkey: e.target.value })
             }}
             placeholder={t('settings.qmcEkeyHint')}
-            style={{
-              width: '100%',
-              padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-1)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-primary)',
-              fontSize: '13px',
-              fontFamily: 'var(--font-mono)',
-              outline: 'none'
-            }}
+            className="field-input"
+            style={{ width: '100%', fontFamily: 'var(--font-mono)' }}
           />
         </div>
 
         {/* KGG Keys */}
-        <div style={{ marginBottom: 'var(--space-5)' }}>
+        <div style={{ marginBottom: 'var(--space-6)' }}>
           <label style={{ display: 'block', fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             {t('settings.kggKeys')}
           </label>
@@ -1128,32 +979,14 @@ function SettingsPanel(): JSX.Element {
             <button
               onClick={handleImportKgg}
               disabled={kggScanning}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--surface-2)',
-                color: kggScanning ? 'var(--text-tertiary)' : 'var(--text-primary)',
-                cursor: kggScanning ? 'not-allowed' : 'pointer',
-                fontSize: '13px',
-                fontFamily: 'var(--font-sans)'
-              }}
+              className="btn-neutral"
             >
               {kggScanning ? t('settings.scanning') : t('settings.importKggKeys')}
             </button>
             <button
               onClick={handleScanKgg}
               disabled={kggScanning}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--surface-2)',
-                color: kggScanning ? 'var(--text-tertiary)' : 'var(--text-primary)',
-                cursor: kggScanning ? 'not-allowed' : 'pointer',
-                fontSize: '13px',
-                fontFamily: 'var(--font-sans)'
-              }}
+              className="btn-neutral"
             >
               {kggScanning ? t('settings.scanning') : t('settings.scanKggKeys')}
             </button>

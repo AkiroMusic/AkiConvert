@@ -58,7 +58,7 @@ function ConversionSummaryModal({ success, fail, total, durationMs, onClose }: P
       onClick={onClose}
     >
       <div
-        className="double-bezel spring-in"
+        className="double-bezel material-liquid spring-in"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '360px',
@@ -84,18 +84,18 @@ function ConversionSummaryModal({ success, fail, total, durationMs, onClose }: P
         <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', marginBottom: 'var(--space-4)' }}>
           {success > 0 && (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-mono)' }}>{success}</div>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>{success}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{t('summary.success', { count: success })}</div>
             </div>
           )}
           {fail > 0 && (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-mono)' }}>{fail}</div>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>{fail}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{t('summary.fail', { count: fail })}</div>
             </div>
           )}
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{total}</div>
+            <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>{total}</div>
             <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{t('summary.total', { count: total })}</div>
           </div>
         </div>
@@ -107,27 +107,7 @@ function ConversionSummaryModal({ success, fail, total, durationMs, onClose }: P
 
         {/* Close button */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: 'var(--space-2) var(--space-8)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent)'
-            }}
-          >
+          <button onClick={onClose} className="btn-primary">
             {t('summary.close')}
           </button>
         </div>

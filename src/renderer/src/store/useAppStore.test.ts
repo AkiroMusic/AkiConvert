@@ -24,7 +24,7 @@ describe('applyPersistedSettings', () => {
       persistedSettings({
         outputDir: 'D:\\out',
         language: 'zh-CN',
-        theme: 'ocean',
+        theme: 'amber',
         outputFormat: 'flac',
         concurrentLimit: 5
       })
@@ -34,7 +34,7 @@ describe('applyPersistedSettings', () => {
     expect(state.outputDir).toBe('D:\\out')
     expect(state.settings.outputDir).toBe('D:\\out')
     expect(state.settings.language).toBe('zh-CN')
-    expect(state.settings.theme).toBe('ocean')
+    expect(state.settings.theme).toBe('amber')
     expect(state.settings.outputFormat).toBe('flac')
     expect(state.settings.concurrentLimit).toBe(5)
   })

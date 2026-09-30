@@ -100,11 +100,6 @@
   "format.opus": "Opus",
   "format.plainAudio": "Plain audio",
   "theme.dark": "Dark",
-  "theme.light": "Light",
-  "theme.sepia": "Sepia",
-  "theme.forest": "Forest",
-  "theme.ocean": "Ocean",
-  "theme.lavender": "Lavender",
   "history.title": "Conversion History",
   "history.empty": "No history yet",
   "history.clear": "Clear History",
@@ -230,5 +225,9 @@
   "loudness.louder": "-6 LUFS (louder)",
   "loudness.enable": "Normalize loudness (EBU R128)",
   "loudness.target": "Target Loudness",
-  "loudness.targetHint": "-14 LUFS is the standard for streaming platforms (Spotify, Apple Music, YouTube). Higher LUFS values (closer to -6) produce louder output; lower values (closer to -23) produce quieter output."
+  "loudness.targetHint": "-14 LUFS is the standard for streaming platforms (Spotify, Apple Music, YouTube). Higher LUFS values (closer to -6) produce louder output; lower values (closer to -23) produce quieter output.",
+  "theme.amber": "Amber",
+  "theme.mint": "Mint",
+  "theme.pearl": "Pearl",
+  "quotes.tagline": "The space between notes is where the story lives."
 }

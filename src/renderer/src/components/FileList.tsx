@@ -10,6 +10,7 @@ import { resolveConcurrency } from '../utils/concurrency'
 import { runConversionBatches } from '../utils/conversion'
 import { basenameFromPath } from '../utils/path'
 import FileItem from './FileItem'
+import { StarTrio } from './Sparkle'
 
 interface Props {
   onConversionComplete?: (success: number, fail: number, total: number, durationMs: number) => void
@@ -336,7 +337,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   if (files.length === 0) {
     return (
       <div
-        className="double-bezel spring-in flex flex-col items-center justify-center"
+        className="double-bezel material-liquid spring-in flex flex-col items-center justify-center"
         style={{
           padding: 'var(--space-8)',
           marginBottom: 'var(--space-6)',
@@ -344,10 +345,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
           fontSize: '14px'
         }}
       >
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ marginBottom: '12px', opacity: 0.5 }}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-        </svg>
+        <StarTrio style={{ marginBottom: 'var(--space-3)' }} />
         {t('status.noFiles')}
       </div>
     )
@@ -360,7 +358,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
   })
 
   return (
-    <div className="double-bezel spring-in flex flex-col flex-1" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+    <div className="double-bezel material-liquid spring-in flex flex-col flex-1" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* FFmpeg unavailable warning */}
       {!ffmpegAvailable && needsFfmpeg && (
         <div
@@ -404,29 +402,13 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         <button
           onClick={removeSelected}
           disabled={selectedIds.length === 0}
+          className="btn-neutral"
           style={{
             height: '28px',
             padding: '0 12px',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            cursor: selectedIds.length === 0 ? 'not-allowed' : 'pointer',
-            fontFamily: 'var(--font-sans)',
             fontSize: '12px',
             fontWeight: 500,
-            backgroundColor: 'var(--surface-2)',
-            color: selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-            opacity: selectedIds.length === 0 ? 0.5 : 1,
-            transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-          }}
-          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-            if (selectedIds.length > 0) {
-              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 8%, var(--surface-2))'
-              e.currentTarget.style.color = 'var(--text-primary)'
-            }
-          }}
-          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.backgroundColor = 'var(--surface-2)'
-            e.currentTarget.style.color = selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)'
+            color: selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)'
           }}
         >
           {t('actions.removeSelected', { count: selectedIds.length })}
@@ -434,24 +416,13 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         {hasErrors && (
           <button
             onClick={retryAll}
+            className="btn-neutral"
             style={{
               height: '28px',
               padding: '0 12px',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
               fontSize: '12px',
               fontWeight: 500,
-              backgroundColor: 'var(--surface-2)',
-              color: 'var(--error)',
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--error) 12%, var(--surface-2))'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-2)'
+              color: 'var(--error)'
             }}
           >
             {t('actions.retryAll')}
@@ -501,30 +472,18 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         {isConverting && !isPaused ? (
           <button
             onClick={handlePause}
+            className="btn-ghost"
             style={{
               height: '40px',
               padding: '0 24px',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '14px',
-              fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 'var(--space-2)',
-              backgroundColor: 'var(--surface-2)',
-              color: 'var(--text-primary)',
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 8%, var(--surface-2))'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-2)'
+              fontSize: '14px',
+              fontWeight: 500
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <rect x="6" y="4" width="4" height="16" rx="1" />
               <rect x="14" y="4" width="4" height="16" rx="1" />
             </svg>
@@ -533,30 +492,15 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         ) : isPaused ? (
           <button
             onClick={handleResume}
+            className="btn-primary"
             style={{
               height: '40px',
-              padding: '0 24px',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '14px',
-              fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 'var(--space-2)',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)',
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent)'
+              gap: 'var(--space-2)'
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
             {t('resume.title')}
@@ -565,31 +509,9 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
           <button
             onClick={convertAll}
             disabled={!hasPending}
-            style={{
-              height: '40px',
-              padding: '0 24px',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              cursor: !hasPending ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '14px',
-              fontWeight: 500,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)',
-              opacity: !hasPending ? 0.6 : 1,
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default), opacity var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              if (hasPending) e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent)'
-            }}
+            className={hasPending ? 'cta-capsule flow-shimmer' : 'cta-capsule'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <polyline points="23 4 23 10 17 10" />
               <polyline points="1 20 1 14 7 14" />
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
@@ -600,34 +522,18 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         <button
           onClick={clearAllHandler}
           disabled={files.length === 0}
+          className="btn-ghost"
           style={{
             height: '40px',
             padding: '0 24px',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            cursor: 'pointer',
-            fontFamily: 'var(--font-sans)',
             fontSize: '14px',
             fontWeight: 500,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 'var(--space-2)',
-            backgroundColor: 'transparent',
-            color: 'var(--text-secondary)',
-            transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-          }}
-          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.borderColor = 'var(--text-tertiary)'
-            e.currentTarget.style.color = 'var(--text-primary)'
-            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
-          }}
-          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.borderColor = 'var(--border)'
-            e.currentTarget.style.color = 'var(--text-secondary)'
-            e.currentTarget.style.backgroundColor = 'transparent'
+            gap: 'var(--space-2)'
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polyline points="3 6 5 6 21 6" />
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
@@ -636,34 +542,18 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         <button
           onClick={clearCompletedHandler}
           disabled={!files.some((f) => f.status === 'success' || f.status === 'error')}
+          className="btn-ghost"
           style={{
             height: '40px',
             padding: '0 24px',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            cursor: 'pointer',
-            fontFamily: 'var(--font-sans)',
             fontSize: '14px',
             fontWeight: 500,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 'var(--space-2)',
-            backgroundColor: 'transparent',
-            color: 'var(--text-secondary)',
-            transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-          }}
-          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.borderColor = 'var(--text-tertiary)'
-            e.currentTarget.style.color = 'var(--text-primary)'
-            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'
-          }}
-          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.style.borderColor = 'var(--border)'
-            e.currentTarget.style.color = 'var(--text-secondary)'
-            e.currentTarget.style.backgroundColor = 'transparent'
+            gap: 'var(--space-2)'
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
@@ -672,30 +562,15 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
         {hasSuccesses && (
           <button
             onClick={downloadAllHandler}
+            className="btn-primary"
             style={{
               height: '40px',
-              padding: '0 24px',
-              border: '1px solid var(--accent)',
-              borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '14px',
-              fontWeight: 500,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 'var(--space-2)',
-              backgroundColor: 'transparent',
-              color: 'var(--accent)',
-              transition: 'border-color var(--duration-hover) var(--ease-default), background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--accent) 10%, transparent)'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
+              gap: 'var(--space-2)'
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -717,7 +592,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
             }}
           >
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>
                 {stats.total}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -725,7 +600,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>
                 {stats.success}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -733,7 +608,7 @@ function FileList({ onConversionComplete }: Props): JSX.Element {
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-sans)', fontFeatureSettings: "'tnum'", letterSpacing: '-0.01em' }}>
                 {stats.fail}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>

@@ -98,7 +98,7 @@ const SETTABLE_KEYS = new Set<keyof AppSettings>([
 const VALIDATORS: Partial<Record<keyof AppSettings, (v: unknown) => boolean>> = {
   language: (v) => v === 'zh-CN' || v === 'en-US',
   languageSet: (v) => typeof v === 'boolean',
-  theme: (v) => ['system', 'dark', 'light', 'sepia', 'forest', 'ocean', 'lavender'].includes(v as string),
+  theme: (v) => ['system', 'dark', 'amber', 'mint', 'pearl'].includes(v as string),
   outputDir: (v) => typeof v === 'string' && v.length <= 4096,
   filenameTemplate: (v) => typeof v === 'string' && v.length <= 200,
   outputFormat: (v) => v === 'source' || OUTPUT_FORMATS.includes(v as string),

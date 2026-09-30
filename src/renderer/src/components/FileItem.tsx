@@ -93,12 +93,15 @@ const FileItem = memo(function FileItem({ file, index }: FileItemProps): JSX.Ele
     }
   }
 
+  // 状态染色：保留 .material-liquid 的镜面高光层，把状态色混进液体底色
+  const LIQUID_SURFACE =
+    'linear-gradient(160deg, color-mix(in srgb, var(--text-primary) 5%, transparent) 0%, transparent 42%)'
   const getStatusBg = (): string => {
     switch (file.status) {
-      case 'converting': return 'color-mix(in srgb, var(--accent) 5%, transparent)'
-      case 'success': return 'color-mix(in srgb, var(--success) 5%, transparent)'
-      case 'error': return 'color-mix(in srgb, var(--error) 5%, transparent)'
-      default: return 'transparent'
+      case 'converting': return `${LIQUID_SURFACE}, color-mix(in srgb, var(--accent) 5%, var(--liquid-bg))`
+      case 'success': return `${LIQUID_SURFACE}, color-mix(in srgb, var(--success) 5%, var(--liquid-bg))`
+      case 'error': return `${LIQUID_SURFACE}, color-mix(in srgb, var(--error) 5%, var(--liquid-bg))`
+      default: return `${LIQUID_SURFACE}, var(--liquid-bg)`
     }
   }
 
@@ -203,7 +206,7 @@ const FileItem = memo(function FileItem({ file, index }: FileItemProps): JSX.Ele
   return (
     <>
     <div
-      className="double-bezel spring-in flex items-center"
+      className="double-bezel material-liquid spring-in flex items-center"
       draggable
       data-file-id={file.id}
       onDragStart={handleDragStart}
@@ -371,9 +374,9 @@ const FileItem = memo(function FileItem({ file, index }: FileItemProps): JSX.Ele
             <div
               style={{
                 flex: 1,
-                height: '3px',
-                backgroundColor: 'var(--border)',
-                borderRadius: 'var(--radius-sm)',
+                height: '6px',
+                backgroundColor: 'color-mix(in srgb, var(--text-primary) 8%, transparent)',
+                borderRadius: 'var(--radius-full)',
                 overflow: 'hidden'
               }}
             >
@@ -381,9 +384,9 @@ const FileItem = memo(function FileItem({ file, index }: FileItemProps): JSX.Ele
                 style={{
                   height: '100%',
                   width: `${Math.round(file.progress * 100)}%`,
-                  backgroundColor: 'var(--accent)',
-                  borderRadius: 'var(--radius-sm)',
-                  transition: 'width var(--duration-hover) var(--ease-default)'
+                  background: 'linear-gradient(90deg, var(--grad-a), var(--grad-b))',
+                  borderRadius: 'var(--radius-full)',
+                  transition: 'width var(--duration-spring) var(--ease-spring)'
                 }}
               />
             </div>

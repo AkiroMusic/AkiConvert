@@ -24,7 +24,7 @@ A cross-platform desktop audio format converter built with Electron. Decrypts pr
 | **Conversion History** | Persistent history with status filtering, clear, and retry capabilities |
 | **Loudness Normalization** | EBU R128 standard (−23 to −6 LUFS), with presets matched to streaming platform targets |
 | **Lyrics** | Extract embedded lyrics from source files; embed companion `.lrc` files during conversion |
-| **Themes** | 7 themes: System, Dark, Light, Sepia, Forest, Ocean, Lavender |
+| **Themes** | 4 color packs (Aurora Glass system): Dark · Aurora Dusk, Amber, Mint (light), Pearl (light), plus System follow |
 | **i18n** | English & 简体中文, auto-detected or user-selected |
 | **Encrypted Key Management** | QMCv2 ekey and KGG key database import for decryption of key-protected formats |
 | **Conversion Presets** | Save and load preset configurations (format, bitrate, sample rate, etc.) |
@@ -172,7 +172,7 @@ Copyright © 2026 [Akiro](https://akiromusic.com) (AkiroMusic). All rights reser
 | **转换历史** | 持久化历史记录，支持状态过滤、清除和重试 |
 | **响度标准化** | EBU R128 标准（−23 ~ −6 LUFS），提供流媒体平台目标预设 |
 | **歌词** | 提取源文件内嵌歌词；转换时嵌入同目录 `.lrc` 歌词文件 |
-| **主题** | 7 种主题：跟随系统、深色、浅色、暖棕、森林、海洋、薰衣草 |
+| **主题** | 4 套配色包（Aurora Glass 设计系统）：深色·Aurora Dusk、琥珀、薄荷（浅色）、珍珠（浅色），另支持跟随系统 |
 | **多语言** | 简体中文 & English，自动检测或手动选择 |
 | **密钥管理** | 导入 QMCv2 ekey 和 KGG 密钥数据库，解密受密钥保护的音乐格式 |
 | **转换预设** | 保存和加载预设配置（格式、比特率、采样率等） |

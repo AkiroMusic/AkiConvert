@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { StarTrio } from './Sparkle'
 
 interface HistoryRecord {
   ts: number
@@ -52,7 +53,7 @@ function HistoryView(): JSX.Element {
   if (loading) {
     return (
       <div
-        className="double-bezel spring-in"
+        className="double-bezel material-liquid spring-in"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -72,11 +73,13 @@ function HistoryView(): JSX.Element {
   if (records.length === 0) {
     return (
       <div
-        className="double-bezel spring-in"
+        className="double-bezel material-liquid spring-in"
         style={{
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: 'var(--space-3)',
           height: '200px',
           color: 'var(--text-secondary)',
           fontSize: '14px',
@@ -84,13 +87,14 @@ function HistoryView(): JSX.Element {
           marginBottom: 'var(--space-6)'
         }}
       >
+        <StarTrio />
         {t('history.empty')}
       </div>
     )
   }
 
   return (
-    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+    <div className="double-bezel material-liquid spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* Header */}
       <div
         style={{
@@ -142,14 +146,21 @@ function HistoryView(): JSX.Element {
         </button>
       </div>
 
-      {/* Records list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      {/* Records list — 表格行样式（§12.10）：分隔线 + hover 染色 */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {records.map((record, index) => (
           <div
             key={`${record.ts}-${index}`}
-            className="double-bezel spring-in"
             style={{
-              padding: 'var(--space-3) var(--space-4)'
+              padding: 'var(--space-3) var(--space-2)',
+              borderBottom: '1px solid var(--border)',
+              transition: 'background-color var(--duration-hover) var(--ease-default)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--accent) 4%, transparent)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
             {/* Main row */}

@@ -9,7 +9,7 @@ import { useAppStore } from '../store/useAppStore'
 import LanguageSwitcher from './LanguageSwitcher'
 import AppIcon from './AppIcon'
 
-const THEME_ORDER: string[] = ['dark', 'light', 'sepia', 'forest', 'ocean', 'lavender']
+const THEME_ORDER: string[] = ['dark', 'amber', 'mint', 'pearl']
 
 function nextThemeName(current: string): string {
   const base = current === 'system' ? 'dark' : current
@@ -73,7 +73,7 @@ function TitleBar(): JSX.Element {
 
   return (
     <div
-      className="glass-surface"
+      className="material-frosted"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -92,7 +92,7 @@ function TitleBar(): JSX.Element {
         <AppIcon size={20} />
         <span
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: '14px',
             color: 'var(--accent)',
             letterSpacing: '0.5px',
@@ -117,7 +117,7 @@ function TitleBar(): JSX.Element {
       >
         <LanguageSwitcher />
 
-        {/* Theme toggle */}
+        {/* Theme toggle — cycles the 4 color packs */}
         <button
           onClick={handleToggleTheme}
           style={{
@@ -130,28 +130,20 @@ function TitleBar(): JSX.Element {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px',
             transition: 'color var(--duration-hover) var(--ease-default)'
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
           title={t('theme.' + nextThemeName(settings.theme))}
+          aria-label={t('theme.' + nextThemeName(settings.theme))}
         >
-          {settings.theme === 'dark' ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2v-1.2c0-.9.7-1.6 1.6-1.6h1.6c1 0 1.8-.8 1.8-1.8 0-.5-.2-1-.6-1.3A9 9 0 0 0 12 3z" />
+            <circle cx="8.5" cy="10" r="0.6" fill="currentColor" />
+            <circle cx="12" cy="7.5" r="0.6" fill="currentColor" />
+            <circle cx="15.5" cy="10" r="0.6" fill="currentColor" />
+          </svg>
         </button>
 
         {/* Windows window controls */}
@@ -169,11 +161,16 @@ function TitleBar(): JSX.Element {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'; e.currentTarget.style.color = 'var(--text-primary)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)' }}
               title={t('titlebar.minimize')}
+              aria-label={t('titlebar.minimize')}
             >
-              ─
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden>
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
             </button>
             <button
               onClick={() => window.akiConvert?.toggleMaximize()}
@@ -187,17 +184,20 @@ function TitleBar(): JSX.Element {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--text-primary) 6%, transparent)'; e.currentTarget.style.color = 'var(--text-primary)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)' }}
               title={t(isMaximized ? 'titlebar.restore' : 'titlebar.maximize')}
+              aria-label={t(isMaximized ? 'titlebar.restore' : 'titlebar.maximize')}
             >
               {isMaximized ? (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
                   <rect x="2" y="4" width="10" height="8" rx="1" />
                   <path d="M4 4V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1" />
                 </svg>
               ) : (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
                   <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" />
                 </svg>
               )}
@@ -214,14 +214,17 @@ function TitleBar(): JSX.Element {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '14px',
-                transition: 'background-color var(--duration-hover) var(--ease-default)'
+                transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
               }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e81123'; e.currentTarget.style.color = '#fff' }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)' }}
               title={t('titlebar.close')}
+              aria-label={t('titlebar.close')}
             >
-              ✕
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden>
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
             </button>
           </>
         )}

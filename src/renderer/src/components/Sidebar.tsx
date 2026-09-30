@@ -60,11 +60,12 @@ function Sidebar({ currentView, onNavigate }: SidebarProps): JSX.Element {
         key={item.id}
         onClick={() => onNavigate(item.id)}
         title={t(item.labelKey)}
+        aria-label={t(item.labelKey)}
         style={{
           width: 'calc(100% - 16px)',
           height: '52px',
           border: 'none',
-          borderRadius: 'var(--radius-sm)',
+          borderRadius: '14px',
           margin: '1px 8px',
           cursor: 'pointer',
           display: 'flex',
@@ -76,8 +77,9 @@ function Sidebar({ currentView, onNavigate }: SidebarProps): JSX.Element {
             ? 'color-mix(in srgb, var(--accent) 13%, transparent)'
             : 'transparent',
           color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+          boxShadow: isActive ? 'var(--glow-sm), inset 0 1px 0 var(--specular)' : 'none',
           transition:
-            'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
+            'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default), box-shadow var(--duration-spring) var(--ease-spring), transform var(--duration-spring) var(--ease-spring)'
         }}
         onMouseEnter={(e) => {
           if (!isActive) {

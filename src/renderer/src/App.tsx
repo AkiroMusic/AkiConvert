@@ -79,11 +79,12 @@ function App(): JSX.Element {
   }, [])
 
   // ===== System theme support =====
-  const resolveSystemTheme = useCallback(async (): Promise<'dark' | 'light'> => {
+  // OS 只报 dark/light：dark → 主配色包（:root），light → Mint 浅色包
+  const resolveSystemTheme = useCallback(async (): Promise<'dark' | 'mint'> => {
     try {
-      return await window.akiConvert.getSystemTheme()
+      return await window.akiConvert.getSystemTheme().then((t) => (t === 'light' ? 'mint' : 'dark'))
     } catch {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'mint'
     }
   }, [])
 
@@ -105,16 +106,17 @@ function App(): JSX.Element {
     if (settingsTheme !== 'system') return
 
     const unsub = window.akiConvert?.onSystemThemeChanged((systemTheme) => {
-      document.documentElement.dataset.theme = systemTheme
-      window.akiConvert?.setAppIcon(systemTheme)
+      const theme = systemTheme === 'light' ? 'mint' : 'dark'
+      document.documentElement.dataset.theme = theme
+      window.akiConvert?.setAppIcon(theme)
     })
     // Also listen via CSS media query as fallback
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const handler = (): void => {
       if (settingsTheme === 'system') {
-        const t = mq.matches ? 'dark' : 'light'
-        document.documentElement.dataset.theme = t
-        window.akiConvert?.setAppIcon(t)
+        const theme = mq.matches ? 'dark' : 'mint'
+        document.documentElement.dataset.theme = theme
+        window.akiConvert?.setAppIcon(theme)
       }
     }
     mq.addEventListener('change', handler)
@@ -247,9 +249,10 @@ function App(): JSX.Element {
 
   return (
     <div className="flex flex-col w-full h-screen" style={{ backgroundColor: 'var(--bg-base)', position: 'relative' }}>
-      <div className="ambient-bg" />
-      <div className="noise-overlay" />
+      <div className="aurora-bg" />
+      <div className="aurora-sweep" />
       <StarBackground />
+      <div className="noise-overlay" />
       <TitleBar />
       <div className="flex flex-1 overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
         <Sidebar currentView={currentView} onNavigate={setCurrentView} />
@@ -268,13 +271,13 @@ function App(): JSX.Element {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 2000,
-            padding: '8px 20px',
-            borderRadius: 'var(--radius-sm)',
+            padding: 'var(--space-2) 20px',
+            borderRadius: 'var(--radius-md)',
             backgroundColor: 'var(--surface-2)',
             border: '1px solid var(--border)',
             color: 'var(--text-secondary)',
             fontSize: '13px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            boxShadow: 'var(--shadow-2)',
             animation: 'fadeIn 0.2s ease'
           }}
         >
@@ -297,7 +300,7 @@ function App(): JSX.Element {
 
       {/* Footer bar */}
       <div
-        className="glass-surface"
+        className="material-frosted"
         style={{
           height: '28px',
           padding: '0 var(--space-4)',
@@ -311,7 +314,20 @@ function App(): JSX.Element {
           userSelect: 'none'
         }}
       >
-        <span>&copy; 2026 Akiro (AkiroMusic)</span>
+        <span style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', overflow: 'hidden' }}>
+          <span>&copy; 2026 Akiro (AkiroMusic)</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontStyle: 'italic',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {t('quotes.tagline')}
+          </span>
+        </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <a
             href="mailto:akiromusic@qq.com"

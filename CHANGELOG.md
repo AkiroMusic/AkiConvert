@@ -9,6 +9,32 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Changed
+- **UI overhauled to the "Aurora Glass" design system v2**: gradient-ramp
+  color packs replace the old flat palettes — Dark · Aurora Dusk (new default
+  base `#0C1220`), Amber Afterglow, Mint Fresh (light) and Pearl Blush Mist
+  (light); the previous Light/Sepia/Forest/Ocean/Lavender themes were removed
+  (persisted old theme values fall back to Dark automatically).
+- Content cards are now liquid-glass Lite (specular highlight + inner shade,
+  zero backdrop cost) with the double-bezel shell; TitleBar/Footer/PlayerBar
+  are true frosted glass (blur 16px); progress bars and the play button take
+  the gradient ramp; the Convert button is the app's signature shimmer capsule.
+- Segmented buttons, neutral buttons and text inputs share new style classes
+  with proper hover/focus feedback; removed an undefined `--space-5` token
+  usage and an emoji placeholder icon (replaced with inline SVG).
+- Window background matches the Dark pack (`#0C1220`) to avoid startup flash;
+  Tailwind font stack no longer references Inter (banned font, asset deleted).
+
+### Fixed
+- **KWM (Kuwo) decryption produced corrupted output for every file**: the
+  seed is now read as uint64 LE at offset 0x18 and the mask cycles the seed's
+  decimal string (was: uint32 at 0x10 with zero-fill); the header's declared
+  format tag is used when payload sniffing is inconclusive. Regression-tested
+  against independently computed reference masks (`kwm.test.ts`).
+- Encrypted sources whose decryption fails header verification now abort with
+  a clear error instead of silently writing an unplayable output file, and
+  `verifyAudioHeader` no longer misjudges ID3-tagged MP3s as invalid.
+
 ## [2.2.0] - 2026-08-12
 
 ### Changed

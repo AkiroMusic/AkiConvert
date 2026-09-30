@@ -14,7 +14,7 @@ export function createWindow(): BrowserWindow {
     height: 800,
     minWidth: 1000,
     minHeight: 700,
-    backgroundColor: '#0E1016',
+    backgroundColor: '#0C1220',
     show: false,
     frame: false,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',

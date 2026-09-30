@@ -175,7 +175,7 @@ function DropZone(): JSX.Element {
   }, [setOutputDir])
 
   return (
-    <div className="double-bezel spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+    <div className="double-bezel material-liquid spring-in" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
       {/* Output directory selector */}
       <div
         className="flex items-center"
@@ -319,7 +319,7 @@ function DropZone(): JSX.Element {
           marginTop: 'var(--space-4)',
           padding: '12px 16px',
           borderRadius: 'var(--radius-md)',
-          backgroundColor: 'var(--surface-1)',
+          backgroundColor: 'var(--surface-2)',
           border: '1px solid var(--border)',
           fontSize: '12px',
           lineHeight: 1.6
@@ -352,7 +352,7 @@ function FormatBadge({ ext, label, desc, dimmed }: { ext: string; label: string;
         display: 'inline-flex',
         alignItems: 'center',
         gap: '4px',
-        opacity: dimmed ? 0.5 : 1
+        opacity: dimmed ? 0.65 : 1
       }}
     >
       <code
@@ -361,7 +361,8 @@ function FormatBadge({ ext, label, desc, dimmed }: { ext: string; label: string;
           fontSize: '11px',
           padding: '1px 5px',
           borderRadius: 'var(--radius-sm)',
-          backgroundColor: 'var(--surface-2)',
+          backgroundColor: dimmed ? 'var(--surface-2)' : 'color-mix(in srgb, var(--accent) 8%, transparent)',
+          border: dimmed ? '1px solid var(--border)' : '1px solid color-mix(in srgb, var(--accent) 18%, transparent)',
           color: dimmed ? 'var(--text-tertiary)' : 'var(--accent)'
         }}
       >

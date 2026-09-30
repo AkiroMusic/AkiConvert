@@ -65,19 +65,19 @@ function ContextMenu({ x, y, items, onClose }: ContextMenuProps): JSX.Element {
   return (
     <div
       ref={menuRef}
+      className="material-liquid"
       style={{
         position: 'fixed',
         left: `${adjustedPos.x}px`,
         top: `${adjustedPos.y}px`,
         zIndex: 9999,
         minWidth: '170px',
-        backgroundColor: 'var(--surface-1)',
-        border: '1px solid var(--border)',
         borderRadius: 'var(--radius-md)',
         padding: 'var(--space-1)',
         boxShadow: 'var(--shadow-3)',
         overflow: 'hidden'
       }}
+      role="menu"
     >
       {items.map((item, i) => {
         if (item.separator) {

@@ -25,7 +25,7 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
     setLoading(true)
     setError(null)
 
-    window.akiConvert.extractLyrics(filePath)
+    window.akiConvert?.extractLyrics(filePath)
       .then((result) => {
         if (cancelled) return
         setLyrics(result)
@@ -58,7 +58,7 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
       onClick={onClose}
     >
       <div
-        className="double-bezel spring-in"
+        className="double-bezel material-liquid spring-in"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '480px',
@@ -128,27 +128,7 @@ function LyricsDialog({ filePath, fileName, onClose }: LyricsDialogProps): JSX.E
 
         {/* Close button */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-4)' }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: 'var(--space-2) var(--space-6)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)',
-              transition: 'background-color var(--duration-hover) var(--ease-default), color var(--duration-hover) var(--ease-default)'
-            }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent-hover)'
-            }}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.backgroundColor = 'var(--accent)'
-            }}
-          >
+          <button onClick={onClose} className="btn-primary">
             {t('summary.close')}
           </button>
         </div>

@@ -7,31 +7,51 @@ module.exports = {
         bg: {
           base: 'var(--bg-base)',
           surface1: 'var(--surface-1)',
-          surface2: 'var(--surface-2)'
+          surface2: 'var(--surface-2)',
+          contrast: 'var(--surface-contrast)'
         },
         border: 'var(--border)',
         text: {
           primary: 'var(--text-primary)',
           secondary: 'var(--text-secondary)',
-          tertiary: 'var(--text-tertiary)'
+          tertiary: 'var(--text-tertiary)',
+          'on-contrast': 'var(--text-on-contrast)',
+          'on-contrast-secondary': 'var(--text-on-contrast-secondary)'
         },
         accent: {
           DEFAULT: 'var(--accent)',
-          hover: 'var(--accent-hover)'
+          hover: 'var(--accent-hover)',
+          secondary: 'var(--accent-secondary)',
+          tertiary: 'var(--accent-tertiary)'
+        },
+        grad: {
+          a: 'var(--grad-a)',
+          b: 'var(--grad-b)',
+          c: 'var(--grad-c)'
         },
         success: 'var(--success)',
-        error: 'var(--error)'
+        error: 'var(--error)',
+        warning: 'var(--warning)'
       },
       fontFamily: {
-        display: ['Fraunces', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'monospace']
+        display: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'ui-monospace', 'monospace']
       },
       borderRadius: {
-        sm: '8px',
-        md: '14px',
-        lg: '20px',
+        sm: '10px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
         full: '999px'
+      },
+      boxShadow: {
+        '1': 'var(--shadow-1)',
+        '2': 'var(--shadow-2)',
+        '3': 'var(--shadow-3)',
+        accent: 'var(--shadow-accent)',
+        'glow-sm': 'var(--glow-sm)',
+        'glow-md': 'var(--glow-md)'
       },
       spacing: {
         '1': '4px',

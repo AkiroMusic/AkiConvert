@@ -35,8 +35,25 @@ function UnlockAnimation({ status, progress }: UnlockAnimationProps): JSX.Elemen
           fontWeight: 600,
           color: status === 'success' ? 'var(--success)' : status === 'error' ? 'var(--error)' : 'var(--accent)'
         }}
+        aria-hidden
       >
-        {status === 'converting' ? Math.round(progress * 100) : status === 'success' ? '✓' : status === 'error' ? '✕' : '🔒'}
+        {status === 'converting' ? (
+          Math.round(progress * 100)
+        ) : status === 'success' ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : status === 'error' ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        )}
       </div>
     )
   }

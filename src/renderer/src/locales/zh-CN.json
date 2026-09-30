@@ -100,11 +100,6 @@
   "format.opus": "Opus",
   "format.plainAudio": "普通音频",
   "theme.dark": "深色",
-  "theme.light": "浅色",
-  "theme.sepia": "暖棕",
-  "theme.forest": "森林",
-  "theme.ocean": "海洋",
-  "theme.lavender": "薰衣草",
   "history.title": "转换历史",
   "history.empty": "暂无转换记录",
   "history.clear": "清空历史",
@@ -230,5 +225,9 @@
   "loudness.louder": "-6 LUFS（更响亮）",
   "loudness.enable": "启用响度标准化 (EBU R128)",
   "loudness.target": "目标响度",
-  "loudness.targetHint": "-14 LUFS 是流媒体平台（Spotify、Apple Music、YouTube）的标准。LUFS 值越高（越接近 -6）音量越大，越低（越接近 -23）音量越小。"
+  "loudness.targetHint": "-14 LUFS 是流媒体平台（Spotify、Apple Music、YouTube）的标准。LUFS 值越高（越接近 -6）音量越大，越低（越接近 -23）音量越小。",
+  "theme.amber": "琥珀",
+  "theme.mint": "薄荷",
+  "theme.pearl": "珍珠",
+  "quotes.tagline": "故事，住在音符与音符之间。"
 }

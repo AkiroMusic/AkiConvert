@@ -19,7 +19,7 @@ function AppIcon({ size = 22 }: AppIconProps): JSX.Element {
       width={size}
       height={size}
       style={{
-        borderRadius: '4px',
+        borderRadius: 'var(--radius-sm)',
         flexShrink: 0,
         display: 'block'
       }}

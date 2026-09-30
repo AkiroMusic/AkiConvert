@@ -9,6 +9,8 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-09-30
+
 ### Changed
 - **UI overhauled to the "Aurora Glass" design system v2**: gradient-ramp
   color packs replace the old flat palettes — Dark · Aurora Dusk (new default

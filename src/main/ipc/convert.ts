@@ -224,6 +224,13 @@ export function registerConvertHandlers(getMainWindow: () => BrowserWindow | nul
         // Verify decrypted audio header integrity
         decryptionVerified = verifyAudioHeader(audio, sourceFormat)
 
+        // 加密格式解密后头部校验失败，说明解密结果是乱码（密钥/算法不匹配
+        // 或源文件损坏）。继续走管线只会把乱码写成"损坏的输出文件"还报成
+        // 功，所以直接失败，交给 catch 给出 error.corruptOrKey 文案。
+        if (isEncrypted && !decryptionVerified) {
+          throw new Error('Decrypted audio failed header verification (' + sourceFormat + ')')
+        }
+
         sendProgress(0.6)
 
         // --- Determine effective output format ---
@@ -539,7 +546,8 @@ function verifyAudioHeader(audio: Uint8Array, format: string): boolean {
       // FLAC magic: fLaC at offset 0
       return audio[0] === 0x66 && audio[1] === 0x4c && audio[2] === 0x61 && audio[3] === 0x43
     case 'mp3':
-      // MP3 sync word: 0xFF 0xFB or 0xFF 0xFx or 0xFF 0xEx
+      // ID3-tagged MP3 or raw frame sync (0xFF 0xFx / 0xFF 0xEx)
+      if (audio[0] === 0x49 && audio[1] === 0x44 && audio[2] === 0x33) return true
       return audio[0] === 0xff && (audio[1] & 0xe0) === 0xe0
     case 'ogg':
     case 'opus':

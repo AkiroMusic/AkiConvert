@@ -1,6 +1,6 @@
 {
   "name": "akiconvert",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "AkiConvert - Multi-format audio conversion tool",
   "main": "./out/main/index.js",
   "author": "Akiro",

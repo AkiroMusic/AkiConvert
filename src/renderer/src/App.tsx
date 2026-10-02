@@ -314,20 +314,7 @@ function App(): JSX.Element {
           userSelect: 'none'
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', overflow: 'hidden' }}>
-          <span>&copy; 2026 Akiro (AkiroMusic)</span>
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontStyle: 'italic',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}
-          >
-            {t('quotes.tagline')}
-          </span>
-        </span>
+        <span>&copy; 2026 Akiro (AkiroMusic)</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <a
             href="mailto:akiromusic@qq.com"

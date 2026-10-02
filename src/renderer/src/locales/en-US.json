@@ -228,6 +228,5 @@
   "loudness.targetHint": "-14 LUFS is the standard for streaming platforms (Spotify, Apple Music, YouTube). Higher LUFS values (closer to -6) produce louder output; lower values (closer to -23) produce quieter output.",
   "theme.amber": "Amber",
   "theme.mint": "Mint",
-  "theme.pearl": "Pearl",
-  "quotes.tagline": "The space between notes is where the story lives."
+  "theme.pearl": "Pearl"
 }
